@@ -1,5 +1,19 @@
 import { db, doc, onSnapshot, setDoc, getDoc } from '../lib/firebase';
-import { PRINCIPAL_INFO } from '../data/schoolData';
+import { 
+  PRINCIPAL_INFO, 
+  PROGRAMS_UNGGULAN, 
+  NEWS_LIST, 
+  FACILITIES_LIST, 
+  EXTRACURRICULAR_LIST, 
+  ACHIEVEMENTS_LIST 
+} from '../data/schoolData';
+import { 
+  ProgramUnggulan, 
+  NewsItem, 
+  FacilityItem, 
+  ExtracurricularItem, 
+  AchievementItem 
+} from '../types';
 
 export interface HeroSlideContent {
   id: number;
@@ -23,6 +37,11 @@ export interface PrincipalProfileContent {
 export interface SchoolSiteContent {
   heroSlides: HeroSlideContent[];
   principal: PrincipalProfileContent;
+  programs: ProgramUnggulan[];
+  news: NewsItem[];
+  facilities: FacilityItem[];
+  extracurriculars: ExtracurricularItem[];
+  achievements: AchievementItem[];
   updatedAt?: number;
   updatedBy?: string;
 }
@@ -84,6 +103,11 @@ export const DEFAULT_PRINCIPAL_CONTENT: PrincipalProfileContent = {
 export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
   heroSlides: DEFAULT_HERO_SLIDES,
   principal: DEFAULT_PRINCIPAL_CONTENT,
+  programs: PROGRAMS_UNGGULAN,
+  news: NEWS_LIST,
+  facilities: FACILITIES_LIST,
+  extracurriculars: EXTRACURRICULAR_LIST,
+  achievements: ACHIEVEMENTS_LIST,
 };
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
@@ -109,6 +133,21 @@ export function subscribeToSiteContent(
               ...DEFAULT_PRINCIPAL_CONTENT,
               ...(data.principal || {}),
             },
+            programs: Array.isArray(data.programs) && data.programs.length > 0
+              ? data.programs
+              : PROGRAMS_UNGGULAN,
+            news: Array.isArray(data.news) && data.news.length > 0
+              ? data.news
+              : NEWS_LIST,
+            facilities: Array.isArray(data.facilities) && data.facilities.length > 0
+              ? data.facilities
+              : FACILITIES_LIST,
+            extracurriculars: Array.isArray(data.extracurriculars) && data.extracurriculars.length > 0
+              ? data.extracurriculars
+              : EXTRACURRICULAR_LIST,
+            achievements: Array.isArray(data.achievements) && data.achievements.length > 0
+              ? data.achievements
+              : ACHIEVEMENTS_LIST,
             updatedAt: data.updatedAt,
             updatedBy: data.updatedBy,
           };
@@ -154,10 +193,17 @@ export async function resetSiteContentToDefaultInFirestore(): Promise<void> {
   await setDoc(CONTENT_DOC_REF, {
     heroSlides: DEFAULT_HERO_SLIDES,
     principal: DEFAULT_PRINCIPAL_CONTENT,
+    programs: PROGRAMS_UNGGULAN,
+    news: NEWS_LIST,
+    facilities: FACILITIES_LIST,
+    extracurriculars: EXTRACURRICULAR_LIST,
+    achievements: ACHIEVEMENTS_LIST,
     updatedAt: Date.now(),
     updatedBy: 'admin_ilham (reset)',
   });
 }
+
+export const resetSiteContentToDefaults = resetSiteContentToDefaultInFirestore;
 
 /**
  * Helper to compress user-uploaded image for optimal Firestore storage and ultra-fast loading

@@ -11,15 +11,21 @@ import {
 import { FACILITIES_LIST } from '../data/schoolData';
 import { FacilityItem } from '../types';
 
-export const FacilitiesSection: React.FC = () => {
+interface FacilitiesSectionProps {
+  facilitiesData?: FacilityItem[];
+}
+
+export const FacilitiesSection: React.FC<FacilitiesSectionProps> = ({ facilitiesData }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Semua');
   const [selectedFacility, setSelectedFacility] = useState<FacilityItem | null>(null);
 
   const categories = ['Semua', 'Akademik', 'Olahraga', 'Seni & Budaya', 'Penunjang'];
 
+  const allFacilities = (facilitiesData && facilitiesData.length > 0) ? facilitiesData : FACILITIES_LIST;
+
   const filteredFacilities = activeCategory === 'Semua'
-    ? FACILITIES_LIST
-    : FACILITIES_LIST.filter((f) => f.category === activeCategory);
+    ? allFacilities
+    : allFacilities.filter((f) => f.category === activeCategory);
 
   return (
     <section id="fasilitas" className="py-16 sm:py-20 bg-white border-b border-slate-200">

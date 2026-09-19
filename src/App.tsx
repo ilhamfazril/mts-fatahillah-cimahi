@@ -118,12 +118,15 @@ export default function App() {
               isAdmin={isAdmin}
               onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
             />
-            <ProgramsSection />
+            <ProgramsSection programsData={currentContent.programs} />
             <PsbSection onOpenPsbModal={() => setIsPsbModalOpen(true)} />
-            <NewsSection onSelectArticle={(article) => setSelectedArticle(article)} />
-            <FacilitiesSection />
-            <ExtracurricularSection />
-            <AchievementsSection />
+            <NewsSection 
+              newsData={currentContent.news} 
+              onSelectArticle={(article) => setSelectedArticle(article)} 
+            />
+            <FacilitiesSection facilitiesData={currentContent.facilities} />
+            <ExtracurricularSection extracurricularsData={currentContent.extracurriculars} />
+            <AchievementsSection achievementsData={currentContent.achievements} />
             <TestimonialsSection />
             <ContactSection />
           </>
@@ -152,7 +155,7 @@ export default function App() {
             />
             <HistorySection />
             <TeachersSection />
-            <FacilitiesSection />
+            <FacilitiesSection facilitiesData={currentContent.facilities} />
           </div>
         )}
 
@@ -208,7 +211,7 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <ProgramsSection />
+            <ProgramsSection programsData={currentContent.programs} />
             <PsbSection onOpenPsbModal={() => setIsPsbModalOpen(true)} />
           </div>
         )}
@@ -225,8 +228,8 @@ export default function App() {
                 </h1>
               </div>
             </div>
-            <ExtracurricularSection />
-            <AchievementsSection />
+            <ExtracurricularSection extracurricularsData={currentContent.extracurriculars} />
+            <AchievementsSection achievementsData={currentContent.achievements} />
           </div>
         )}
 
@@ -242,7 +245,7 @@ export default function App() {
                 </h1>
               </div>
             </div>
-            <AchievementsSection />
+            <AchievementsSection achievementsData={currentContent.achievements} />
             <TestimonialsSection />
           </div>
         )}
@@ -259,7 +262,7 @@ export default function App() {
                 </h1>
               </div>
             </div>
-            <FacilitiesSection />
+            <FacilitiesSection facilitiesData={currentContent.facilities} />
           </div>
         )}
 
@@ -295,7 +298,10 @@ export default function App() {
                 </h1>
               </div>
             </div>
-            <NewsSection onSelectArticle={(article) => setSelectedArticle(article)} />
+            <NewsSection 
+              newsData={currentContent.news}
+              onSelectArticle={(article) => setSelectedArticle(article)} 
+            />
           </div>
         )}
 
@@ -362,6 +368,10 @@ export default function App() {
           setSelectedArticle(article);
         }}
         onNavigateTab={handleNavigate}
+        newsList={currentContent.news}
+        programsList={currentContent.programs}
+        facilitiesList={currentContent.facilities}
+        extracurricularList={currentContent.extracurriculars}
       />
 
       {/* Admin Login Modal (Username: admin_ilham, Password: ilhamfazril) */}

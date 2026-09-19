@@ -18,8 +18,13 @@ import {
   Headphones
 } from 'lucide-react';
 import { EXTRACURRICULAR_LIST } from '../data/schoolData';
+import { ExtracurricularItem } from '../types';
 
-export const ExtracurricularSection: React.FC = () => {
+interface ExtracurricularSectionProps {
+  extracurricularsData?: ExtracurricularItem[];
+}
+
+export const ExtracurricularSection: React.FC<ExtracurricularSectionProps> = ({ extracurricularsData }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Semua');
 
   const categories = [
@@ -30,9 +35,13 @@ export const ExtracurricularSection: React.FC = () => {
     'Bahasa & Keorganisasian'
   ];
 
+  const allItems = (extracurricularsData && extracurricularsData.length > 0)
+    ? extracurricularsData
+    : EXTRACURRICULAR_LIST;
+
   const filteredItems = activeCategory === 'Semua'
-    ? EXTRACURRICULAR_LIST
-    : EXTRACURRICULAR_LIST.filter((item) => item.category === activeCategory);
+    ? allItems
+    : allItems.filter((item) => item.category === activeCategory);
 
   const getIcon = (iconName: string) => {
     switch (iconName) {

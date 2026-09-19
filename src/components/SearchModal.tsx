@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { Search, X, ChevronRight, FileText, Sparkles, Trophy, Building2 } from 'lucide-react';
 import { NEWS_LIST, PROGRAMS_UNGGULAN, FACILITIES_LIST, EXTRACURRICULAR_LIST } from '../data/schoolData';
-import { NewsItem } from '../types';
+import { NewsItem, ProgramUnggulan, FacilityItem, ExtracurricularItem } from '../types';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectArticle: (article: NewsItem) => void;
   onNavigateTab: (tab: string) => void;
+  newsList?: NewsItem[];
+  programsList?: ProgramUnggulan[];
+  facilitiesList?: FacilityItem[];
+  extracurricularList?: ExtracurricularItem[];
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -15,15 +19,24 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onClose,
   onSelectArticle,
   onNavigateTab,
+  newsList,
+  programsList,
+  facilitiesList,
+  extracurricularList,
 }) => {
   const [query, setQuery] = useState('');
 
   if (!isOpen) return null;
 
+  const actualNews = newsList || NEWS_LIST;
+  const actualPrograms = programsList || PROGRAMS_UNGGULAN;
+  const actualFacilities = facilitiesList || FACILITIES_LIST;
+  const actualEkskul = extracurricularList || EXTRACURRICULAR_LIST;
+
   const normalizedQuery = query.toLowerCase().trim();
 
   const matchingNews = normalizedQuery
-    ? NEWS_LIST.filter(
+    ? actualNews.filter(
         (n) =>
           n.title.toLowerCase().includes(normalizedQuery) ||
           n.excerpt.toLowerCase().includes(normalizedQuery) ||
@@ -32,7 +45,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     : [];
 
   const matchingPrograms = normalizedQuery
-    ? PROGRAMS_UNGGULAN.filter(
+    ? actualPrograms.filter(
         (p) =>
           p.title.toLowerCase().includes(normalizedQuery) ||
           p.shortDesc.toLowerCase().includes(normalizedQuery)
@@ -40,7 +53,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     : [];
 
   const matchingFacilities = normalizedQuery
-    ? FACILITIES_LIST.filter(
+    ? actualFacilities.filter(
         (f) =>
           f.name.toLowerCase().includes(normalizedQuery) ||
           f.description.toLowerCase().includes(normalizedQuery)
@@ -48,7 +61,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     : [];
 
   const matchingEkskul = normalizedQuery
-    ? EXTRACURRICULAR_LIST.filter(
+    ? actualEkskul.filter(
         (e) =>
           e.name.toLowerCase().includes(normalizedQuery) ||
           e.description.toLowerCase().includes(normalizedQuery) ||

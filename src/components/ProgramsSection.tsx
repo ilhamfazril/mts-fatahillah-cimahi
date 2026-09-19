@@ -13,8 +13,14 @@ import {
 import { PROGRAMS_UNGGULAN } from '../data/schoolData';
 import { ProgramUnggulan } from '../types';
 
-export const ProgramsSection: React.FC = () => {
+interface ProgramsSectionProps {
+  programsData?: ProgramUnggulan[];
+}
+
+export const ProgramsSection: React.FC<ProgramsSectionProps> = ({ programsData }) => {
   const [selectedProgram, setSelectedProgram] = useState<ProgramUnggulan | null>(null);
+
+  const programs = (programsData && programsData.length > 0) ? programsData : PROGRAMS_UNGGULAN;
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -53,7 +59,7 @@ export const ProgramsSection: React.FC = () => {
 
         {/* Grid Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {PROGRAMS_UNGGULAN.map((program) => (
+          {programs.map((program) => (
             <div
               key={program.id}
               className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col group"

@@ -8,8 +8,17 @@ import {
   ExternalLink 
 } from 'lucide-react';
 import { ACHIEVEMENTS_LIST } from '../data/schoolData';
+import { AchievementItem } from '../types';
 
-export const AchievementsSection: React.FC = () => {
+interface AchievementsSectionProps {
+  achievementsData?: AchievementItem[];
+}
+
+export const AchievementsSection: React.FC<AchievementsSectionProps> = ({ achievementsData }) => {
+  const achievements = (achievementsData && achievementsData.length > 0)
+    ? achievementsData
+    : ACHIEVEMENTS_LIST;
+
   return (
     <section id="prestasi" className="py-16 sm:py-20 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,7 +39,7 @@ export const AchievementsSection: React.FC = () => {
 
         {/* Achievement Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {ACHIEVEMENTS_LIST.map((ach) => (
+          {achievements.map((ach) => (
             <div
               key={ach.id}
               className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"

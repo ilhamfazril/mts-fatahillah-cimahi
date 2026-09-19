@@ -13,18 +13,21 @@ import { NewsItem } from '../types';
 
 interface NewsSectionProps {
   onSelectArticle: (article: NewsItem) => void;
+  newsData?: NewsItem[];
 }
 
-export const NewsSection: React.FC<NewsSectionProps> = ({ onSelectArticle }) => {
+export const NewsSection: React.FC<NewsSectionProps> = ({ onSelectArticle, newsData }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Semua');
 
   const categories = ['Semua', 'Berita', 'Prestasi', 'Pengumuman', 'Agenda'];
 
-  const filteredNews = activeCategory === 'Semua'
-    ? NEWS_LIST
-    : NEWS_LIST.filter((n) => n.category === activeCategory);
+  const allNews = (newsData && newsData.length > 0) ? newsData : NEWS_LIST;
 
-  const featuredNews = NEWS_LIST.find((n) => n.featured) || NEWS_LIST[0];
+  const filteredNews = activeCategory === 'Semua'
+    ? allNews
+    : allNews.filter((n) => n.category === activeCategory);
+
+  const featuredNews = allNews.find((n) => n.featured) || allNews[0];
 
   return (
     <section id="berita" className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">

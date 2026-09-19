@@ -1,32 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ShieldCheck, 
   X, 
-  Save, 
-  Upload, 
-  RefreshCcw, 
-  Layers, 
+  LayoutDashboard, 
+  Image as ImageIcon, 
   UserCheck, 
-  CheckCircle2, 
-  AlertCircle, 
+  BookOpen, 
+  Newspaper, 
+  Building2, 
+  Activity, 
+  Trophy, 
+  Settings, 
   LogOut, 
-  Cloud, 
-  Sparkles,
-  Eye,
-  Camera,
-  FileText,
-  Trash2
+  CheckCircle2, 
+  RotateCcw, 
+  ShieldCheck, 
+  Download,
+  AlertCircle,
+  Database,
+  ChevronRight,
+  Menu
 } from 'lucide-react';
 import { 
   SchoolSiteContent, 
   HeroSlideContent, 
+  PrincipalProfileContent,
   saveSiteContentToFirestore, 
-  resetSiteContentToDefaultInFirestore,
-  compressImageForStorage,
+  resetSiteContentToDefaults,
   DEFAULT_HERO_SLIDES,
   DEFAULT_PRINCIPAL_CONTENT
 } from '../services/siteContentService';
-import { logoutAdmin, getAdminSession } from '../services/adminAuthService';
+import { getAdminSession } from '../services/adminAuthService';
+import { ProgramUnggulan, NewsItem, FacilityItem, ExtracurricularItem, AchievementItem } from '../types';
+import { PROGRAMS_UNGGULAN, NEWS_LIST, FACILITIES_LIST, EXTRACURRICULAR_LIST, ACHIEVEMENTS_LIST } from '../data/schoolData';
+
+import { AdminOverviewTab } from './admin/AdminOverviewTab';
+import { AdminHeroSlidesTab } from './admin/AdminHeroSlidesTab';
+import { AdminPrincipalTab } from './admin/AdminPrincipalTab';
+import { AdminProgramsTab } from './admin/AdminProgramsTab';
+import { AdminNewsTab } from './admin/AdminNewsTab';
+import { AdminFacilitiesTab } from './admin/AdminFacilitiesTab';
+import { AdminExtracurricularsTab } from './admin/AdminExtracurricularsTab';
+import { AdminAchievementsTab } from './admin/AdminAchievementsTab';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
@@ -35,637 +49,514 @@ interface AdminDashboardModalProps {
   onLogout: () => void;
 }
 
+type AdminTab = 
+  | 'overview' 
+  | 'slides' 
+  | 'principal' 
+  | 'programs' 
+  | 'news' 
+  | 'facilities' 
+  | 'extracurriculars' 
+  | 'achievements' 
+  | 'settings';
+
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   isOpen,
   onClose,
   siteContent,
   onLogout,
 }) => {
-  const [activeTab, setActiveTab] = useState<'slides' | 'principal' | 'sync'>('slides');
-  const [selectedSlideIndex, setSelectedSlideIndex] = useState<number>(0);
-  
-  // Working local state before saving to Firestore
-  const [slidesDraft, setSlidesDraft] = useState<HeroSlideContent[]>([]);
-  const [principalDraft, setPrincipalDraft] = useState(siteContent.principal);
-
-  const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [globalFeedback, setGlobalFeedback] = useState<string | null>(null);
 
   const session = getAdminSession();
 
-  // Sync draft whenever siteContent changes from Firestore or modal opens
+  // Close with Esc key
   useEffect(() => {
-    if (isOpen) {
-      setSlidesDraft(JSON.parse(JSON.stringify(siteContent.heroSlides)));
-      setPrincipalDraft(JSON.parse(JSON.stringify(siteContent.principal)));
-      setSaveSuccessMsg(null);
-      setErrorMsg(null);
-    }
-  }, [isOpen, siteContent]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  const currentSlide = slidesDraft[selectedSlideIndex] || DEFAULT_HERO_SLIDES[0];
-
-  const handleSlideFieldChange = (field: keyof HeroSlideContent, value: string) => {
-    setSlidesDraft((prev) => {
-      const updated = [...prev];
-      if (updated[selectedSlideIndex]) {
-        updated[selectedSlideIndex] = {
-          ...updated[selectedSlideIndex],
-          [field]: value,
-        };
-      }
-      return updated;
-    });
+  // Generic helper to update a part of siteContent and push to Firestore
+  const updateSiteSection = async (partial: Partial<SchoolSiteContent>) => {
+    const updated: SchoolSiteContent = {
+      ...siteContent,
+      ...partial,
+      updatedAt: new Date().toISOString(),
+      updatedBy: session?.username || 'admin_ilham',
+    };
+    await saveSiteContentToFirestore(updated);
   };
 
-  const handleSlideImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleSaveSlides = async (updatedSlides: HeroSlideContent[]) => {
+    await updateSiteSection({ heroSlides: updatedSlides });
+  };
 
+  const handleSavePrincipal = async (updatedPrincipal: PrincipalProfileContent) => {
+    await updateSiteSection({ principal: updatedPrincipal });
+  };
+
+  const handleSavePrograms = async (updatedPrograms: ProgramUnggulan[]) => {
+    await updateSiteSection({ programs: updatedPrograms });
+  };
+
+  const handleSaveNews = async (updatedNews: NewsItem[]) => {
+    await updateSiteSection({ news: updatedNews });
+  };
+
+  const handleSaveFacilities = async (updatedFacilities: FacilityItem[]) => {
+    await updateSiteSection({ facilities: updatedFacilities });
+  };
+
+  const handleSaveExtracurriculars = async (updatedExtracurriculars: ExtracurricularItem[]) => {
+    await updateSiteSection({ extracurriculars: updatedExtracurriculars });
+  };
+
+  const handleSaveAchievements = async (updatedAchievements: AchievementItem[]) => {
+    await updateSiteSection({ achievements: updatedAchievements });
+  };
+
+  const handleResetToDefaults = async () => {
     try {
-      setUploadProgress(`Mengoptimalkan foto slide ${selectedSlideIndex + 1}...`);
-      const optimizedDataUrl = await compressImageForStorage(file, 1600, 1000, 0.84);
-      handleSlideFieldChange('bgImage', optimizedDataUrl);
-      setUploadProgress(null);
+      setIsResetting(true);
+      await resetSiteContentToDefaults();
+      setIsResetConfirmOpen(false);
+      setGlobalFeedback('Seluruh data website berhasil dikembalikan ke standar awal.');
+      setTimeout(() => setGlobalFeedback(null), 5000);
     } catch (err) {
       console.error(err);
-      setErrorMsg('Gagal memproses file foto. Silakan gunakan format JPG/PNG yang valid.');
-      setUploadProgress(null);
-    }
-  };
-
-  const handlePrincipalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploadProgress('Mengoptimalkan foto Kepala Sekolah...');
-      const optimizedDataUrl = await compressImageForStorage(file, 800, 800, 0.88);
-      setPrincipalDraft((prev) => ({
-        ...prev,
-        photo: optimizedDataUrl,
-      }));
-      setUploadProgress(null);
-    } catch (err) {
-      console.error(err);
-      setErrorMsg('Gagal memproses foto Kepala Sekolah.');
-      setUploadProgress(null);
-    }
-  };
-
-  const handleSaveToCloud = async () => {
-    setIsSaving(true);
-    setErrorMsg(null);
-    setSaveSuccessMsg(null);
-
-    try {
-      await saveSiteContentToFirestore({
-        heroSlides: slidesDraft,
-        principal: principalDraft,
-      }, session?.username || 'admin_ilham');
-
-      setIsSaving(false);
-      setSaveSuccessMsg('Berhasil! Perubahan telah tersimpan di Firestore dan otomatis tampil di seluruh pengunjung.');
-      setTimeout(() => {
-        setSaveSuccessMsg(null);
-      }, 5000);
-    } catch (err) {
-      console.error('Save to Firestore error:', err);
-      setIsSaving(false);
-      setErrorMsg('Gagal menyimpan ke server Firestore. Periksa koneksi internet Anda.');
-    }
-  };
-
-  const handleResetToDefault = async () => {
-    if (!window.confirm('Apakah Anda yakin ingin mengembalikan semua slide dan profil Kepala Sekolah ke foto & teks bawaan asli?')) {
-      return;
-    }
-
-    setIsResetting(true);
-    setErrorMsg(null);
-    try {
-      await resetSiteContentToDefaultInFirestore();
-      setSlidesDraft(JSON.parse(JSON.stringify(DEFAULT_HERO_SLIDES)));
-      setPrincipalDraft(JSON.parse(JSON.stringify(DEFAULT_PRINCIPAL_CONTENT)));
+      alert('Gagal mengatur ulang data.');
+    } finally {
       setIsResetting(false);
-      setSaveSuccessMsg('Semua data berhasil di-reset ke pengaturan awal.');
-      setTimeout(() => setSaveSuccessMsg(null), 4000);
-    } catch (err) {
-      console.error(err);
-      setIsResetting(false);
-      setErrorMsg('Gagal me-reset data ke cloud.');
     }
   };
+
+  const handleExportBackup = () => {
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(siteContent, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `smp_pgri_5_cimahi_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const navItems = [
+    {
+      id: 'overview' as AdminTab,
+      label: 'Ringkasan & Status',
+      icon: <LayoutDashboard className="w-4 h-4" />,
+      badge: null,
+    },
+    {
+      id: 'slides' as AdminTab,
+      label: 'Slide Banner Hero',
+      icon: <ImageIcon className="w-4 h-4" />,
+      badge: siteContent.heroSlides?.length || 4,
+    },
+    {
+      id: 'principal' as AdminTab,
+      label: 'Profil Kepala Sekolah',
+      icon: <UserCheck className="w-4 h-4" />,
+      badge: null,
+    },
+    {
+      id: 'programs' as AdminTab,
+      label: 'Program Unggulan',
+      icon: <BookOpen className="w-4 h-4" />,
+      badge: siteContent.programs?.length || PROGRAMS_UNGGULAN.length,
+    },
+    {
+      id: 'news' as AdminTab,
+      label: 'Berita & Agenda',
+      icon: <Newspaper className="w-4 h-4" />,
+      badge: siteContent.news?.length || NEWS_LIST.length,
+    },
+    {
+      id: 'facilities' as AdminTab,
+      label: 'Fasilitas Sarana',
+      icon: <Building2 className="w-4 h-4" />,
+      badge: siteContent.facilities?.length || FACILITIES_LIST.length,
+    },
+    {
+      id: 'extracurriculars' as AdminTab,
+      label: 'Ekstrakurikuler',
+      icon: <Activity className="w-4 h-4" />,
+      badge: siteContent.extracurriculars?.length || EXTRACURRICULAR_LIST.length,
+    },
+    {
+      id: 'achievements' as AdminTab,
+      label: 'Prestasi Siswa',
+      icon: <Trophy className="w-4 h-4" />,
+      badge: siteContent.achievements?.length || ACHIEVEMENTS_LIST.length,
+    },
+    {
+      id: 'settings' as AdminTab,
+      label: 'Cadangan & Pengaturan',
+      icon: <Settings className="w-4 h-4" />,
+      badge: null,
+    },
+  ];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-slate-50 w-full h-full sm:h-[94vh] sm:w-[96vw] sm:max-w-7xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-700/50">
         
-        {/* Header Bar */}
-        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 px-6 py-4 text-white flex items-center justify-between border-b border-emerald-700/50 flex-shrink-0">
+        {/* Top Header Bar */}
+        <header className="bg-emerald-950 text-white px-4 sm:px-6 py-3.5 border-b border-emerald-800/80 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow">
-              <ShieldCheck className="w-5 h-5" />
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+              className="p-1.5 rounded-lg bg-emerald-900/80 text-emerald-200 md:hidden hover:bg-emerald-800"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">
+              P5
             </div>
+
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black tracking-tight">Panel Admin SMP PGRI 5 Cimahi</h2>
-                <span className="bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Cloud className="w-3 h-3 text-emerald-300" />
-                  Firestore Real-Time
+                <h2 className="text-sm sm:text-base font-extrabold tracking-tight text-white leading-none">
+                  Admin Panel SMP PGRI 5 Cimahi
+                </h2>
+                <span className="hidden sm:inline-flex items-center gap-1 bg-emerald-800/90 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-600/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Real-Time Sync
                 </span>
               </div>
-              <p className="text-xs text-emerald-200">
-                Ubah foto background, judul, dan profil kepala sekolah langsung tersinkron ke semua pengguna
+              <p className="text-[11px] text-emerald-300/80 hidden sm:block mt-0.5">
+                Pengelolaan Konten Mandiri & Sinkronisasi Cloud Firestore
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* User badge */}
-            <div className="hidden sm:flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-emerald-100 font-semibold">{session?.username || 'admin_ilham'}</span>
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* User Profile Info */}
+            <div className="hidden lg:flex items-center gap-2 bg-emerald-900/60 border border-emerald-700/50 px-3 py-1.5 rounded-xl text-xs">
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <div>
+                <span className="font-bold text-white block leading-none">
+                  {session?.displayName || 'Administrator'}
+                </span>
+                <span className="text-[10px] text-emerald-300 font-mono">
+                  @{session?.username || 'admin_ilham'}
+                </span>
+              </div>
             </div>
 
+            {/* Logout button */}
             <button
               type="button"
-              onClick={() => {
-                logoutAdmin();
-                onLogout();
-              }}
-              className="px-3 py-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
-              title="Keluar dari akun admin"
+              onClick={onLogout}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 hover:text-white border border-rose-800/60 rounded-xl text-xs font-bold transition-colors"
+              title="Keluar dari sesi Admin"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Keluar</span>
             </button>
 
+            {/* Close modal */}
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors ml-1"
-              title="Tutup"
+              className="p-1.5 sm:p-2 text-emerald-300 hover:text-white hover:bg-emerald-800/60 rounded-xl transition-colors"
+              title="Tutup Panel (Kembali ke Web)"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Tab Navigation */}
-        <div className="bg-slate-100/90 border-b border-slate-200 px-6 pt-3 flex items-center gap-2 flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => setActiveTab('slides')}
-            className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all border-t-2 ${
-              activeTab === 'slides'
-                ? 'bg-white text-emerald-800 border-emerald-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 border-transparent hover:bg-slate-200/60'
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <span>Slide Banner Hero (1 - 4)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('principal')}
-            className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all border-t-2 ${
-              activeTab === 'principal'
-                ? 'bg-white text-emerald-800 border-emerald-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 border-transparent hover:bg-slate-200/60'
-            }`}
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Foto & Profil Kepala Sekolah</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('sync')}
-            className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all border-t-2 ${
-              activeTab === 'sync'
-                ? 'bg-white text-emerald-800 border-emerald-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 border-transparent hover:bg-slate-200/60'
-            }`}
-          >
-            <Cloud className="w-4 h-4" />
-            <span>Status Cloud & Reset</span>
-          </button>
-        </div>
-
-        {/* Notifications */}
-        {saveSuccessMsg && (
-          <div className="bg-emerald-50 border-b border-emerald-200 px-6 py-2.5 text-xs text-emerald-800 font-bold flex items-center justify-between animate-in slide-in-from-top-1">
+        {/* Global Feedback Banner */}
+        {globalFeedback && (
+          <div className="bg-emerald-600 text-white text-xs font-semibold px-6 py-2.5 flex items-center justify-between animate-in fade-in">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>{saveSuccessMsg}</span>
+              <CheckCircle2 className="w-4 h-4 text-amber-300" />
+              <span>{globalFeedback}</span>
             </div>
-            <button onClick={() => setSaveSuccessMsg(null)} className="text-emerald-600 hover:text-emerald-900">
-              <X className="w-3.5 h-3.5" />
+            <button
+              type="button"
+              onClick={() => setGlobalFeedback(null)}
+              className="text-emerald-100 hover:text-white"
+            >
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {errorMsg && (
-          <div className="bg-rose-50 border-b border-rose-200 px-6 py-2.5 text-xs text-rose-800 font-bold flex items-center justify-between animate-in slide-in-from-top-1">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-            <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-900">
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
-
-        {uploadProgress && (
-          <div className="bg-amber-50 border-b border-amber-200 px-6 py-2 text-xs text-amber-900 font-semibold flex items-center gap-2">
-            <div className="w-3.5 h-3.5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-            <span>{uploadProgress}</span>
-          </div>
-        )}
-
-        {/* Modal Body (Scrollable) */}
-        <div className="flex-grow overflow-y-auto p-6 space-y-6">
+        {/* Main Body: Sidebar + Active Tab Content */}
+        <div className="flex flex-1 overflow-hidden relative">
           
-          {/* TAB 1: SLIDE BANNER HERO */}
-          {activeTab === 'slides' && (
-            <div className="space-y-6">
-              
-              {/* Slide Selector Buttons */}
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Pilih Slide yang Akan Diedit:
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {slidesDraft.map((slide, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setSelectedSlideIndex(idx)}
-                      className={`p-3 rounded-2xl text-left border transition-all flex flex-col justify-between ${
-                        selectedSlideIndex === idx
-                          ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-sm'
-                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className={`text-xs font-black px-2 py-0.5 rounded-full ${
-                          selectedSlideIndex === idx ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'
-                        }`}>
-                          Slide {idx + 1}
-                        </span>
-                        <span className="text-[10px] text-slate-400 truncate max-w-[80px]">
-                          {slide.badge}
-                        </span>
-                      </div>
-                      <p className="text-xs font-bold text-slate-900 truncate">
-                        {slide.title}
-                      </p>
-                    </button>
-                  ))}
-                </div>
+          {/* Sidebar Navigation */}
+          <aside
+            className={`absolute md:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-300 ease-in-out ${
+              isMobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+            }`}
+          >
+            <div className="p-3 overflow-y-auto space-y-1">
+              <div className="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                Menu Manajemen
               </div>
 
-              {/* Editor for Currently Selected Slide */}
-              <div className="bg-slate-50 rounded-3xl p-5 sm:p-6 border border-slate-200/80 space-y-5">
-                
-                {/* Photo Preview & Change Photo Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-                  
-                  {/* Photo Preview Card */}
-                  <div className="lg:col-span-5 flex flex-col space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Foto Background Slide {selectedSlideIndex + 1}
-                      </label>
-                    </div>
-
-                    <div className="relative aspect-video rounded-2xl overflow-hidden shadow-md border-2 border-slate-200 bg-slate-900 group">
-                      <img
-                        src={currentSlide.bgImage}
-                        alt={currentSlide.alt || `Slide ${selectedSlideIndex + 1}`}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-3">
-                        <span className="text-[11px] text-white font-semibold truncate">
-                          {currentSlide.title}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Upload button for this slide */}
-                    <div className="flex items-center gap-2">
-                      <label className="flex-grow cursor-pointer bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl text-center shadow transition-colors flex items-center justify-center gap-2">
-                        <Camera className="w-4 h-4 text-amber-300" />
-                        <span>Ganti Foto Slide {selectedSlideIndex + 1}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleSlideImageUpload}
-                          className="hidden"
-                        />
-                      </label>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const defaultImg = DEFAULT_HERO_SLIDES[selectedSlideIndex]?.bgImage;
-                          if (defaultImg) handleSlideFieldChange('bgImage', defaultImg);
-                        }}
-                        className="p-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-600 text-xs font-medium"
-                        title="Kembalikan foto bawaan slide ini"
-                      >
-                        <RefreshCcw className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-slate-500">
-                      Gunakan foto asli resolusi tajam. Sistem otomatis mengoptimalkan ukuran file.
-                    </p>
-                  </div>
-
-                  {/* Text Fields Editor */}
-                  <div className="lg:col-span-7 space-y-4">
-                    
-                    {/* Badge */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Kategori / Badge Kecil Atas
-                      </label>
-                      <input
-                        type="text"
-                        value={currentSlide.badge}
-                        onChange={(e) => handleSlideFieldChange('badge', e.target.value)}
-                        placeholder="Contoh: Sekolah Berkarakter & Humanis"
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
-
-                    {/* Judul Utama */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Judul Utama Slide (Headline)
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={currentSlide.title}
-                        onChange={(e) => handleSlideFieldChange('title', e.target.value)}
-                        placeholder="Masukkan judul utama slide..."
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-snug"
-                      />
-                    </div>
-
-                    {/* Subjudul */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Subjudul
-                      </label>
-                      <input
-                        type="text"
-                        value={currentSlide.subtitle}
-                        onChange={(e) => handleSlideFieldChange('subtitle', e.target.value)}
-                        placeholder="Masukkan subjudul slide..."
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
-
-                    {/* Deskripsi */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Deskripsi / Paragraf Penjelas
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={currentSlide.description}
-                        onChange={(e) => handleSlideFieldChange('description', e.target.value)}
-                        placeholder="Masukkan deskripsi penjelasan singkat..."
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed"
-                      />
-                    </div>
-
-                    {/* Tombol Utama */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                          Teks Tombol Utama
-                        </label>
-                        <input
-                          type="text"
-                          value={currentSlide.primaryBtn}
-                          onChange={(e) => handleSlideFieldChange('primaryBtn', e.target.value)}
-                          className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                          Teks Tombol Sekunder
-                        </label>
-                        <input
-                          type="text"
-                          value={currentSlide.secondaryBtn}
-                          onChange={(e) => handleSlideFieldChange('secondaryBtn', e.target.value)}
-                          className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: FOTO & PROFIL KEPALA SEKOLAH */}
-          {activeTab === 'principal' && (
-            <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200/80 space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                {/* Photo Column */}
-                <div className="lg:col-span-4 flex flex-col items-center text-center space-y-3">
-                  <div className="relative w-52 h-52 sm:w-56 sm:h-56 rounded-2xl overflow-hidden shadow-xl border-4 border-amber-400 bg-gradient-to-br from-emerald-800 to-teal-900 p-1">
-                    <img
-                      src={principalDraft.photo}
-                      alt={principalDraft.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover rounded-xl"
-                    />
-                  </div>
-
-                  <label className="cursor-pointer bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow transition-colors flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-amber-300" />
-                    <span>Upload Foto Kepala Sekolah</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePrincipalImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-
+              {navItems.map((item) => {
+                const isActive = activeTab === item.id;
+                return (
                   <button
+                    key={item.id}
                     type="button"
                     onClick={() => {
-                      setPrincipalDraft((prev) => ({
-                        ...prev,
-                        photo: DEFAULT_PRINCIPAL_CONTENT.photo,
-                      }));
+                      setActiveTab(item.id);
+                      setIsMobileNavOpen(false);
                     }}
-                    className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 underline"
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                      isActive
+                        ? 'bg-emerald-700 text-white shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
                   >
-                    <RefreshCcw className="w-3 h-3" />
-                    <span>Reset ke foto bawaan</span>
+                    <div className="flex items-center gap-2.5">
+                      <span className={isActive ? 'text-amber-300' : 'text-slate-400'}>
+                        {item.icon}
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.badge !== null && (
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isActive
+                            ? 'bg-emerald-800 text-emerald-100'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
                   </button>
-                </div>
-
-                {/* Info Fields */}
-                <div className="lg:col-span-8 space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Nama Lengkap & Gelar Kepala Sekolah
-                    </label>
-                    <input
-                      type="text"
-                      value={principalDraft.name}
-                      onChange={(e) => setPrincipalDraft({ ...principalDraft, name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Jabatan / Keterangan Lembaga
-                    </label>
-                    <input
-                      type="text"
-                      value={principalDraft.role}
-                      onChange={(e) => setPrincipalDraft({ ...principalDraft, role: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:ring-2 focus:ring-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Kutipan Sambutan Singkat (Quote)
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={principalDraft.quote}
-                      onChange={(e) => setPrincipalDraft({ ...principalDraft, quote: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-700 focus:ring-2 focus:ring-emerald-500 leading-relaxed"
-                    />
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
+
+            {/* Sidebar Footer Info */}
+            <div className="p-4 border-t border-slate-200 bg-slate-50/70 text-[11px] text-slate-500">
+              <div className="flex items-center gap-1.5 font-bold text-slate-700 mb-1">
+                <Database className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Cloud Firestore</span>
+              </div>
+              <p className="text-[10px] text-slate-400 leading-snug">
+                Data terenkripsi dan terhubung secara live ke seluruh browser pengunjung.
+              </p>
+            </div>
+          </aside>
+
+          {/* Backdrop for mobile nav */}
+          {isMobileNavOpen && (
+            <div
+              onClick={() => setIsMobileNavOpen(false)}
+              className="fixed inset-0 bg-black/40 z-20 md:hidden"
+            />
           )}
 
-          {/* TAB 3: STATUS CLOUD & RESET */}
-          {activeTab === 'sync' && (
-            <div className="space-y-5">
-              <div className="bg-emerald-50/80 rounded-3xl p-6 border border-emerald-200">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center flex-shrink-0 shadow">
-                    <Cloud className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-extrabold text-emerald-950">
-                      Sinkronisasi Database Cloud Firestore Aktif
-                    </h4>
-                    <p className="text-xs sm:text-sm text-emerald-800 mt-1 leading-relaxed">
-                      Sistem terhubung langsung ke Firebase Firestore dengan mode <strong>Real-Time Listener (onSnapshot)</strong>. 
-                      Setiap kali Anda menekan tombol <strong>"Simpan & Publikasikan"</strong>, data langsung tersebar ke seluruh HP, tablet, dan komputer pengunjung dalam hitungan milidetik.
-                    </p>
+          {/* Tab Content View Area */}
+          <main className="flex-1 bg-slate-100/70 overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <div className="max-w-6xl mx-auto">
+              {activeTab === 'overview' && (
+                <AdminOverviewTab
+                  content={siteContent}
+                  onNavigateTab={(tab) => setActiveTab(tab)}
+                />
+              )}
 
-                    <div className="mt-4 pt-3 border-t border-emerald-200/80 flex flex-wrap items-center gap-6 text-xs text-emerald-900">
+              {activeTab === 'slides' && (
+                <AdminHeroSlidesTab
+                  slides={siteContent.heroSlides || DEFAULT_HERO_SLIDES}
+                  onSaveSlides={handleSaveSlides}
+                />
+              )}
+
+              {activeTab === 'principal' && (
+                <AdminPrincipalTab
+                  principal={siteContent.principal || DEFAULT_PRINCIPAL_CONTENT}
+                  onSavePrincipal={handleSavePrincipal}
+                />
+              )}
+
+              {activeTab === 'programs' && (
+                <AdminProgramsTab
+                  programs={siteContent.programs || PROGRAMS_UNGGULAN}
+                  onSavePrograms={handleSavePrograms}
+                />
+              )}
+
+              {activeTab === 'news' && (
+                <AdminNewsTab
+                  newsList={siteContent.news || NEWS_LIST}
+                  onSaveNews={handleSaveNews}
+                />
+              )}
+
+              {activeTab === 'facilities' && (
+                <AdminFacilitiesTab
+                  facilitiesList={siteContent.facilities || FACILITIES_LIST}
+                  onSaveFacilities={handleSaveFacilities}
+                />
+              )}
+
+              {activeTab === 'extracurriculars' && (
+                <AdminExtracurricularsTab
+                  extracurricularsList={siteContent.extracurriculars || EXTRACURRICULAR_LIST}
+                  onSaveExtracurriculars={handleSaveExtracurriculars}
+                />
+              )}
+
+              {activeTab === 'achievements' && (
+                <AdminAchievementsTab
+                  achievementsList={siteContent.achievements || ACHIEVEMENTS_LIST}
+                  onSaveAchievements={handleSaveAchievements}
+                />
+              )}
+
+              {activeTab === 'settings' && (
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <div className="pb-4 border-b border-slate-200">
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-emerald-700" />
+                      <span>Cadangan Data & Pemulihan Sistem</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Unduh cadangan data (backup) atau atur ulang konten ke konfigurasi sampel awal sekolah.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Backup Section */}
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
                       <div>
-                        <span className="font-semibold text-emerald-700">Project: </span>
-                        <strong>decisive-emitter-hds98</strong>
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-3">
+                          <Download className="w-5 h-5" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          Unduh Cadangan Lengkap (JSON)
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                          Simpan seluruh data sekolah (Slide, Profil, Program, Berita, Fasilitas, Ekskul, Prestasi) ke dalam satu berkas JSON di komputer Anda.
+                        </p>
+                      </div>
+
+                      <div className="mt-5 pt-4 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={handleExportBackup}
+                          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow transition-all"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Unduh File Cadangan (.json)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Reset Section */}
+                    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                      <div>
+                        <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center mb-3">
+                          <RotateCcw className="w-5 h-5" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          Kembalikan ke Sampel Data Awal
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                          Jika Anda ingin mereset konten sekolah kembali ke data bawaan SMP PGRI 5 Cimahi (semua penyesuaian baru akan diganti dengan data awal).
+                        </p>
+                      </div>
+
+                      <div className="mt-5 pt-4 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={() => setIsResetConfirmOpen(true)}
+                          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          <span>Atur Ulang ke Default</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* System Metadata Card */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-xs text-slate-600 space-y-2">
+                    <h5 className="font-bold text-slate-800">
+                      Informasi Sesi & Lingkungan Server
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-500 pt-1">
+                      <div>
+                        <span className="font-medium text-slate-400 block text-[11px]">Koleksi Firestore:</span>
+                        <span className="font-mono text-slate-800">site_content/main_config</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-emerald-700">Terakhir Diperbarui: </span>
-                        <strong>{siteContent.updatedAt ? new Date(siteContent.updatedAt).toLocaleString('id-ID') : 'Default'}</strong>
+                        <span className="font-medium text-slate-400 block text-[11px]">Login Aktif:</span>
+                        <span className="text-slate-800 font-bold">{session?.displayName} (@{session?.username})</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-emerald-700">Oleh: </span>
-                        <strong>{siteContent.updatedBy || 'admin_ilham'}</strong>
+                        <span className="font-medium text-slate-400 block text-[11px]">Terakhir Diperbarui:</span>
+                        <span className="text-slate-800">{siteContent.updatedAt ? new Date(siteContent.updatedAt).toLocaleString('id-ID') : 'Default'}</span>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Danger Zone: Reset */}
-              <div className="bg-rose-50/60 rounded-3xl p-6 border border-rose-200">
-                <h4 className="text-sm font-extrabold text-rose-950 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600" />
-                  Kembalikan ke Pengaturan Default Asli
-                </h4>
-                <p className="text-xs text-rose-800 mt-1">
-                  Jika sewaktu-waktu Anda ingin mengembalikan 4 foto slide dan teks kembali ke bawaan awal SMP PGRI 5 Cimahi, gunakan tombol di bawah ini:
-                </p>
-
-                <button
-                  type="button"
-                  onClick={handleResetToDefault}
-                  disabled={isResetting}
-                  className="mt-4 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-300 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center gap-2"
-                >
-                  {isResetting ? (
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <RefreshCcw className="w-4 h-4" />
-                  )}
-                  <span>Reset Konten ke Bawaan Default</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-        </div>
-
-        {/* Footer Actions */}
-        <div className="bg-slate-50 border-t border-slate-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0">
-          <div className="text-xs text-slate-500 font-medium text-center sm:text-left">
-            Pastikan foto dan teks sudah sesuai sebelum mempublikasikan ke seluruh pengunjung.
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs transition-colors"
-            >
-              Tutup
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSaveToCloud}
-              disabled={isSaving}
-              className="flex-1 sm:flex-none bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-400 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
-            >
-              {isSaving ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Menyimpan ke Firestore...</span>
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 text-amber-300" />
-                  <span>Simpan & Publikasikan ke Seluruh Pengguna</span>
-                </>
               )}
-            </button>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      {/* Reset Confirmation Modal */}
+      {isResetConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 space-y-4">
+            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <div className="text-center">
+              <h4 className="text-base font-bold text-slate-900">
+                Atur Ulang Seluruh Data Sekolah?
+              </h4>
+              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                Tindakan ini akan mengembalikan seluruh teks slide, profil, program unggulan, berita, fasilitas, ekstrakurikuler, dan prestasi ke data bawaan awal.
+              </p>
+            </div>
+            <div className="flex gap-3 justify-center pt-2">
+              <button
+                type="button"
+                onClick={() => setIsResetConfirmOpen(false)}
+                className="px-4 py-2 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-100 text-xs font-bold transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleResetToDefaults}
+                disabled={isResetting}
+                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow transition-all"
+              >
+                {isResetting ? 'Mereset...' : 'Ya, Atur Ulang Semua'}
+              </button>
+            </div>
           </div>
         </div>
-
-      </div>
+      )}
     </div>
   );
 };
