@@ -16,7 +16,7 @@ import {
 } from '../types';
 
 export interface HeroSlideContent {
-  id: number;
+  id: number | string;
   title: string;
   subtitle: string;
   description: string;

@@ -45,10 +45,6 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({ programsData }
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-900 text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider mb-3">
-            <Trophy className="w-3.5 h-3.5 text-amber-600" />
-            <span>Karakteristik & Keunggulan</span>
-          </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Program Unggulan <span className="text-emerald-700">SMP PGRI 5 Cimahi</span>
           </h2>

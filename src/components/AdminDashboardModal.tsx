@@ -18,7 +18,8 @@ import {
   AlertCircle,
   Database,
   ChevronRight,
-  Menu
+  Menu,
+  ArrowLeft
 } from 'lucide-react';
 import { 
   SchoolSiteContent, 
@@ -67,10 +68,31 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   onLogout,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [tabHistory, setTabHistory] = useState<AdminTab[]>(['overview']);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [globalFeedback, setGlobalFeedback] = useState<string | null>(null);
+
+  const navigateToTab = (tab: AdminTab) => {
+    if (tab !== activeTab) {
+      setTabHistory((prev) => [...prev, tab]);
+      setActiveTab(tab);
+    }
+    setIsMobileNavOpen(false);
+  };
+
+  const handleGoBack = () => {
+    if (tabHistory.length > 1) {
+      const nextHistory = [...tabHistory];
+      nextHistory.pop(); // remove current tab
+      const prev = nextHistory[nextHistory.length - 1];
+      setTabHistory(nextHistory);
+      setActiveTab(prev || 'overview');
+    } else {
+      setActiveTab('overview');
+    }
+  };
 
   const session = getAdminSession();
 
@@ -317,10 +339,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => {
-                      setActiveTab(item.id);
-                      setIsMobileNavOpen(false);
-                    }}
+                    onClick={() => navigateToTab(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                       isActive
                         ? 'bg-emerald-700 text-white shadow-sm'
@@ -371,12 +390,46 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           )}
 
           {/* Tab Content View Area */}
-          <main className="flex-1 bg-slate-100/70 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 bg-slate-100/70 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
             <div className="max-w-6xl mx-auto">
+              {/* Sticky Top Back Bar (Permanently visible at the top without scrolling) */}
+              {activeTab !== 'overview' && (
+                <div className="sticky top-0 z-30 -mt-2 mb-6 backdrop-blur-md bg-white/95 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 px-3.5 sm:px-4 shadow-sm flex items-center justify-between transition-all">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                      type="button"
+                      id="btn-admin-sticky-back"
+                      onClick={handleGoBack}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+                      title="Kembali ke halaman sebelumnya tanpa perlu scroll"
+                    >
+                      <ArrowLeft className="w-4 h-4 text-amber-400" />
+                      <span>Kembali ke Halaman Sebelumnya</span>
+                    </button>
+
+                    <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium pl-2 border-l border-slate-200">
+                      <span className="text-slate-400">Panel</span>
+                      <span>/</span>
+                      <span className="font-bold text-slate-800">
+                        {navItems.find((n) => n.id === activeTab)?.label || activeTab}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="hidden md:inline">Live Cloud Firestore</span>
+                      <span className="md:hidden">Live Sync</span>
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'overview' && (
                 <AdminOverviewTab
                   content={siteContent}
-                  onNavigateTab={(tab) => setActiveTab(tab)}
+                  onNavigateTab={(tab) => navigateToTab(tab)}
                 />
               )}
 
@@ -384,6 +437,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 <AdminHeroSlidesTab
                   slides={siteContent.heroSlides || DEFAULT_HERO_SLIDES}
                   onSaveSlides={handleSaveSlides}
+                  onBack={handleGoBack}
                 />
               )}
 
@@ -518,6 +572,20 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Floating Quick Return Pill: accessible anywhere on long pages without scrolling */}
+            {activeTab !== 'overview' && (
+              <button
+                type="button"
+                id="btn-admin-floating-back"
+                onClick={handleGoBack}
+                className="fixed bottom-6 right-6 z-40 bg-slate-900/95 hover:bg-emerald-700 text-white shadow-2xl rounded-full px-4 py-2.5 text-xs font-bold flex items-center gap-2 border border-slate-700 backdrop-blur-md transition-all hover:scale-105 active:scale-95 group"
+                title="Kembali ke halaman sebelumnya tanpa scroll"
+              >
+                <ArrowLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+                <span>Kembali</span>
+              </button>
+            )}
           </main>
         </div>
       </div>

@@ -36,10 +36,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ onSelectArticle, newsD
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Kabar Terkini</span>
-            </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Berita, Prestasi & <span className="text-emerald-700">Agenda Sekolah</span>
             </h2>

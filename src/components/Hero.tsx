@@ -30,11 +30,19 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Active slides from Firestore real-time content or fallback
-  const slides = (slidesData && slidesData.length === 4) ? slidesData : DEFAULT_HERO_SLIDES;
+  // Active slides from Firestore real-time content or fallback (supports any number of slides)
+  const slides = (slidesData && slidesData.length > 0) ? slidesData : DEFAULT_HERO_SLIDES;
+
+  // Ensure currentSlide is within bounds if slides count changes
+  useEffect(() => {
+    if (currentSlide >= slides.length) {
+      setCurrentSlide(0);
+    }
+  }, [slides.length, currentSlide]);
 
   // Auto slide rotation
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
@@ -57,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="relative h-[560px] sm:h-[620px] lg:h-[680px] w-full group">
         {slides.map((slide, idx) => (
           <div
-            key={idx}
+            key={slide.id || idx}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
               idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
             }`}
@@ -77,14 +85,6 @@ export const Hero: React.FC<HeroProps> = ({
         {/* Content Container */}
         <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
           <div className="max-w-3xl pt-6 sm:pt-0">
-            {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 bg-emerald-800/80 backdrop-blur-md border border-emerald-500/50 text-amber-300 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold mb-4 shadow-lg">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>{activeSlide.badge}</span>
-              <span className="text-emerald-400">•</span>
-              <span className="text-emerald-100">SMP PGRI 5 Cimahi</span>
-            </div>
-
             {/* Main Headline (Synced via Firestore in real-time) */}
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight sm:leading-[1.15]">
               {activeSlide.title}

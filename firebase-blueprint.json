@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "HeroSlide": {
+      "title": "HeroSlide",
+      "description": "Slide item in hero carousel",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bgImage": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "description": { "type": "string" },
+        "badge": { "type": "string" },
+        "primaryBtn": { "type": "string" },
+        "secondaryBtn": { "type": "string" }
+      }
+    },
+    "SiteContent": {
+      "title": "SiteContent",
+      "description": "Central school website configuration",
+      "type": "object",
+      "properties": {
+        "heroSlides": { "type": "array" },
+        "principal": { "type": "object" },
+        "programs": { "type": "array" },
+        "news": { "type": "array" },
+        "facilities": { "type": "array" },
+        "extracurriculars": { "type": "array" },
+        "achievements": { "type": "array" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/site_content/{contentId}": {
+      "schema": "SiteContent",
+      "description": "Dynamic school content documents"
+    }
+  }
+}
