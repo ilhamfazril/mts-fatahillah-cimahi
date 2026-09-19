@@ -1,0 +1,70 @@
+const ADMIN_CREDENTIALS = {
+  username: 'admin_ilham',
+  password: 'ilhamfazril',
+};
+
+const AUTH_STORAGE_KEY = 'smp_pgri_5_admin_session';
+
+export interface AdminSession {
+  username: string;
+  displayName: string;
+  role: string;
+  loggedInAt: number;
+}
+
+export function loginAdmin(usernameInput: string, passwordInput: string): { success: boolean; error?: string; session?: AdminSession } {
+  const cleanUser = usernameInput.trim();
+  const cleanPass = passwordInput.trim();
+
+  if (!cleanUser || !cleanPass) {
+    return { success: false, error: 'Silakan isi username dan kata sandi.' };
+  }
+
+  if (cleanUser === ADMIN_CREDENTIALS.username && cleanPass === ADMIN_CREDENTIALS.password) {
+    const session: AdminSession = {
+      username: ADMIN_CREDENTIALS.username,
+      displayName: 'Ilham Fazril (Administrator)',
+      role: 'Administrator Konten Utama',
+      loggedInAt: Date.now(),
+    };
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+    } catch {
+      // Fallback
+    }
+    return { success: true, session };
+  }
+
+  return { 
+    success: false, 
+    error: 'Username atau kata sandi tidak cocok. Pastikan menggunakan akun admin yang terdaftar.' 
+  };
+}
+
+export function logoutAdmin(): void {
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {
+    // Ignore
+  }
+}
+
+export function getAdminSession(): AdminSession | null {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const session = JSON.parse(raw) as AdminSession;
+    if (session && session.username === ADMIN_CREDENTIALS.username) {
+      return session;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function isAdminAuthenticated(): boolean {
+  return getAdminSession() !== null;
+}
+
+export const isAdminLoggedIn = isAdminAuthenticated;

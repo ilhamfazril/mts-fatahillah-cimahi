@@ -1,0 +1,6 @@
+{
+  "name": "SMP PGRI 5 Cimahi",
+  "description": "Website Resmi SMP PGRI 5 Cimahi - Membentuk Generasi Cerdas, Berkarakter, Disiplin, dan Berakhlak Mulia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
