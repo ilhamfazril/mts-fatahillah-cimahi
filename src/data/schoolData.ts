@@ -48,9 +48,9 @@ export const SCHOOL_INFO = {
 };
 
 export const PRINCIPAL_INFO = {
-  name: 'Dra. Hj. Sri Wahyuni, M.M.Pd.',
+  name: 'ILHAM FAZRIL',
   role: 'Kepala SMP PGRI 5 Cimahi',
-  photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
+  photo: '/images/kepala_sekolah.jpg',
   quote: '"Di SMP PGRI 5 Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
   welcomeMessage: [
     'Assalamu’alaikum Warahmatullahi Wabarakatuh, Sampurasun, Salam Sejahtera untuk kita semua.',
