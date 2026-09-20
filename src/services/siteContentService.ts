@@ -12,6 +12,7 @@ import {
   orderBy,
   getDocFromServer
 } from '../lib/firebase';
+import firebaseConfigData from '../../firebase-applet-config.json';
 import { 
   PRINCIPAL_INFO, 
   PROGRAMS_UNGGULAN, 
@@ -53,6 +54,119 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   };
   console.error('Firestore Error:', JSON.stringify(errInfo));
   return errInfo;
+}
+
+// REST API Base URL to Google Cloud Firestore (direct cloud persistence fallback)
+const FIRESTORE_REST_BASE = `https://firestore.googleapis.com/v1/projects/${firebaseConfigData.projectId}/databases/${firebaseConfigData.firestoreDatabaseId}/documents/site_content/main_config?key=${firebaseConfigData.apiKey}`;
+
+// Decode raw Firestore REST API document format into clean TypeScript objects
+function decodeFirestoreValue(val: any): any {
+  if (!val || typeof val !== 'object') return val;
+  if ('stringValue' in val) return val.stringValue;
+  if ('integerValue' in val) return Number(val.integerValue);
+  if ('doubleValue' in val) return Number(val.doubleValue);
+  if ('booleanValue' in val) return val.booleanValue;
+  if ('timestampValue' in val) return val.timestampValue;
+  if ('nullValue' in val) return null;
+  if ('arrayValue' in val) {
+    const values = val.arrayValue?.values || [];
+    return values.map(decodeFirestoreValue);
+  }
+  if ('mapValue' in val) {
+    const fields = val.mapValue?.fields || {};
+    const res: Record<string, any> = {};
+    for (const [k, v] of Object.entries(fields)) {
+      res[k] = decodeFirestoreValue(v);
+    }
+    return res;
+  }
+  return val;
+}
+
+function decodeFirestoreDocument(docData: any): Partial<SchoolSiteContent> | null {
+  if (!docData || !docData.fields) return null;
+  const res: Record<string, any> = {};
+  for (const [k, v] of Object.entries(docData.fields)) {
+    res[k] = decodeFirestoreValue(v);
+  }
+  return res as Partial<SchoolSiteContent>;
+}
+
+// Encode clean JavaScript object to Firestore REST API fields format
+function encodeFirestoreValue(val: any): any {
+  if (val === null || val === undefined) return { nullValue: null };
+  if (typeof val === 'string') return { stringValue: val };
+  if (typeof val === 'boolean') return { booleanValue: val };
+  if (typeof val === 'number') {
+    return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
+  }
+  if (Array.isArray(val)) {
+    return {
+      arrayValue: {
+        values: val.map(encodeFirestoreValue),
+      },
+    };
+  }
+  if (typeof val === 'object') {
+    const fields: Record<string, any> = {};
+    for (const [k, v] of Object.entries(val)) {
+      if (v !== undefined) {
+        fields[k] = encodeFirestoreValue(v);
+      }
+    }
+    return { mapValue: { fields } };
+  }
+  return { stringValue: String(val) };
+}
+
+function encodeFirestoreDocument(obj: Record<string, any>): any {
+  const fields: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) {
+      fields[k] = encodeFirestoreValue(v);
+    }
+  }
+  return { fields };
+}
+
+/**
+ * Direct HTTPS REST fetch to Google Cloud Firestore servers.
+ * Bypasses all WebChannel / WebSocket / iframe limitations.
+ */
+export async function fetchLiveContentFromFirestoreRest(): Promise<Partial<SchoolSiteContent> | null> {
+  try {
+    const res = await fetch(FIRESTORE_REST_BASE, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return decodeFirestoreDocument(json);
+  } catch (err) {
+    console.warn('Direct REST fetch notice:', err);
+    return null;
+  }
+}
+
+/**
+ * Direct HTTPS REST write to Google Cloud Firestore servers.
+ * Guarantees permanent persistence in Firebase even if client SDK is in offline mode.
+ */
+export async function saveLiveContentToFirestoreRest(data: Partial<SchoolSiteContent>): Promise<boolean> {
+  try {
+    const cleaned = cleanForFirestore(data);
+    const encoded = encodeFirestoreDocument(cleaned);
+    const fields = Object.keys(data).filter((k) => (data as any)[k] !== undefined);
+    const mask = fields.map((k) => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+    const url = `${FIRESTORE_REST_BASE}&${mask}`;
+
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(encoded),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('Direct REST write notice:', err);
+    return false;
+  }
 }
 
 // Validate connection to Firestore on initialization per Skill requirement
@@ -249,7 +363,48 @@ function notifySubscribers(content: SchoolSiteContent) {
 }
 
 /**
- * Subscribe to real-time site content updates across all users & browser tabs
+ * Safely merge live Firestore document or cached state with application fallbacks.
+ * Preserves all user modifications and ensures no sections are ever null/undefined.
+ */
+export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): SchoolSiteContent {
+  if (!data) return currentSiteContentMemory;
+  return {
+    heroSlides: Array.isArray(data.heroSlides) && data.heroSlides.length > 0
+      ? data.heroSlides
+      : (currentSiteContentMemory.heroSlides || DEFAULT_HERO_SLIDES),
+    principal: {
+      ...DEFAULT_PRINCIPAL_CONTENT,
+      ...(currentSiteContentMemory.principal || {}),
+      ...(data.principal || {}),
+    },
+    programs: Array.isArray(data.programs) && data.programs.length > 0
+      ? data.programs
+      : (currentSiteContentMemory.programs || PROGRAMS_UNGGULAN),
+    news: Array.isArray(data.news) && data.news.length > 0
+      ? data.news
+      : (currentSiteContentMemory.news || NEWS_LIST),
+    facilities: Array.isArray(data.facilities) && data.facilities.length > 0
+      ? data.facilities
+      : (currentSiteContentMemory.facilities || FACILITIES_LIST),
+    extracurriculars: Array.isArray(data.extracurriculars) && data.extracurriculars.length > 0
+      ? data.extracurriculars
+      : (currentSiteContentMemory.extracurriculars || EXTRACURRICULAR_LIST),
+    achievements: Array.isArray(data.achievements) && data.achievements.length > 0
+      ? data.achievements
+      : (currentSiteContentMemory.achievements || ACHIEVEMENTS_LIST),
+    updatedAt: data.updatedAt || Date.now(),
+    updatedBy: data.updatedBy || 'admin_ilham',
+  };
+}
+
+/**
+ * Subscribe to real-time site content updates across all users & browser tabs.
+ * Combines:
+ * 1. Immediate optimistic emission from memory/localStorage
+ * 2. Instant Cloud Hydration via getDocFromServer + REST fallback on page load
+ * 3. Continuous real-time Firestore onSnapshot listener
+ * 4. Automatic cross-tab sync via storage events
+ * 5. Heartbeat sync on tab focus and every 15s to guarantee fresh cloud state
  */
 export function subscribeToSiteContent(
   onUpdate: (content: SchoolSiteContent) => void,
@@ -265,12 +420,8 @@ export function subscribeToSiteContent(
     if (e.key === CACHE_STORAGE_KEY && e.newValue) {
       try {
         const parsed = JSON.parse(e.newValue);
-        currentSiteContentMemory = {
-          ...DEFAULT_SITE_CONTENT,
-          ...parsed,
-          principal: { ...DEFAULT_PRINCIPAL_CONTENT, ...(parsed.principal || {}) },
-        };
-        onUpdate(currentSiteContentMemory);
+        const merged = mergeWithDefaults(parsed);
+        notifySubscribers(merged);
       } catch (err) {
         console.warn('Cross-tab sync parse error:', err);
       }
@@ -281,6 +432,37 @@ export function subscribeToSiteContent(
     window.addEventListener('storage', handleStorageEvent);
   }
 
+  // Active Cloud Hydration: Fetch live document directly from Google Cloud servers
+  let isHydrated = false;
+  const hydrateFromCloud = async () => {
+    try {
+      const snap = await getDocFromServer(CONTENT_DOC_REF);
+      if (snap.exists()) {
+        const serverData = snap.data() as Partial<SchoolSiteContent>;
+        const merged = mergeWithDefaults(serverData);
+        isHydrated = true;
+        notifySubscribers(merged);
+        return;
+      }
+    } catch {
+      // If SDK server fetch fails (e.g. iframe offline / WebChannel delay), proceed to REST
+    }
+
+    try {
+      const restData = await fetchLiveContentFromFirestoreRest();
+      if (restData) {
+        const merged = mergeWithDefaults(restData);
+        isHydrated = true;
+        notifySubscribers(merged);
+      }
+    } catch (e) {
+      console.warn('Cloud hydration notice:', e);
+    }
+  };
+
+  // Run immediate hydration upon subscribing
+  hydrateFromCloud();
+
   let unsubscribeFirestore: (() => void) | null = null;
   try {
     unsubscribeFirestore = onSnapshot(
@@ -288,35 +470,9 @@ export function subscribeToSiteContent(
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data() as Partial<SchoolSiteContent>;
-          const merged: SchoolSiteContent = {
-            heroSlides: Array.isArray(data.heroSlides)
-              ? data.heroSlides 
-              : (currentSiteContentMemory.heroSlides || DEFAULT_HERO_SLIDES),
-            principal: {
-              ...DEFAULT_PRINCIPAL_CONTENT,
-              ...(currentSiteContentMemory.principal || {}),
-              ...(data.principal || {}),
-            },
-            programs: Array.isArray(data.programs)
-              ? data.programs
-              : (currentSiteContentMemory.programs || PROGRAMS_UNGGULAN),
-            news: Array.isArray(data.news)
-              ? data.news
-              : (currentSiteContentMemory.news || NEWS_LIST),
-            facilities: Array.isArray(data.facilities)
-              ? data.facilities
-              : (currentSiteContentMemory.facilities || FACILITIES_LIST),
-            extracurriculars: Array.isArray(data.extracurriculars)
-              ? data.extracurriculars
-              : (currentSiteContentMemory.extracurriculars || EXTRACURRICULAR_LIST),
-            achievements: Array.isArray(data.achievements)
-              ? data.achievements
-              : (currentSiteContentMemory.achievements || ACHIEVEMENTS_LIST),
-            updatedAt: data.updatedAt || Date.now(),
-            updatedBy: data.updatedBy || 'admin_ilham',
-          };
+          const merged = mergeWithDefaults(data);
           notifySubscribers(merged);
-        } else {
+        } else if (!isHydrated) {
           // If document doesn't exist yet in Firestore, provision it with initial content
           const initialPayload = cleanForFirestore(currentSiteContentMemory);
           setDoc(CONTENT_DOC_REF, initialPayload).catch((e) => {
@@ -327,19 +483,39 @@ export function subscribeToSiteContent(
       },
       (err) => {
         handleFirestoreError(err, OperationType.GET, 'site_content/main_config');
-        notifySubscribers(currentSiteContentMemory);
+        // If onSnapshot fails (e.g. iframe WebChannel blocked), immediately fallback to REST
+        hydrateFromCloud();
         if (onError) onError(err);
       }
     );
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, 'site_content/main_config');
-    notifySubscribers(currentSiteContentMemory);
+    hydrateFromCloud();
+  }
+
+  // Heartbeat & focus sync: ensures fresh cloud data even after device sleep or tab switch
+  const intervalId = setInterval(() => {
+    hydrateFromCloud();
+  }, 15000);
+
+  const handleVisibilityChange = () => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      hydrateFromCloud();
+    }
+  };
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
   }
 
   return () => {
     localSubscribers.delete(onUpdate);
+    clearInterval(intervalId);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', handleStorageEvent);
+    }
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
     if (unsubscribeFirestore) {
       unsubscribeFirestore();
@@ -349,8 +525,9 @@ export function subscribeToSiteContent(
 
 /**
  * Save updated content to Firestore (Real-Time broadcast to all connected clients).
- * Safely preserves and merges existing sections so updating one section (e.g. news)
- * NEVER overwrites or reverts other sections (e.g. principal, facilities).
+ * Non-destructive: pre-fetches live state from Cloud Firestore (SDK + REST fallback)
+ * and uses Dual-Persistence (Firestore SDK + direct HTTPS REST) to guarantee that
+ * data is permanently written directly to Google Cloud servers.
  */
 export async function saveSiteContentToFirestore(
   updatedContent: Partial<SchoolSiteContent>,
@@ -359,42 +536,21 @@ export async function saveSiteContentToFirestore(
   // 1. Fetch latest state from Firestore to prevent stale overwrites across sessions/tabs
   let liveExistingData: Partial<SchoolSiteContent> = {};
   try {
-    const snap = await getDoc(CONTENT_DOC_REF);
+    const snap = await getDocFromServer(CONTENT_DOC_REF);
     if (snap.exists()) {
       liveExistingData = snap.data() as Partial<SchoolSiteContent>;
     }
-  } catch (err) {
-    console.warn('Could not pre-fetch live document, using memory cache:', err);
+  } catch {
+    try {
+      const rest = await fetchLiveContentFromFirestoreRest();
+      if (rest) liveExistingData = rest;
+    } catch {
+      // Fallback to in-memory state
+    }
   }
 
   // 2. Base content is merged from live Firestore -> memory cache -> default fallbacks
-  const baseDoc: SchoolSiteContent = {
-    heroSlides: Array.isArray(liveExistingData.heroSlides)
-      ? liveExistingData.heroSlides
-      : (currentSiteContentMemory.heroSlides || DEFAULT_HERO_SLIDES),
-    principal: {
-      ...DEFAULT_PRINCIPAL_CONTENT,
-      ...(currentSiteContentMemory.principal || {}),
-      ...(liveExistingData.principal || {}),
-    },
-    programs: Array.isArray(liveExistingData.programs)
-      ? liveExistingData.programs
-      : (currentSiteContentMemory.programs || PROGRAMS_UNGGULAN),
-    news: Array.isArray(liveExistingData.news)
-      ? liveExistingData.news
-      : (currentSiteContentMemory.news || NEWS_LIST),
-    facilities: Array.isArray(liveExistingData.facilities)
-      ? liveExistingData.facilities
-      : (currentSiteContentMemory.facilities || FACILITIES_LIST),
-    extracurriculars: Array.isArray(liveExistingData.extracurriculars)
-      ? liveExistingData.extracurriculars
-      : (currentSiteContentMemory.extracurriculars || EXTRACURRICULAR_LIST),
-    achievements: Array.isArray(liveExistingData.achievements)
-      ? liveExistingData.achievements
-      : (currentSiteContentMemory.achievements || ACHIEVEMENTS_LIST),
-    updatedAt: liveExistingData.updatedAt || Date.now(),
-    updatedBy: liveExistingData.updatedBy || adminUsername,
-  };
+  const baseDoc = mergeWithDefaults(liveExistingData);
 
   // 3. Selectively merge ONLY the sections that are actually updated
   const mergedDoc: SchoolSiteContent = {
@@ -414,16 +570,30 @@ export async function saveSiteContentToFirestore(
   // 4. Immediately notify local subscribers & localStorage for instant zero-latency UI update
   notifySubscribers(mergedDoc);
 
-  // 5. Sanitize against undefined values and persist to Cloud Firestore
+  // 5. Dual-persistence: Write to Firestore SDK AND direct HTTPS REST
   const payload = cleanForFirestore(mergedDoc);
+  let sdkSuccess = false;
+  let restSuccess = false;
 
   try {
     await setDoc(CONTENT_DOC_REF, payload, { merge: true });
-    return mergedDoc;
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, 'site_content/main_config');
-    throw error;
+    sdkSuccess = true;
+  } catch (sdkErr) {
+    console.warn('Firestore SDK write error/offline notice:', sdkErr);
   }
+
+  try {
+    restSuccess = await saveLiveContentToFirestoreRest(mergedDoc);
+  } catch (restErr) {
+    console.warn('Firestore REST write error notice:', restErr);
+  }
+
+  if (!sdkSuccess && !restSuccess) {
+    handleFirestoreError(new Error('Gagal menyimpan ke Google Cloud Firestore'), OperationType.WRITE, 'site_content/main_config');
+    throw new Error('Gagal menyimpan perubahan ke Cloud Firestore. Silakan periksa koneksi internet Anda.');
+  }
+
+  return mergedDoc;
 }
 
 /**
@@ -445,11 +615,24 @@ export async function resetSiteContentToDefaultInFirestore(): Promise<void> {
   notifySubscribers(defaultDoc);
   const payload = cleanForFirestore(defaultDoc);
 
+  let sdkSuccess = false;
+  let restSuccess = false;
+
   try {
     await setDoc(CONTENT_DOC_REF, payload);
+    sdkSuccess = true;
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, 'site_content/main_config');
-    throw error;
+    console.warn('Reset SDK notice:', error);
+  }
+
+  try {
+    restSuccess = await saveLiveContentToFirestoreRest(defaultDoc);
+  } catch (error) {
+    console.warn('Reset REST notice:', error);
+  }
+
+  if (!sdkSuccess && !restSuccess) {
+    throw new Error('Gagal mereset data di Firestore.');
   }
 }
 
