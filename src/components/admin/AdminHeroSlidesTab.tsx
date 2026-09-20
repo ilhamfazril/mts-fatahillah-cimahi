@@ -49,13 +49,14 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
-  // Sync slides from Firestore when updated in real-time
+  // Sync slides from Firestore ONLY if user is not actively making unsaved changes
   useEffect(() => {
-    if (slides && slides.length > 0) {
+    if (!isDirty && slides && slides.length > 0) {
       setSlidesDraft(slides);
     }
-  }, [slides]);
+  }, [slides, isDirty]);
 
   // Safe reference to currently selected slide
   const validIndex = Math.min(selectedIndex, Math.max(0, slidesDraft.length - 1));
@@ -72,6 +73,7 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
       }
       return updated;
     });
+    setIsDirty(true);
     setSaveSuccess(false);
   };
 
@@ -81,10 +83,10 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
 
     try {
       setUploadStatus(`Mengompresi dan mengoptimalkan foto slide ${validIndex + 1}...`);
-      const optimized = await compressImageForStorage(file, 1200, 700, 0.72);
+      const optimized = await compressImageForStorage(file, 1200, 700, 0.70);
       handleFieldChange('bgImage', optimized);
-      setUploadStatus('✓ Foto berhasil dikompresi hemat (<80 KB) & siap disimpan ke Firestore.');
-      setTimeout(() => setUploadStatus(null), 4000);
+      setUploadStatus('✓ Foto slide berhasil dipasang. Klik "Simpan Semua Slide ke Cloud" di bawah untuk mempublikasikan secara permanen.');
+      setTimeout(() => setUploadStatus(null), 5000);
     } catch (err) {
       console.error(err);
       alert('Gagal memproses file foto. Pastikan format foto adalah JPG/PNG.');
@@ -152,6 +154,7 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
     try {
       setIsSaving(true);
       await onSaveSlides(slidesDraft);
+      setIsDirty(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {

@@ -23,16 +23,18 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
-  // Sync draft whenever principal prop updates from Firestore
+  // Sync draft whenever principal prop updates from Firestore ONLY if no unsaved user changes
   useEffect(() => {
-    if (principal) {
+    if (!isDirty && principal) {
       setDraft(principal);
     }
-  }, [principal]);
+  }, [principal, isDirty]);
 
   const handleFieldChange = (field: keyof PrincipalProfileContent, value: string) => {
     setDraft((prev) => ({ ...prev, [field]: value }));
+    setIsDirty(true);
     setSaveSuccess(false);
   };
 
@@ -42,10 +44,10 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
 
     try {
       setUploadStatus('Mengompresi dan mengoptimalkan foto Kepala Sekolah...');
-      const optimized = await compressImageForStorage(file, 600, 600, 0.70);
+      const optimized = await compressImageForStorage(file, 500, 500, 0.70);
       handleFieldChange('photo', optimized);
-      setUploadStatus('✓ Foto berhasil dikompresi hemat (<60 KB) & siap disimpan ke Firestore.');
-      setTimeout(() => setUploadStatus(null), 4000);
+      setUploadStatus('✓ Foto Kepala Sekolah siap. Klik "Simpan Profil Kepala Sekolah" untuk mempublikasikan secara permanen.');
+      setTimeout(() => setUploadStatus(null), 5000);
     } catch (err) {
       console.error(err);
       alert('Gagal memproses file foto. Gunakan format JPG/PNG.');
@@ -57,6 +59,7 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
     try {
       setIsSaving(true);
       await onSavePrincipal(draft);
+      setIsDirty(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {

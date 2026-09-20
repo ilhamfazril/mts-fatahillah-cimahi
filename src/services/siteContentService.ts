@@ -343,7 +343,7 @@ function safeSetLocalStorage(content: SchoolSiteContent): void {
   try {
     localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(content));
   } catch (e) {
-    console.warn('Cache write notice:', e);
+    console.warn('Cache write notice (quota full or private mode):', e);
   }
 }
 
@@ -365,9 +365,18 @@ let currentSiteContentMemory: SchoolSiteContent = (() => {
   return { ...DEFAULT_SITE_CONTENT };
 })();
 
+/**
+ * Returns currently cached or memory site content immediately for instant mounting
+ * without waiting for network or showing default AI placeholders.
+ */
+export function getInitialSiteContent(): SchoolSiteContent {
+  return currentSiteContentMemory || DEFAULT_SITE_CONTENT;
+}
+
 const localSubscribers = new Set<(content: SchoolSiteContent) => void>();
 
 function notifySubscribers(content: SchoolSiteContent) {
+  // Clean any legacy "media:" references if present
   const resolved = resolveObjectMedia(content);
   currentSiteContentMemory = resolved;
   safeSetLocalStorage(resolved);
@@ -381,80 +390,11 @@ function notifySubscribers(content: SchoolSiteContent) {
 }
 
 /**
- * Automatically extracts uploaded image dataUrls and stores each in dedicated
- * media_assets documents in Cloud Firestore, replacing the bulky inline Base64 with
- * lightweight media: references so main_config is always tiny (<20KB) and never hits 1MB limits.
+ * Helper to ensure slide images or profile photos are valid web URLs or Base64
+ * and never broken "media:" reference tokens.
  */
-async function extractAndPersistMediaAssets(
-  content: SchoolSiteContent
-): Promise<{ toStoreInMainConfig: SchoolSiteContent; toNotify: SchoolSiteContent }> {
-  const mainDoc: SchoolSiteContent = JSON.parse(JSON.stringify(content));
-  const notifyDoc: SchoolSiteContent = JSON.parse(JSON.stringify(content));
-
-  // 1. Hero slides
-  if (Array.isArray(mainDoc.heroSlides)) {
-    for (let i = 0; i < mainDoc.heroSlides.length; i++) {
-      const slide = mainDoc.heroSlides[i];
-      if (slide.bgImage && slide.bgImage.startsWith('data:image/')) {
-        const assetId = `slide_${slide.id || i}`;
-        await saveMediaAsset(assetId, slide.bgImage);
-        slide.bgImage = `media:${assetId}`;
-      }
-    }
-  }
-
-  // 2. Principal photo
-  if (mainDoc.principal?.photo && mainDoc.principal.photo.startsWith('data:image/')) {
-    const assetId = 'principal_photo';
-    await saveMediaAsset(assetId, mainDoc.principal.photo);
-    mainDoc.principal.photo = `media:${assetId}`;
-  }
-
-  // 3. News
-  if (Array.isArray(mainDoc.news)) {
-    for (const item of mainDoc.news) {
-      if (item.image && item.image.startsWith('data:image/')) {
-        const assetId = `news_${item.id}`;
-        await saveMediaAsset(assetId, item.image);
-        item.image = `media:${assetId}`;
-      }
-    }
-  }
-
-  // 4. Facilities
-  if (Array.isArray(mainDoc.facilities)) {
-    for (const item of mainDoc.facilities) {
-      if (item.image && item.image.startsWith('data:image/')) {
-        const assetId = `facility_${item.id}`;
-        await saveMediaAsset(assetId, item.image);
-        item.image = `media:${assetId}`;
-      }
-    }
-  }
-
-  // 5. Programs
-  if (Array.isArray(mainDoc.programs)) {
-    for (const item of mainDoc.programs) {
-      if (item.image && item.image.startsWith('data:image/')) {
-        const assetId = `program_${item.id}`;
-        await saveMediaAsset(assetId, item.image);
-        item.image = `media:${assetId}`;
-      }
-    }
-  }
-
-  // 6. Achievements
-  if (Array.isArray(mainDoc.achievements)) {
-    for (const item of mainDoc.achievements) {
-      if (item.image && item.image.startsWith('data:image/')) {
-        const assetId = `achievement_${item.id}`;
-        await saveMediaAsset(assetId, item.image);
-        item.image = `media:${assetId}`;
-      }
-    }
-  }
-
-  return { toStoreInMainConfig: mainDoc, toNotify: notifyDoc };
+function sanitizeMediaReferences(content: SchoolSiteContent): SchoolSiteContent {
+  return resolveObjectMedia(content);
 }
 
 /**
@@ -463,32 +403,50 @@ async function extractAndPersistMediaAssets(
  */
 export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): SchoolSiteContent {
   if (!data) return currentSiteContentMemory;
+
+  // Clean data in case legacy "media:" tokens were retrieved from previous iterations
+  const sanitized = sanitizeMediaReferences(data as SchoolSiteContent);
+
   return {
-    heroSlides: Array.isArray(data.heroSlides) && data.heroSlides.length > 0
-      ? data.heroSlides
+    heroSlides: Array.isArray(sanitized.heroSlides) && sanitized.heroSlides.length > 0
+      ? sanitized.heroSlides.map((slide, idx) => {
+          const fallback = DEFAULT_HERO_SLIDES[idx] || DEFAULT_HERO_SLIDES[0];
+          // If bgImage is a broken token or empty, fallback gracefully
+          const bgImage = (slide.bgImage && !slide.bgImage.startsWith('media:')) 
+            ? slide.bgImage 
+            : (currentSiteContentMemory.heroSlides?.[idx]?.bgImage || fallback.bgImage);
+          return {
+            ...fallback,
+            ...slide,
+            bgImage,
+          };
+        })
       : (currentSiteContentMemory.heroSlides || DEFAULT_HERO_SLIDES),
     principal: {
       ...DEFAULT_PRINCIPAL_CONTENT,
       ...(currentSiteContentMemory.principal || {}),
-      ...(data.principal || {}),
+      ...(sanitized.principal || {}),
+      photo: (sanitized.principal?.photo && !sanitized.principal.photo.startsWith('media:'))
+        ? sanitized.principal.photo
+        : (currentSiteContentMemory.principal?.photo || DEFAULT_PRINCIPAL_CONTENT.photo),
     },
-    programs: Array.isArray(data.programs) && data.programs.length > 0
-      ? data.programs
+    programs: Array.isArray(sanitized.programs) && sanitized.programs.length > 0
+      ? sanitized.programs
       : (currentSiteContentMemory.programs || PROGRAMS_UNGGULAN),
-    news: Array.isArray(data.news) && data.news.length > 0
-      ? data.news
+    news: Array.isArray(sanitized.news) && sanitized.news.length > 0
+      ? sanitized.news
       : (currentSiteContentMemory.news || NEWS_LIST),
-    facilities: Array.isArray(data.facilities) && data.facilities.length > 0
-      ? data.facilities
+    facilities: Array.isArray(sanitized.facilities) && sanitized.facilities.length > 0
+      ? sanitized.facilities
       : (currentSiteContentMemory.facilities || FACILITIES_LIST),
-    extracurriculars: Array.isArray(data.extracurriculars) && data.extracurriculars.length > 0
-      ? data.extracurriculars
+    extracurriculars: Array.isArray(sanitized.extracurriculars) && sanitized.extracurriculars.length > 0
+      ? sanitized.extracurriculars
       : (currentSiteContentMemory.extracurriculars || EXTRACURRICULAR_LIST),
-    achievements: Array.isArray(data.achievements) && data.achievements.length > 0
-      ? data.achievements
+    achievements: Array.isArray(sanitized.achievements) && sanitized.achievements.length > 0
+      ? sanitized.achievements
       : (currentSiteContentMemory.achievements || ACHIEVEMENTS_LIST),
-    updatedAt: data.updatedAt || Date.now(),
-    updatedBy: data.updatedBy || 'admin_ilham',
+    updatedAt: sanitized.updatedAt || Date.now(),
+    updatedBy: sanitized.updatedBy || 'admin_ilham',
   };
 }
 
@@ -675,15 +633,11 @@ export async function saveSiteContentToFirestore(
     updatedBy: adminUsername,
   };
 
-  // 4. Extract any uploaded photo dataUrls and persist them into dedicated media_assets collection
-  //    This keeps main_config under 25KB, eliminates 1MB limits permanently, and persists images indefinitely.
-  const { toStoreInMainConfig, toNotify } = await extractAndPersistMediaAssets(mergedDoc);
+  // 4. Immediately notify local subscribers & localStorage with full, pure photos
+  notifySubscribers(mergedDoc);
 
-  // 5. Immediately notify local subscribers & localStorage with fully resolved image content
-  notifySubscribers(toNotify);
-
-  // 6. Dual-persistence: Write compact manifest (with media: references) to Firestore SDK AND direct HTTPS REST
-  const payload = cleanForFirestore(toStoreInMainConfig);
+  // 5. Dual-persistence: Write full document directly to Firestore SDK AND direct HTTPS REST
+  const payload = cleanForFirestore(mergedDoc);
   let sdkSuccess = false;
   let restSuccess = false;
 
@@ -695,7 +649,7 @@ export async function saveSiteContentToFirestore(
   }
 
   try {
-    restSuccess = await saveLiveContentToFirestoreRest(toStoreInMainConfig);
+    restSuccess = await saveLiveContentToFirestoreRest(mergedDoc);
   } catch (restErr) {
     console.warn('Firestore REST write error notice:', restErr);
   }
@@ -705,7 +659,7 @@ export async function saveSiteContentToFirestore(
     throw new Error('Gagal menyimpan perubahan ke Cloud Firestore. Silakan periksa koneksi internet Anda.');
   }
 
-  return toNotify;
+  return mergedDoc;
 }
 
 /**

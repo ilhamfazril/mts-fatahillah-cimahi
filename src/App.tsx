@@ -29,7 +29,8 @@ import {
   SchoolSiteContent, 
   DEFAULT_HERO_SLIDES,
   DEFAULT_PRINCIPAL_CONTENT,
-  DEFAULT_SITE_CONTENT 
+  DEFAULT_SITE_CONTENT,
+  getInitialSiteContent
 } from './services/siteContentService';
 import { NewsItem } from './types';
 import { ArrowUp, GraduationCap } from 'lucide-react';
@@ -46,8 +47,8 @@ export default function App() {
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
 
-  // Real-time Firestore content state
-  const [siteContent, setSiteContent] = useState<SchoolSiteContent | null>(null);
+  // Real-time Firestore content state initialized with cached / saved state
+  const [siteContent, setSiteContent] = useState<SchoolSiteContent>(() => getInitialSiteContent());
 
   useEffect(() => {
     // Subscribe to real-time changes from Firestore database
