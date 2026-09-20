@@ -1,5 +1,18 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { 
+  getFirestore, 
+  doc, 
+  onSnapshot, 
+  setDoc, 
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  getDocFromServer
+} from 'firebase/firestore';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
 const firebaseConfig = {
@@ -18,4 +31,16 @@ export const db = firebaseConfigData.firestoreDatabaseId && firebaseConfigData.f
   ? getFirestore(app, firebaseConfigData.firestoreDatabaseId)
   : getFirestore(app);
 
-export { doc, onSnapshot, setDoc, getDoc };
+export { 
+  doc, 
+  onSnapshot, 
+  setDoc, 
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  getDocFromServer
+};

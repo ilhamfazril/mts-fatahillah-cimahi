@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Save, 
   Upload, 
@@ -49,6 +49,13 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  // Sync slides from Firestore when updated in real-time
+  useEffect(() => {
+    if (slides && slides.length > 0) {
+      setSlidesDraft(slides);
+    }
+  }, [slides]);
 
   // Safe reference to currently selected slide
   const validIndex = Math.min(selectedIndex, Math.max(0, slidesDraft.length - 1));

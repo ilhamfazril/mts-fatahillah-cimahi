@@ -27,8 +27,27 @@
         "facilities": { "type": "array" },
         "extracurriculars": { "type": "array" },
         "achievements": { "type": "array" },
-        "updatedAt": { "type": "string" },
+        "updatedAt": { "type": "number" },
         "updatedBy": { "type": "string" }
+      }
+    },
+    "PPDBRegistration": {
+      "title": "PPDBRegistration",
+      "description": "Online student registration submission",
+      "type": "object",
+      "properties": {
+        "registrationCode": { "type": "string" },
+        "candidateName": { "type": "string" },
+        "originSchool": { "type": "string" },
+        "nisn": { "type": "string" },
+        "gender": { "type": "string" },
+        "parentName": { "type": "string" },
+        "parentPhone": { "type": "string" },
+        "parentEmail": { "type": "string" },
+        "selectedTrack": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "number" }
       }
     }
   },
@@ -36,6 +55,10 @@
     "/site_content/{contentId}": {
       "schema": "SiteContent",
       "description": "Dynamic school content documents"
+    },
+    "/ppdb_registrations/{registrationId}": {
+      "schema": "PPDBRegistration",
+      "description": "PPDB student admission documents"
     }
   }
 }

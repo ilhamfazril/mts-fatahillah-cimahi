@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Pencil, 
@@ -37,6 +37,13 @@ export const AdminExtracurricularsTab: React.FC<AdminExtracurricularsTabProps> =
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Sync with Firestore real-time updates
+  useEffect(() => {
+    if (extracurricularsList) {
+      setItems(extracurricularsList);
+    }
+  }, [extracurricularsList]);
 
   const categories = [
     'Semua',

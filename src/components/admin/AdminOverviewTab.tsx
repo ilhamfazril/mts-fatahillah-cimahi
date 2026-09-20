@@ -96,6 +96,16 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
       borderColor: 'border-yellow-200',
       description: 'Kejuaraan kota, provinsi & nasional',
     },
+    {
+      id: 'ppdb',
+      label: 'Pendaftaran PPDB Online',
+      count: 'Live',
+      unit: 'Firebase',
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-600" />,
+      bgColor: 'bg-emerald-50',
+      borderColor: 'border-emerald-200',
+      description: 'Data formulir calon siswa baru yang masuk real-time',
+    },
   ];
 
   const lastUpdatedFormatted = content.updatedAt

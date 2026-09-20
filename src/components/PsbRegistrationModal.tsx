@@ -13,6 +13,7 @@ import {
   Mail
 } from 'lucide-react';
 import { PSB_INFO, SCHOOL_INFO } from '../data/schoolData';
+import { savePpdbRegistrationToFirestore } from '../services/siteContentService';
 
 interface PsbRegistrationModalProps {
   isOpen: boolean;
@@ -33,17 +34,42 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
     notes: ''
   });
   const [registrationCode, setRegistrationCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.candidateName || !formData.originSchool || !formData.parentPhone) return;
 
-    // Generate simulated registration token
-    const randomCode = `PSB-LABS25-${Math.floor(100000 + Math.random() * 900000)}`;
-    setRegistrationCode(randomCode);
-    setStep('success');
+    try {
+      setIsSubmitting(true);
+      const randomCode = `PSB-PGRI5-${Math.floor(100000 + Math.random() * 900000)}`;
+      setRegistrationCode(randomCode);
+
+      // Save to Firebase Firestore in real-time
+      await savePpdbRegistrationToFirestore({
+        registrationCode: randomCode,
+        candidateName: formData.candidateName,
+        originSchool: formData.originSchool,
+        nisn: formData.nisn || '-',
+        gender: formData.gender,
+        parentName: formData.parentName,
+        parentPhone: formData.parentPhone,
+        parentEmail: formData.parentEmail || '',
+        selectedTrack: formData.selectedTrack,
+        notes: formData.notes || '',
+        status: 'Baru',
+      });
+
+      setStep('success');
+    } catch (err) {
+      console.error('Error saving PPDB registration:', err);
+      // Still allow success view with generated code so user has proof
+      setStep('success');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {

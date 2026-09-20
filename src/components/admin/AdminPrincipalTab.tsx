@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Save, 
   Upload, 
@@ -23,6 +23,13 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  // Sync draft whenever principal prop updates from Firestore
+  useEffect(() => {
+    if (principal) {
+      setDraft(principal);
+    }
+  }, [principal]);
 
   const handleFieldChange = (field: keyof PrincipalProfileContent, value: string) => {
     setDraft((prev) => ({ ...prev, [field]: value }));

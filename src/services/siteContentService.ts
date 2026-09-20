@@ -1,4 +1,17 @@
-import { db, doc, onSnapshot, setDoc, getDoc } from '../lib/firebase';
+import { 
+  db, 
+  doc, 
+  onSnapshot, 
+  setDoc, 
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  getDocFromServer
+} from '../lib/firebase';
 import { 
   PRINCIPAL_INFO, 
   PROGRAMS_UNGGULAN, 
@@ -14,6 +27,49 @@ import {
   ExtracurricularItem, 
   AchievementItem 
 } from '../types';
+
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  timestamp: string;
+}
+
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    operationType,
+    path,
+    timestamp: new Date().toISOString()
+  };
+  console.error('Firestore Error:', JSON.stringify(errInfo));
+  return errInfo;
+}
+
+// Validate connection to Firestore on initialization per Skill requirement
+export async function testFirestoreConnection(): Promise<boolean> {
+  try {
+    await getDocFromServer(doc(db, 'site_content', 'connection_test'));
+    return true;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.warn('Firestore notice: client appears offline or using cached state.');
+    }
+    return false;
+  }
+}
+
+// Run connection check in background
+testFirestoreConnection();
 
 export interface HeroSlideContent {
   id: number | string;
@@ -44,6 +100,22 @@ export interface SchoolSiteContent {
   achievements: AchievementItem[];
   updatedAt?: number;
   updatedBy?: string;
+}
+
+export interface PPDBRegistrationRecord {
+  id?: string;
+  registrationCode: string;
+  candidateName: string;
+  originSchool: string;
+  nisn?: string;
+  gender: string;
+  parentName: string;
+  parentPhone: string;
+  parentEmail?: string;
+  selectedTrack: string;
+  notes?: string;
+  status: 'Baru' | 'Diverifikasi' | 'Diterima' | 'Menunggu';
+  createdAt: number;
 }
 
 export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
@@ -111,6 +183,7 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
 };
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
+const PPDB_COLLECTION_REF = collection(db, 'ppdb_registrations');
 
 /**
  * Subscribe to real-time site content updates across all users
@@ -126,7 +199,7 @@ export function subscribeToSiteContent(
         if (snapshot.exists()) {
           const data = snapshot.data() as Partial<SchoolSiteContent>;
           const merged: SchoolSiteContent = {
-            heroSlides: data.heroSlides && data.heroSlides.length === 4 
+            heroSlides: Array.isArray(data.heroSlides) && data.heroSlides.length > 0 
               ? data.heroSlides 
               : DEFAULT_HERO_SLIDES,
             principal: {
@@ -158,13 +231,13 @@ export function subscribeToSiteContent(
         }
       },
       (err) => {
-        console.warn('Firestore subscription notice, fallback to default:', err);
+        handleFirestoreError(err, OperationType.GET, 'site_content/main_config');
         onUpdate(DEFAULT_SITE_CONTENT);
         if (onError) onError(err);
       }
     );
   } catch (error) {
-    console.error('Error establishing Firestore subscription:', error);
+    handleFirestoreError(error, OperationType.GET, 'site_content/main_config');
     onUpdate(DEFAULT_SITE_CONTENT);
     return () => {};
   }
@@ -183,27 +256,116 @@ export async function saveSiteContentToFirestore(
     updatedBy: adminUsername,
   };
 
-  await setDoc(CONTENT_DOC_REF, payload, { merge: true });
+  try {
+    await setDoc(CONTENT_DOC_REF, payload, { merge: true });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'site_content/main_config');
+    throw error;
+  }
 }
 
 /**
  * Reset content back to pure default configuration in Firestore
  */
 export async function resetSiteContentToDefaultInFirestore(): Promise<void> {
-  await setDoc(CONTENT_DOC_REF, {
-    heroSlides: DEFAULT_HERO_SLIDES,
-    principal: DEFAULT_PRINCIPAL_CONTENT,
-    programs: PROGRAMS_UNGGULAN,
-    news: NEWS_LIST,
-    facilities: FACILITIES_LIST,
-    extracurriculars: EXTRACURRICULAR_LIST,
-    achievements: ACHIEVEMENTS_LIST,
-    updatedAt: Date.now(),
-    updatedBy: 'admin_ilham (reset)',
-  });
+  try {
+    await setDoc(CONTENT_DOC_REF, {
+      heroSlides: DEFAULT_HERO_SLIDES,
+      principal: DEFAULT_PRINCIPAL_CONTENT,
+      programs: PROGRAMS_UNGGULAN,
+      news: NEWS_LIST,
+      facilities: FACILITIES_LIST,
+      extracurriculars: EXTRACURRICULAR_LIST,
+      achievements: ACHIEVEMENTS_LIST,
+      updatedAt: Date.now(),
+      updatedBy: 'admin_ilham (reset)',
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'site_content/main_config');
+    throw error;
+  }
 }
 
 export const resetSiteContentToDefaults = resetSiteContentToDefaultInFirestore;
+
+/**
+ * Save a new PPDB Registration to Firestore
+ */
+export async function savePpdbRegistrationToFirestore(
+  registration: Omit<PPDBRegistrationRecord, 'id' | 'createdAt'>
+): Promise<string> {
+  try {
+    const docRef = await addDoc(PPDB_COLLECTION_REF, {
+      ...registration,
+      createdAt: Date.now(),
+    });
+    return docRef.id;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'ppdb_registrations');
+    throw error;
+  }
+}
+
+/**
+ * Subscribe to real-time PPDB Registrations
+ */
+export function subscribeToPpdbRegistrations(
+  onUpdate: (registrations: PPDBRegistrationRecord[]) => void,
+  onError?: (error: Error) => void
+): () => void {
+  try {
+    const q = query(PPDB_COLLECTION_REF, orderBy('createdAt', 'desc'));
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const items: PPDBRegistrationRecord[] = [];
+        snapshot.forEach((docSnap) => {
+          items.push({
+            id: docSnap.id,
+            ...(docSnap.data() as Omit<PPDBRegistrationRecord, 'id'>),
+          });
+        });
+        onUpdate(items);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, 'ppdb_registrations');
+        if (onError) onError(err);
+      }
+    );
+  } catch (error) {
+    handleFirestoreError(error, OperationType.LIST, 'ppdb_registrations');
+    return () => {};
+  }
+}
+
+/**
+ * Update the verification status of a PPDB Registration in Firestore
+ */
+export async function updatePpdbRegistrationStatus(
+  docId: string, 
+  status: 'Baru' | 'Diverifikasi' | 'Diterima' | 'Menunggu'
+): Promise<void> {
+  try {
+    const regDocRef = doc(db, 'ppdb_registrations', docId);
+    await updateDoc(regDocRef, { status });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, `ppdb_registrations/${docId}`);
+    throw error;
+  }
+}
+
+/**
+ * Delete a PPDB Registration from Firestore
+ */
+export async function deletePpdbRegistration(docId: string): Promise<void> {
+  try {
+    const regDocRef = doc(db, 'ppdb_registrations', docId);
+    await deleteDoc(regDocRef);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, `ppdb_registrations/${docId}`);
+    throw error;
+  }
+}
 
 /**
  * Helper to compress user-uploaded image for optimal Firestore storage and ultra-fast loading

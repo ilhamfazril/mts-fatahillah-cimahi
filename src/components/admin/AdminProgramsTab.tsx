@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Pencil, 
@@ -34,6 +34,13 @@ export const AdminProgramsTab: React.FC<AdminProgramsTabProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  // Synchronize items with incoming Firestore real-time updates
+  useEffect(() => {
+    if (programs) {
+      setItems(programs);
+    }
+  }, [programs]);
 
   // Filtered items
   const filtered = items.filter((p) =>

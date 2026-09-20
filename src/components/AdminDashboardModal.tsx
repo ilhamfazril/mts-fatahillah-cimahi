@@ -19,7 +19,8 @@ import {
   Database,
   ChevronRight,
   Menu,
-  ArrowLeft
+  ArrowLeft,
+  GraduationCap
 } from 'lucide-react';
 import { 
   SchoolSiteContent, 
@@ -42,6 +43,7 @@ import { AdminNewsTab } from './admin/AdminNewsTab';
 import { AdminFacilitiesTab } from './admin/AdminFacilitiesTab';
 import { AdminExtracurricularsTab } from './admin/AdminExtracurricularsTab';
 import { AdminAchievementsTab } from './admin/AdminAchievementsTab';
+import { AdminPpdbTab } from './admin/AdminPpdbTab';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
@@ -59,6 +61,7 @@ type AdminTab =
   | 'facilities' 
   | 'extracurriculars' 
   | 'achievements' 
+  | 'ppdb'
   | 'settings';
 
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
@@ -221,6 +224,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       label: 'Prestasi Siswa',
       icon: <Trophy className="w-4 h-4" />,
       badge: siteContent.achievements?.length || ACHIEVEMENTS_LIST.length,
+    },
+    {
+      id: 'ppdb' as AdminTab,
+      label: 'Pendaftar PPDB Online',
+      icon: <GraduationCap className="w-4 h-4 text-amber-400" />,
+      badge: 'Live',
     },
     {
       id: 'settings' as AdminTab,
@@ -481,6 +490,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   achievementsList={siteContent.achievements || ACHIEVEMENTS_LIST}
                   onSaveAchievements={handleSaveAchievements}
                 />
+              )}
+
+              {activeTab === 'ppdb' && (
+                <AdminPpdbTab />
               )}
 
               {activeTab === 'settings' && (

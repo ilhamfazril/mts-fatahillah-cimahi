@@ -1,11 +1,17 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Pengunjung publik dapat membaca konten secara real-time
-    // Admin dapat memperbarui slide dan profil kepala sekolah
+    // School public site content (read by all visitors, updated by admin in real-time)
     match /site_content/{document=**} {
       allow read, write: if true;
     }
+
+    // PPDB Online registrations (submitted by public, managed by admin in real-time)
+    match /ppdb_registrations/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Default open for prototype
     match /{document=**} {
       allow read, write: if true;
     }

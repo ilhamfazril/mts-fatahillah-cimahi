@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Pencil, 
@@ -34,6 +34,13 @@ export const AdminFacilitiesTab: React.FC<AdminFacilitiesTabProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  // Sync with Firestore real-time updates
+  useEffect(() => {
+    if (facilitiesList) {
+      setItems(facilitiesList);
+    }
+  }, [facilitiesList]);
 
   const filtered = items.filter((f) => {
     const matchesCategory = selectedCategory === 'Semua' || f.category === selectedCategory;
