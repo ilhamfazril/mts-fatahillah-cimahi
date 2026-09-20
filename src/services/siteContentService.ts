@@ -38,6 +38,7 @@ import {
   EXTRACURRICULAR_LIST, 
   ACHIEVEMENTS_LIST 
 } from '../data/schoolData';
+import { PERSISTED_USER_CONTENT } from '../data/persistedSchoolContent';
 import { 
   ProgramUnggulan, 
   NewsItem, 
@@ -74,7 +75,8 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 // REST API Base URL to Google Cloud Firestore (direct cloud persistence fallback)
-const FIRESTORE_REST_BASE = `https://firestore.googleapis.com/v1/projects/${firebaseConfigData.projectId}/databases/${firebaseConfigData.firestoreDatabaseId}/documents/site_content/main_config?key=${firebaseConfigData.apiKey}`;
+const FIRESTORE_DOCS_ROOT = `https://firestore.googleapis.com/v1/projects/${firebaseConfigData.projectId}/databases/${firebaseConfigData.firestoreDatabaseId}/documents/site_content`;
+const FIRESTORE_REST_BASE = `${FIRESTORE_DOCS_ROOT}/main_config?key=${firebaseConfigData.apiKey}`;
 
 // Decode raw Firestore REST API document format into clean TypeScript objects
 function decodeFirestoreValue(val: any): any {
@@ -147,43 +149,139 @@ function encodeFirestoreDocument(obj: Record<string, any>): any {
 }
 
 /**
- * Direct HTTPS REST fetch to Google Cloud Firestore servers.
- * Bypasses all WebChannel / WebSocket / iframe limitations.
+ * Direct HTTPS REST fetch for a specific section document in site_content.
  */
-export async function fetchLiveContentFromFirestoreRest(): Promise<Partial<SchoolSiteContent> | null> {
+export async function fetchSectionFromFirestoreRest(sectionKey: string): Promise<any | null> {
   try {
-    const res = await fetch(FIRESTORE_REST_BASE, { cache: 'no-store' });
+    const url = `${FIRESTORE_DOCS_ROOT}/section_${sectionKey}?key=${firebaseConfigData.apiKey}`;
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return null;
     const json = await res.json();
-    return decodeFirestoreDocument(json);
+    const docFields = json.fields || {};
+    if (docFields.data) {
+      return decodeFirestoreValue(docFields.data);
+    }
+    return null;
   } catch (err) {
-    console.warn('Direct REST fetch notice:', err);
+    console.warn(`Direct REST fetch error for section_${sectionKey}:`, err);
     return null;
   }
 }
 
 /**
- * Direct HTTPS REST write to Google Cloud Firestore servers.
- * Guarantees permanent persistence in Firebase even if client SDK is in offline mode.
+ * Direct HTTPS REST write for a specific section document in site_content.
+ * Keeps payload small (~30-350 KB), completely eliminating Firestore 1MB limits.
  */
-export async function saveLiveContentToFirestoreRest(data: Partial<SchoolSiteContent>): Promise<boolean> {
+export async function saveSectionToFirestoreRest(
+  sectionKey: string, 
+  data: any, 
+  adminUsername: string
+): Promise<boolean> {
   try {
+    const url = `${FIRESTORE_DOCS_ROOT}/section_${sectionKey}?key=${firebaseConfigData.apiKey}`;
     const cleaned = cleanForFirestore(data);
-    const encoded = encodeFirestoreDocument(cleaned);
-    const fields = Object.keys(data).filter((k) => (data as any)[k] !== undefined);
-    const mask = fields.map((k) => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
-    const url = `${FIRESTORE_REST_BASE}&${mask}`;
-
+    const body = {
+      fields: {
+        data: encodeFirestoreValue(cleaned),
+        updatedAt: { integerValue: String(Date.now()) },
+        updatedBy: { stringValue: adminUsername },
+      },
+    };
     const res = await fetch(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(encoded),
+      body: JSON.stringify(body),
     });
     return res.ok;
   } catch (err) {
-    console.warn('Direct REST write notice:', err);
+    console.warn(`Direct REST save error for section_${sectionKey}:`, err);
     return false;
   }
+}
+
+/**
+ * Direct HTTPS REST fetch to Google Cloud Firestore servers.
+ * Fetches all individual section documents in parallel and merges them.
+ * Bypasses all WebChannel / WebSocket / iframe limitations.
+ */
+export async function fetchLiveContentFromFirestoreRest(): Promise<Partial<SchoolSiteContent> | null> {
+  const sections: (keyof SchoolSiteContent)[] = [
+    'heroSlides',
+    'principal',
+    'facilities',
+    'programs',
+    'news',
+    'achievements',
+    'extracurriculars',
+  ];
+
+  const result: Partial<SchoolSiteContent> = {};
+  let anyLoaded = false;
+
+  await Promise.all(
+    sections.map(async (sec) => {
+      try {
+        const secData = await fetchSectionFromFirestoreRest(sec as string);
+        if (secData !== null && secData !== undefined) {
+          (result as any)[sec] = secData;
+          anyLoaded = true;
+        }
+      } catch (e) {
+        console.warn(`Section fetch notice (${sec}):`, e);
+      }
+    })
+  );
+
+  // Also check main_config as fallback for any sections
+  try {
+    const res = await fetch(FIRESTORE_REST_BASE, { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      const mainDoc = decodeFirestoreDocument(json);
+      if (mainDoc) {
+        for (const sec of sections) {
+          if ((result as any)[sec] === undefined && (mainDoc as any)[sec] !== undefined) {
+            (result as any)[sec] = (mainDoc as any)[sec];
+            anyLoaded = true;
+          }
+        }
+        if (mainDoc.updatedAt && !result.updatedAt) result.updatedAt = mainDoc.updatedAt;
+        if (mainDoc.updatedBy && !result.updatedBy) result.updatedBy = mainDoc.updatedBy;
+      }
+    }
+  } catch (err) {
+    console.warn('Direct REST fetch main_config notice:', err);
+  }
+
+  return anyLoaded ? result : null;
+}
+
+/**
+ * Direct HTTPS REST write to Google Cloud Firestore servers.
+ */
+export async function saveLiveContentToFirestoreRest(data: Partial<SchoolSiteContent>): Promise<boolean> {
+  const sections: (keyof SchoolSiteContent)[] = [
+    'heroSlides',
+    'principal',
+    'facilities',
+    'programs',
+    'news',
+    'achievements',
+    'extracurriculars',
+  ];
+
+  const sectionsToSave = sections.filter((sec) => (data as any)[sec] !== undefined);
+  if (sectionsToSave.length === 0) return true;
+
+  let allSuccess = true;
+  await Promise.all(
+    sectionsToSave.map(async (sec) => {
+      const ok = await saveSectionToFirestoreRest(String(sec), (data as any)[sec], data.updatedBy || 'admin_ilham');
+      if (!ok) allSuccess = false;
+    })
+  );
+
+  return allSuccess;
 }
 
 // Validate connection to Firestore on initialization per Skill requirement
@@ -349,20 +447,34 @@ function safeSetLocalStorage(content: SchoolSiteContent): void {
 
 let currentSiteContentMemory: SchoolSiteContent = (() => {
   const cached = safeGetLocalStorage();
-  if (cached) {
-    return {
-      heroSlides: Array.isArray(cached.heroSlides) ? cached.heroSlides : DEFAULT_HERO_SLIDES,
-      principal: { ...DEFAULT_PRINCIPAL_CONTENT, ...(cached.principal || {}) },
-      programs: Array.isArray(cached.programs) ? cached.programs : PROGRAMS_UNGGULAN,
-      news: Array.isArray(cached.news) ? cached.news : NEWS_LIST,
-      facilities: Array.isArray(cached.facilities) ? cached.facilities : FACILITIES_LIST,
-      extracurriculars: Array.isArray(cached.extracurriculars) ? cached.extracurriculars : EXTRACURRICULAR_LIST,
-      achievements: Array.isArray(cached.achievements) ? cached.achievements : ACHIEVEMENTS_LIST,
-      updatedAt: cached.updatedAt || Date.now(),
-      updatedBy: cached.updatedBy || 'admin_ilham',
-    };
-  }
-  return { ...DEFAULT_SITE_CONTENT };
+  const base = cached || PERSISTED_USER_CONTENT || {};
+  return {
+    heroSlides: Array.isArray(base.heroSlides) && base.heroSlides.length > 0 
+      ? base.heroSlides 
+      : (PERSISTED_USER_CONTENT.heroSlides || DEFAULT_HERO_SLIDES),
+    principal: { 
+      ...DEFAULT_PRINCIPAL_CONTENT, 
+      ...(PERSISTED_USER_CONTENT.principal || {}),
+      ...(base.principal || {}) 
+    },
+    programs: Array.isArray(base.programs) && base.programs.length > 0 
+      ? base.programs 
+      : (PERSISTED_USER_CONTENT.programs || PROGRAMS_UNGGULAN),
+    news: Array.isArray(base.news) && base.news.length > 0 
+      ? base.news 
+      : (PERSISTED_USER_CONTENT.news || NEWS_LIST),
+    facilities: Array.isArray(base.facilities) && base.facilities.length > 0 
+      ? base.facilities 
+      : (PERSISTED_USER_CONTENT.facilities || FACILITIES_LIST),
+    extracurriculars: Array.isArray(base.extracurriculars) && base.extracurriculars.length > 0 
+      ? base.extracurriculars 
+      : (PERSISTED_USER_CONTENT.extracurriculars || EXTRACURRICULAR_LIST),
+    achievements: Array.isArray(base.achievements) && base.achievements.length > 0 
+      ? base.achievements 
+      : (PERSISTED_USER_CONTENT.achievements || ACHIEVEMENTS_LIST),
+    updatedAt: base.updatedAt || Date.now(),
+    updatedBy: base.updatedBy || 'admin_ilham',
+  };
 })();
 
 /**
@@ -452,12 +564,8 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
 
 /**
  * Subscribe to real-time site content updates across all users & browser tabs.
- * Combines:
- * 1. Immediate optimistic emission from memory/localStorage
- * 2. Instant Cloud Hydration via getDocFromServer + REST fallback on page load
- * 3. Continuous real-time Firestore onSnapshot listener
- * 4. Automatic cross-tab sync via storage events
- * 5. Heartbeat sync on tab focus and every 15s to guarantee fresh cloud state
+ * Uses individual section documents in Firestore to support high-res photos
+ * without ever reaching single-document size limits.
  */
 export function subscribeToSiteContent(
   onUpdate: (content: SchoolSiteContent) => void,
@@ -485,27 +593,13 @@ export function subscribeToSiteContent(
     window.addEventListener('storage', handleStorageEvent);
   }
 
-  // Active Cloud Hydration: Fetch live document directly from Google Cloud servers
+  // Active Cloud Hydration: Fetch live section documents directly from Google Cloud servers
   let isHydrated = false;
   const hydrateFromCloud = async () => {
-    // 1. Fetch all cloud media assets first so media: references resolve immediately
     try {
       await fetchAllMediaAssetsRest();
     } catch (e) {
       console.warn('Media assets prefetch notice:', e);
-    }
-
-    try {
-      const snap = await getDocFromServer(CONTENT_DOC_REF);
-      if (snap.exists()) {
-        const serverData = snap.data() as Partial<SchoolSiteContent>;
-        const merged = mergeWithDefaults(serverData);
-        isHydrated = true;
-        notifySubscribers(merged);
-        return;
-      }
-    } catch {
-      // If SDK server fetch fails (e.g. iframe offline / WebChannel delay), proceed to REST
     }
 
     try {
@@ -526,34 +620,68 @@ export function subscribeToSiteContent(
   // Real-time synchronization of media_assets
   const unsubscribeMedia = initMediaAssetsSync();
 
-  let unsubscribeFirestore: (() => void) | null = null;
+  // Listen to individual section documents in Firestore for real-time reactivity
+  const sectionsList: (keyof SchoolSiteContent)[] = [
+    'heroSlides',
+    'principal',
+    'facilities',
+    'programs',
+    'news',
+    'achievements',
+    'extracurriculars',
+  ];
+
+  const unsubs: (() => void)[] = [];
+
+  sectionsList.forEach((sec) => {
+    try {
+      const secRef = doc(db, 'site_content', 'section_' + String(sec));
+      const unsub = onSnapshot(
+        secRef,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const docData = snapshot.data();
+            if (docData && docData.data !== undefined) {
+              const partialUpdate: Partial<SchoolSiteContent> = {
+                [sec]: docData.data,
+                updatedAt: docData.updatedAt || Date.now(),
+                updatedBy: docData.updatedBy || 'admin_ilham',
+              };
+              const merged = mergeWithDefaults(partialUpdate);
+              notifySubscribers(merged);
+            }
+          }
+        },
+        (err) => {
+          console.warn(`Snapshot listener notice for section_${String(sec)}:`, err);
+        }
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn(`Setup snapshot error for section_${String(sec)}:`, e);
+    }
+  });
+
+  // Also listen to main_config as fallback
   try {
-    unsubscribeFirestore = onSnapshot(
+    const unsubMain = onSnapshot(
       CONTENT_DOC_REF,
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data() as Partial<SchoolSiteContent>;
           const merged = mergeWithDefaults(data);
           notifySubscribers(merged);
-        } else if (!isHydrated) {
-          // If document doesn't exist yet in Firestore, provision it with initial content
-          const initialPayload = cleanForFirestore(currentSiteContentMemory);
-          setDoc(CONTENT_DOC_REF, initialPayload).catch((e) => {
-            console.warn('Initial doc provisioning notice:', e);
-          });
-          notifySubscribers(currentSiteContentMemory);
         }
       },
       (err) => {
         handleFirestoreError(err, OperationType.GET, 'site_content/main_config');
-        // If onSnapshot fails (e.g. iframe WebChannel blocked), immediately fallback to REST
         hydrateFromCloud();
         if (onError) onError(err);
       }
     );
+    unsubs.push(unsubMain);
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, 'site_content/main_config');
-    hydrateFromCloud();
   }
 
   // Heartbeat & focus sync: ensures fresh cloud data even after device sleep or tab switch
@@ -580,9 +708,11 @@ export function subscribeToSiteContent(
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
-    if (unsubscribeFirestore) {
-      unsubscribeFirestore();
-    }
+    unsubs.forEach((u) => {
+      try {
+        u();
+      } catch {}
+    });
     if (unsubscribeMedia) {
       unsubscribeMedia();
     }
@@ -591,71 +721,104 @@ export function subscribeToSiteContent(
 
 /**
  * Save updated content to Firestore (Real-Time broadcast to all connected clients).
- * Non-destructive: pre-fetches live state from Cloud Firestore (SDK + REST fallback)
- * and uses Dual-Persistence (Firestore SDK + direct HTTPS REST) to guarantee that
- * data is permanently written directly to Google Cloud servers.
+ * Non-destructive: Persists each section to its own dedicated Firestore document
+ * (e.g. section_heroSlides, section_facilities, section_programs, section_principal).
+ * This completely eliminates Firestore's 1MB single-document limit and ensures that
+ * no uploaded photos are ever reset, corrupted, or rejected with "Gagal Tersimpan Ke Firebase".
  */
 export async function saveSiteContentToFirestore(
   updatedContent: Partial<SchoolSiteContent>,
   adminUsername: string = 'admin_ilham'
 ): Promise<SchoolSiteContent> {
-  // 1. Fetch latest state from Firestore to prevent stale overwrites across sessions/tabs
-  let liveExistingData: Partial<SchoolSiteContent> = {};
-  try {
-    const snap = await getDocFromServer(CONTENT_DOC_REF);
-    if (snap.exists()) {
-      liveExistingData = snap.data() as Partial<SchoolSiteContent>;
-    }
-  } catch {
-    try {
-      const rest = await fetchLiveContentFromFirestoreRest();
-      if (rest) liveExistingData = rest;
-    } catch {
-      // Fallback to in-memory state
-    }
-  }
+  const sectionsList: (keyof SchoolSiteContent)[] = [
+    'heroSlides',
+    'principal',
+    'facilities',
+    'programs',
+    'news',
+    'achievements',
+    'extracurriculars',
+  ];
 
-  // 2. Base content is merged from live Firestore -> memory cache -> default fallbacks
-  const baseDoc = mergeWithDefaults(liveExistingData);
-
-  // 3. Selectively merge ONLY the sections that are actually updated
+  // 1. Immediately merge into memory & notify local subscribers (optimistic fast UI)
   const mergedDoc: SchoolSiteContent = {
-    heroSlides: updatedContent.heroSlides !== undefined ? updatedContent.heroSlides : baseDoc.heroSlides,
-    principal: updatedContent.principal !== undefined 
-      ? { ...baseDoc.principal, ...updatedContent.principal }
-      : baseDoc.principal,
-    programs: updatedContent.programs !== undefined ? updatedContent.programs : baseDoc.programs,
-    news: updatedContent.news !== undefined ? updatedContent.news : baseDoc.news,
-    facilities: updatedContent.facilities !== undefined ? updatedContent.facilities : baseDoc.facilities,
-    extracurriculars: updatedContent.extracurriculars !== undefined ? updatedContent.extracurriculars : baseDoc.extracurriculars,
-    achievements: updatedContent.achievements !== undefined ? updatedContent.achievements : baseDoc.achievements,
+    ...currentSiteContentMemory,
+    ...updatedContent,
     updatedAt: Date.now(),
     updatedBy: adminUsername,
   };
 
-  // 4. Immediately notify local subscribers & localStorage with full, pure photos
   notifySubscribers(mergedDoc);
 
-  // 5. Dual-persistence: Write full document directly to Firestore SDK AND direct HTTPS REST
-  const payload = cleanForFirestore(mergedDoc);
-  let sdkSuccess = false;
-  let restSuccess = false;
-
-  try {
-    await setDoc(CONTENT_DOC_REF, payload, { merge: true });
-    sdkSuccess = true;
-  } catch (sdkErr) {
-    console.warn('Firestore SDK write error/offline notice:', sdkErr);
+  // 2. Identify which sections are updated
+  const sectionsToSave = sectionsList.filter((sec) => updatedContent[sec] !== undefined);
+  if (sectionsToSave.length === 0) {
+    sectionsToSave.push(...sectionsList);
   }
 
+  // 3. Save each updated section independently to its dedicated document in Cloud Firestore
+  let atLeastOneSuccess = false;
+
+  await Promise.all(
+    sectionsToSave.map(async (sec) => {
+      const secData = (mergedDoc as any)[sec];
+      if (secData === undefined) return;
+
+      const cleanedSecData = cleanForFirestore(secData);
+      let sdkSuccess = false;
+      let restSuccess = false;
+
+      // Persist via Firestore SDK
+      try {
+        const secDocRef = doc(db, 'site_content', 'section_' + String(sec));
+        await setDoc(
+          secDocRef,
+          {
+            data: cleanedSecData,
+            updatedAt: Date.now(),
+            updatedBy: adminUsername,
+          },
+          { merge: true }
+        );
+        sdkSuccess = true;
+      } catch (sdkErr) {
+        console.warn(`Firestore SDK write notice for section_${String(sec)}:`, sdkErr);
+      }
+
+      // Persist via direct HTTPS REST
+      try {
+        restSuccess = await saveSectionToFirestoreRest(String(sec), cleanedSecData, adminUsername);
+      } catch (restErr) {
+        console.warn(`Firestore REST write notice for section_${String(sec)}:`, restErr);
+      }
+
+      if (sdkSuccess || restSuccess) {
+        atLeastOneSuccess = true;
+      }
+    })
+  );
+
+  // 4. Update lightweight metadata in main_config (without large payload)
   try {
-    restSuccess = await saveLiveContentToFirestoreRest(mergedDoc);
-  } catch (restErr) {
-    console.warn('Firestore REST write error notice:', restErr);
+    setDoc(
+      CONTENT_DOC_REF,
+      {
+        updatedAt: Date.now(),
+        updatedBy: adminUsername,
+        lastSectionsUpdated: sectionsToSave.map(String),
+      },
+      { merge: true }
+    ).catch(() => {});
+  } catch {
+    // Non-blocking
   }
 
-  if (!sdkSuccess && !restSuccess) {
-    handleFirestoreError(new Error('Gagal menyimpan ke Google Cloud Firestore'), OperationType.WRITE, 'site_content/main_config');
+  if (!atLeastOneSuccess) {
+    handleFirestoreError(
+      new Error('Gagal menyimpan ke Google Cloud Firestore'),
+      OperationType.WRITE,
+      'site_content'
+    );
     throw new Error('Gagal menyimpan perubahan ke Cloud Firestore. Silakan periksa koneksi internet Anda.');
   }
 

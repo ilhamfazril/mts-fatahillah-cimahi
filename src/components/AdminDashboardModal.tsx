@@ -134,7 +134,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       updatedAt: Date.now(),
       updatedBy: session?.username || 'admin_ilham',
     };
-    await saveSiteContentToFirestore(updated);
+    await saveSiteContentToFirestore(partial, session?.username || 'admin_ilham');
 
     if (meta) {
       setRealtimeSuccessInfo({
