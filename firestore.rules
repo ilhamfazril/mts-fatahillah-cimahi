@@ -6,6 +6,11 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Media assets collection for uploaded photos (optimized, compressed, persistent)
+    match /media_assets/{document=**} {
+      allow read, write: if true;
+    }
+
     // PPDB Online registrations (submitted by public, managed by admin in real-time)
     match /ppdb_registrations/{document=**} {
       allow read, write: if true;

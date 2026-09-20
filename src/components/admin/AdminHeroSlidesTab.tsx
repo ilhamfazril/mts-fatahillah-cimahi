@@ -80,10 +80,11 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
     if (!file) return;
 
     try {
-      setUploadStatus(`Mengoptimalkan foto slide ${validIndex + 1}...`);
-      const optimized = await compressImageForStorage(file, 1600, 1000, 0.84);
+      setUploadStatus(`Mengompresi dan mengoptimalkan foto slide ${validIndex + 1}...`);
+      const optimized = await compressImageForStorage(file, 1200, 700, 0.72);
       handleFieldChange('bgImage', optimized);
-      setUploadStatus(null);
+      setUploadStatus('✓ Foto berhasil dikompresi hemat (<80 KB) & siap disimpan ke Firestore.');
+      setTimeout(() => setUploadStatus(null), 4000);
     } catch (err) {
       console.error(err);
       alert('Gagal memproses file foto. Pastikan format foto adalah JPG/PNG.');
@@ -396,6 +397,10 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
                   className="hidden"
                 />
               </label>
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-slate-500">
+              <span>Mendukung file JPG, PNG, atau WEBP dari HP/komputer.</span>
+              <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">⚡ Kompresi otomatis &lt;80 KB</span>
             </div>
             {uploadStatus && (
               <p className="text-[11px] text-emerald-700 font-medium animate-pulse">

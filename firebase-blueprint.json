@@ -49,12 +49,26 @@
         "status": { "type": "string" },
         "createdAt": { "type": "number" }
       }
+    },
+    "MediaAsset": {
+      "title": "MediaAsset",
+      "description": "Compressed media file asset stored in Firestore",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "dataUrl": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      }
     }
   },
   "firestore": {
     "/site_content/{contentId}": {
       "schema": "SiteContent",
       "description": "Dynamic school content documents"
+    },
+    "/media_assets/{assetId}": {
+      "schema": "MediaAsset",
+      "description": "Compressed image assets for slides, principal, news and facilities"
     },
     "/ppdb_registrations/{registrationId}": {
       "schema": "PPDBRegistration",

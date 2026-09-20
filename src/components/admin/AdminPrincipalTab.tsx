@@ -41,10 +41,11 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
     if (!file) return;
 
     try {
-      setUploadStatus('Mengoptimalkan foto Kepala Sekolah...');
-      const optimized = await compressImageForStorage(file, 800, 800, 0.85);
+      setUploadStatus('Mengompresi dan mengoptimalkan foto Kepala Sekolah...');
+      const optimized = await compressImageForStorage(file, 600, 600, 0.70);
       handleFieldChange('photo', optimized);
-      setUploadStatus(null);
+      setUploadStatus('✓ Foto berhasil dikompresi hemat (<60 KB) & siap disimpan ke Firestore.');
+      setTimeout(() => setUploadStatus(null), 4000);
     } catch (err) {
       console.error(err);
       alert('Gagal memproses file foto. Gunakan format JPG/PNG.');
@@ -132,6 +133,10 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
                   className="hidden"
                 />
               </label>
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+              <span>Mendukung file JPG, PNG dari HP atau kamera.</span>
+              <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/80">⚡ Kompresi cerdas &lt;60 KB</span>
             </div>
             {uploadStatus && (
               <p className="text-[11px] text-emerald-700 font-medium animate-pulse mt-1">

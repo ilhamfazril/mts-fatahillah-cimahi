@@ -11,7 +11,8 @@ import {
   deleteDoc,
   query,
   orderBy,
-  getDocFromServer
+  getDocFromServer,
+  getDocs
 } from 'firebase/firestore';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
@@ -42,5 +43,6 @@ export {
   deleteDoc,
   query,
   orderBy,
-  getDocFromServer
+  getDocFromServer,
+  getDocs
 };

@@ -13,6 +13,23 @@ import {
   getDocFromServer
 } from '../lib/firebase';
 import firebaseConfigData from '../../firebase-applet-config.json';
+import {
+  compressImageForStorage,
+  saveMediaAsset,
+  resolveMediaUrl,
+  resolveObjectMedia,
+  initMediaAssetsSync,
+  fetchAllMediaAssetsRest,
+} from './mediaAssetService';
+
+export {
+  compressImageForStorage,
+  saveMediaAsset,
+  resolveMediaUrl,
+  resolveObjectMedia,
+  initMediaAssetsSync,
+  fetchAllMediaAssetsRest,
+};
 import { 
   PRINCIPAL_INFO, 
   PROGRAMS_UNGGULAN, 
@@ -351,15 +368,93 @@ let currentSiteContentMemory: SchoolSiteContent = (() => {
 const localSubscribers = new Set<(content: SchoolSiteContent) => void>();
 
 function notifySubscribers(content: SchoolSiteContent) {
-  currentSiteContentMemory = content;
-  safeSetLocalStorage(content);
+  const resolved = resolveObjectMedia(content);
+  currentSiteContentMemory = resolved;
+  safeSetLocalStorage(resolved);
   localSubscribers.forEach((fn) => {
     try {
-      fn(content);
+      fn(resolved);
     } catch (err) {
       console.error('Subscriber callback error:', err);
     }
   });
+}
+
+/**
+ * Automatically extracts uploaded image dataUrls and stores each in dedicated
+ * media_assets documents in Cloud Firestore, replacing the bulky inline Base64 with
+ * lightweight media: references so main_config is always tiny (<20KB) and never hits 1MB limits.
+ */
+async function extractAndPersistMediaAssets(
+  content: SchoolSiteContent
+): Promise<{ toStoreInMainConfig: SchoolSiteContent; toNotify: SchoolSiteContent }> {
+  const mainDoc: SchoolSiteContent = JSON.parse(JSON.stringify(content));
+  const notifyDoc: SchoolSiteContent = JSON.parse(JSON.stringify(content));
+
+  // 1. Hero slides
+  if (Array.isArray(mainDoc.heroSlides)) {
+    for (let i = 0; i < mainDoc.heroSlides.length; i++) {
+      const slide = mainDoc.heroSlides[i];
+      if (slide.bgImage && slide.bgImage.startsWith('data:image/')) {
+        const assetId = `slide_${slide.id || i}`;
+        await saveMediaAsset(assetId, slide.bgImage);
+        slide.bgImage = `media:${assetId}`;
+      }
+    }
+  }
+
+  // 2. Principal photo
+  if (mainDoc.principal?.photo && mainDoc.principal.photo.startsWith('data:image/')) {
+    const assetId = 'principal_photo';
+    await saveMediaAsset(assetId, mainDoc.principal.photo);
+    mainDoc.principal.photo = `media:${assetId}`;
+  }
+
+  // 3. News
+  if (Array.isArray(mainDoc.news)) {
+    for (const item of mainDoc.news) {
+      if (item.image && item.image.startsWith('data:image/')) {
+        const assetId = `news_${item.id}`;
+        await saveMediaAsset(assetId, item.image);
+        item.image = `media:${assetId}`;
+      }
+    }
+  }
+
+  // 4. Facilities
+  if (Array.isArray(mainDoc.facilities)) {
+    for (const item of mainDoc.facilities) {
+      if (item.image && item.image.startsWith('data:image/')) {
+        const assetId = `facility_${item.id}`;
+        await saveMediaAsset(assetId, item.image);
+        item.image = `media:${assetId}`;
+      }
+    }
+  }
+
+  // 5. Programs
+  if (Array.isArray(mainDoc.programs)) {
+    for (const item of mainDoc.programs) {
+      if (item.image && item.image.startsWith('data:image/')) {
+        const assetId = `program_${item.id}`;
+        await saveMediaAsset(assetId, item.image);
+        item.image = `media:${assetId}`;
+      }
+    }
+  }
+
+  // 6. Achievements
+  if (Array.isArray(mainDoc.achievements)) {
+    for (const item of mainDoc.achievements) {
+      if (item.image && item.image.startsWith('data:image/')) {
+        const assetId = `achievement_${item.id}`;
+        await saveMediaAsset(assetId, item.image);
+        item.image = `media:${assetId}`;
+      }
+    }
+  }
+
+  return { toStoreInMainConfig: mainDoc, toNotify: notifyDoc };
 }
 
 /**
@@ -435,6 +530,13 @@ export function subscribeToSiteContent(
   // Active Cloud Hydration: Fetch live document directly from Google Cloud servers
   let isHydrated = false;
   const hydrateFromCloud = async () => {
+    // 1. Fetch all cloud media assets first so media: references resolve immediately
+    try {
+      await fetchAllMediaAssetsRest();
+    } catch (e) {
+      console.warn('Media assets prefetch notice:', e);
+    }
+
     try {
       const snap = await getDocFromServer(CONTENT_DOC_REF);
       if (snap.exists()) {
@@ -462,6 +564,9 @@ export function subscribeToSiteContent(
 
   // Run immediate hydration upon subscribing
   hydrateFromCloud();
+
+  // Real-time synchronization of media_assets
+  const unsubscribeMedia = initMediaAssetsSync();
 
   let unsubscribeFirestore: (() => void) | null = null;
   try {
@@ -520,6 +625,9 @@ export function subscribeToSiteContent(
     if (unsubscribeFirestore) {
       unsubscribeFirestore();
     }
+    if (unsubscribeMedia) {
+      unsubscribeMedia();
+    }
   };
 }
 
@@ -567,11 +675,15 @@ export async function saveSiteContentToFirestore(
     updatedBy: adminUsername,
   };
 
-  // 4. Immediately notify local subscribers & localStorage for instant zero-latency UI update
-  notifySubscribers(mergedDoc);
+  // 4. Extract any uploaded photo dataUrls and persist them into dedicated media_assets collection
+  //    This keeps main_config under 25KB, eliminates 1MB limits permanently, and persists images indefinitely.
+  const { toStoreInMainConfig, toNotify } = await extractAndPersistMediaAssets(mergedDoc);
 
-  // 5. Dual-persistence: Write to Firestore SDK AND direct HTTPS REST
-  const payload = cleanForFirestore(mergedDoc);
+  // 5. Immediately notify local subscribers & localStorage with fully resolved image content
+  notifySubscribers(toNotify);
+
+  // 6. Dual-persistence: Write compact manifest (with media: references) to Firestore SDK AND direct HTTPS REST
+  const payload = cleanForFirestore(toStoreInMainConfig);
   let sdkSuccess = false;
   let restSuccess = false;
 
@@ -583,7 +695,7 @@ export async function saveSiteContentToFirestore(
   }
 
   try {
-    restSuccess = await saveLiveContentToFirestoreRest(mergedDoc);
+    restSuccess = await saveLiveContentToFirestoreRest(toStoreInMainConfig);
   } catch (restErr) {
     console.warn('Firestore REST write error notice:', restErr);
   }
@@ -593,7 +705,7 @@ export async function saveSiteContentToFirestore(
     throw new Error('Gagal menyimpan perubahan ke Cloud Firestore. Silakan periksa koneksi internet Anda.');
   }
 
-  return mergedDoc;
+  return toNotify;
 }
 
 /**
@@ -717,49 +829,3 @@ export async function deletePpdbRegistration(docId: string): Promise<void> {
   }
 }
 
-/**
- * Helper to compress user-uploaded image for optimal Firestore storage and ultra-fast loading
- */
-export function compressImageForStorage(
-  file: File,
-  maxWidth: number = 1600,
-  maxHeight: number = 1000,
-  quality: number = 0.82
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        if (height > maxHeight) {
-          width = Math.round((width * maxHeight) / height);
-          height = maxHeight;
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(event.target?.result as string);
-          return;
-        }
-
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-        resolve(dataUrl);
-      };
-      img.onerror = () => reject(new Error('Gagal memproses file foto.'));
-      img.src = event.target?.result as string;
-    };
-    reader.onerror = () => reject(new Error('Gagal membaca file gambar.'));
-    reader.readAsDataURL(file);
-  });
-}

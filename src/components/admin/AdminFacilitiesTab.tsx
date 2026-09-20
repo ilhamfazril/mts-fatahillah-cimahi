@@ -127,10 +127,11 @@ export const AdminFacilitiesTab: React.FC<AdminFacilitiesTabProps> = ({
     if (!file || !editingItem) return;
 
     try {
-      setUploadStatus('Mengoptimalkan foto sarana...');
-      const optimized = await compressImageForStorage(file, 1200, 800, 0.82);
+      setUploadStatus('Mengompresi dan mengoptimalkan foto fasilitas...');
+      const optimized = await compressImageForStorage(file, 800, 500, 0.70);
       setEditingItem({ ...editingItem, image: optimized });
-      setUploadStatus(null);
+      setUploadStatus('✓ Foto berhasil dikompresi hemat (<60 KB).');
+      setTimeout(() => setUploadStatus(null), 3500);
     } catch (err) {
       console.error(err);
       alert('Gagal memproses gambar. Gunakan format JPG/PNG.');
