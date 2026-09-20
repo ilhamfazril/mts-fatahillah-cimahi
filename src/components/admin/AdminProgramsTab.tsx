@@ -18,7 +18,7 @@ import { compressImageForStorage } from '../../services/siteContentService';
 
 interface AdminProgramsTabProps {
   programs: ProgramUnggulan[];
-  onSavePrograms: (updated: ProgramUnggulan[]) => Promise<void>;
+  onSavePrograms: (updated: ProgramUnggulan[], meta?: { action?: 'create' | 'update' | 'delete'; title?: string }) => Promise<void>;
 }
 
 export const AdminProgramsTab: React.FC<AdminProgramsTabProps> = ({
@@ -85,12 +85,14 @@ export const AdminProgramsTab: React.FC<AdminProgramsTabProps> = ({
     }
 
     setItems(updatedList);
+    const actionType = isCreatingNew ? 'create' : 'update';
+    const itemTitle = editingItem.title;
     setEditingItem(null);
 
     // Save directly to Firestore
     try {
       setIsSaving(true);
-      await onSavePrograms(updatedList);
+      await onSavePrograms(updatedList, { action: actionType, title: itemTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
@@ -104,13 +106,14 @@ export const AdminProgramsTab: React.FC<AdminProgramsTabProps> = ({
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
 
+    const deletedTitle = itemToDelete.title;
     const updatedList = items.filter((p) => p.id !== itemToDelete.id);
     setItems(updatedList);
     setItemToDelete(null);
 
     try {
       setIsSaving(true);
-      await onSavePrograms(updatedList);
+      await onSavePrograms(updatedList, { action: 'delete', title: deletedTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {

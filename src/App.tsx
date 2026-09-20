@@ -28,7 +28,8 @@ import {
   subscribeToSiteContent, 
   SchoolSiteContent, 
   DEFAULT_HERO_SLIDES,
-  DEFAULT_PRINCIPAL_CONTENT 
+  DEFAULT_PRINCIPAL_CONTENT,
+  DEFAULT_SITE_CONTENT 
 } from './services/siteContentService';
 import { NewsItem } from './types';
 import { ArrowUp, GraduationCap } from 'lucide-react';
@@ -69,9 +70,17 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNavigate = (tab: string) => {
+  const handleNavigate = (tab: string, elementId?: string) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (elementId) {
+      setTimeout(() => {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+    }
   };
 
   const handleLogout = () => {
@@ -80,10 +89,14 @@ export default function App() {
     setIsAdminDashboardOpen(false);
   };
 
-  const currentContent: SchoolSiteContent = siteContent || {
-    heroSlides: DEFAULT_HERO_SLIDES,
-    principal: DEFAULT_PRINCIPAL_CONTENT,
-  };
+  const currentContent: SchoolSiteContent = siteContent ? {
+    ...DEFAULT_SITE_CONTENT,
+    ...siteContent,
+    principal: {
+      ...DEFAULT_PRINCIPAL_CONTENT,
+      ...(siteContent.principal || {}),
+    }
+  } : DEFAULT_SITE_CONTENT;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans">
@@ -352,7 +365,11 @@ export default function App() {
 
       {/* Modals */}
       <NewsDetailModal
-        article={selectedArticle}
+        article={
+          selectedArticle
+            ? currentContent.news?.find((n) => n.id === selectedArticle.id) || selectedArticle
+            : null
+        }
         onClose={() => setSelectedArticle(null)}
       />
 
@@ -391,6 +408,7 @@ export default function App() {
         onClose={() => setIsAdminDashboardOpen(false)}
         siteContent={currentContent}
         onLogout={handleLogout}
+        onNavigateTab={handleNavigate}
       />
     </div>
   );

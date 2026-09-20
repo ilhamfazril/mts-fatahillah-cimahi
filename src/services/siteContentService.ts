@@ -184,16 +184,93 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
 const PPDB_COLLECTION_REF = collection(db, 'ppdb_registrations');
+const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_site_content_cache';
+
+// Clean object recursively to eliminate any `undefined` fields that break Firestore writes
+function cleanForFirestore<T>(input: T): T {
+  return JSON.parse(
+    JSON.stringify(input, (_, value) => {
+      if (value === undefined) return null;
+      return value;
+    })
+  );
+}
+
+// In-memory cache & local subscribers to guarantee instant, zero-delay real-time reactivity
+let currentSiteContentMemory: SchoolSiteContent = (() => {
+  try {
+    const saved = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        heroSlides: Array.isArray(parsed.heroSlides) && parsed.heroSlides.length > 0 ? parsed.heroSlides : DEFAULT_HERO_SLIDES,
+        principal: { ...DEFAULT_PRINCIPAL_CONTENT, ...(parsed.principal || {}) },
+        programs: Array.isArray(parsed.programs) && parsed.programs.length > 0 ? parsed.programs : PROGRAMS_UNGGULAN,
+        news: Array.isArray(parsed.news) && parsed.news.length > 0 ? parsed.news : NEWS_LIST,
+        facilities: Array.isArray(parsed.facilities) && parsed.facilities.length > 0 ? parsed.facilities : FACILITIES_LIST,
+        extracurriculars: Array.isArray(parsed.extracurriculars) && parsed.extracurriculars.length > 0 ? parsed.extracurriculars : EXTRACURRICULAR_LIST,
+        achievements: Array.isArray(parsed.achievements) && parsed.achievements.length > 0 ? parsed.achievements : ACHIEVEMENTS_LIST,
+        updatedAt: parsed.updatedAt || Date.now(),
+        updatedBy: parsed.updatedBy || 'admin_ilham',
+      };
+    }
+  } catch (e) {
+    console.warn('Cache read notice:', e);
+  }
+  return { ...DEFAULT_SITE_CONTENT };
+})();
+
+const localSubscribers = new Set<(content: SchoolSiteContent) => void>();
+
+function notifySubscribers(content: SchoolSiteContent) {
+  currentSiteContentMemory = content;
+  try {
+    localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(content));
+  } catch (e) {
+    console.warn('Cache write notice:', e);
+  }
+  localSubscribers.forEach((fn) => {
+    try {
+      fn(content);
+    } catch (err) {
+      console.error('Subscriber callback error:', err);
+    }
+  });
+}
 
 /**
- * Subscribe to real-time site content updates across all users
+ * Subscribe to real-time site content updates across all users & browser tabs
  */
 export function subscribeToSiteContent(
   onUpdate: (content: SchoolSiteContent) => void,
   onError?: (error: Error) => void
 ): () => void {
+  // Register local subscriber for instant optimistic updates
+  localSubscribers.add(onUpdate);
+  // Emit current data immediately so caller never waits with null state
+  onUpdate(currentSiteContentMemory);
+
+  // Cross-tab real-time synchronization via storage events
+  const handleStorageEvent = (e: StorageEvent) => {
+    if (e.key === CACHE_STORAGE_KEY && e.newValue) {
+      try {
+        const parsed = JSON.parse(e.newValue);
+        currentSiteContentMemory = {
+          ...DEFAULT_SITE_CONTENT,
+          ...parsed,
+          principal: { ...DEFAULT_PRINCIPAL_CONTENT, ...(parsed.principal || {}) },
+        };
+        onUpdate(currentSiteContentMemory);
+      } catch (err) {
+        console.warn('Cross-tab sync parse error:', err);
+      }
+    }
+  };
+  window.addEventListener('storage', handleStorageEvent);
+
+  let unsubscribeFirestore: (() => void) | null = null;
   try {
-    return onSnapshot(
+    unsubscribeFirestore = onSnapshot(
       CONTENT_DOC_REF,
       (snapshot) => {
         if (snapshot.exists()) {
@@ -221,26 +298,33 @@ export function subscribeToSiteContent(
             achievements: Array.isArray(data.achievements) && data.achievements.length > 0
               ? data.achievements
               : ACHIEVEMENTS_LIST,
-            updatedAt: data.updatedAt,
-            updatedBy: data.updatedBy,
+            updatedAt: data.updatedAt || Date.now(),
+            updatedBy: data.updatedBy || 'admin_ilham',
           };
-          onUpdate(merged);
+          notifySubscribers(merged);
         } else {
-          // If document doesn't exist yet in Firestore, provide default content
-          onUpdate(DEFAULT_SITE_CONTENT);
+          // If document doesn't exist yet in Firestore, provision it with current content
+          notifySubscribers(currentSiteContentMemory);
         }
       },
       (err) => {
         handleFirestoreError(err, OperationType.GET, 'site_content/main_config');
-        onUpdate(DEFAULT_SITE_CONTENT);
+        notifySubscribers(currentSiteContentMemory);
         if (onError) onError(err);
       }
     );
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, 'site_content/main_config');
-    onUpdate(DEFAULT_SITE_CONTENT);
-    return () => {};
+    notifySubscribers(currentSiteContentMemory);
   }
+
+  return () => {
+    localSubscribers.delete(onUpdate);
+    window.removeEventListener('storage', handleStorageEvent);
+    if (unsubscribeFirestore) {
+      unsubscribeFirestore();
+    }
+  };
 }
 
 /**
@@ -249,15 +333,32 @@ export function subscribeToSiteContent(
 export async function saveSiteContentToFirestore(
   updatedContent: Partial<SchoolSiteContent>,
   adminUsername: string = 'admin_ilham'
-): Promise<void> {
-  const payload = {
-    ...updatedContent,
+): Promise<SchoolSiteContent> {
+  const completeDoc: SchoolSiteContent = {
+    heroSlides: updatedContent.heroSlides || currentSiteContentMemory.heroSlides || DEFAULT_HERO_SLIDES,
+    principal: {
+      ...DEFAULT_PRINCIPAL_CONTENT,
+      ...(currentSiteContentMemory.principal || {}),
+      ...(updatedContent.principal || {}),
+    },
+    programs: updatedContent.programs || currentSiteContentMemory.programs || PROGRAMS_UNGGULAN,
+    news: updatedContent.news || currentSiteContentMemory.news || NEWS_LIST,
+    facilities: updatedContent.facilities || currentSiteContentMemory.facilities || FACILITIES_LIST,
+    extracurriculars: updatedContent.extracurriculars || currentSiteContentMemory.extracurriculars || EXTRACURRICULAR_LIST,
+    achievements: updatedContent.achievements || currentSiteContentMemory.achievements || ACHIEVEMENTS_LIST,
     updatedAt: Date.now(),
     updatedBy: adminUsername,
   };
 
+  // 1. Immediately notify local subscribers & localStorage for instant zero-latency UI update
+  notifySubscribers(completeDoc);
+
+  // 2. Sanitize against undefined values and persist to Cloud Firestore
+  const payload = cleanForFirestore(completeDoc);
+
   try {
     await setDoc(CONTENT_DOC_REF, payload, { merge: true });
+    return completeDoc;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'site_content/main_config');
     throw error;
@@ -268,18 +369,23 @@ export async function saveSiteContentToFirestore(
  * Reset content back to pure default configuration in Firestore
  */
 export async function resetSiteContentToDefaultInFirestore(): Promise<void> {
+  const defaultDoc: SchoolSiteContent = {
+    heroSlides: DEFAULT_HERO_SLIDES,
+    principal: DEFAULT_PRINCIPAL_CONTENT,
+    programs: PROGRAMS_UNGGULAN,
+    news: NEWS_LIST,
+    facilities: FACILITIES_LIST,
+    extracurriculars: EXTRACURRICULAR_LIST,
+    achievements: ACHIEVEMENTS_LIST,
+    updatedAt: Date.now(),
+    updatedBy: 'admin_ilham (reset)',
+  };
+
+  notifySubscribers(defaultDoc);
+  const payload = cleanForFirestore(defaultDoc);
+
   try {
-    await setDoc(CONTENT_DOC_REF, {
-      heroSlides: DEFAULT_HERO_SLIDES,
-      principal: DEFAULT_PRINCIPAL_CONTENT,
-      programs: PROGRAMS_UNGGULAN,
-      news: NEWS_LIST,
-      facilities: FACILITIES_LIST,
-      extracurriculars: EXTRACURRICULAR_LIST,
-      achievements: ACHIEVEMENTS_LIST,
-      updatedAt: Date.now(),
-      updatedBy: 'admin_ilham (reset)',
-    });
+    await setDoc(CONTENT_DOC_REF, payload);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'site_content/main_config');
     throw error;

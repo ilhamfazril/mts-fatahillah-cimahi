@@ -44,12 +44,14 @@ import { AdminFacilitiesTab } from './admin/AdminFacilitiesTab';
 import { AdminExtracurricularsTab } from './admin/AdminExtracurricularsTab';
 import { AdminAchievementsTab } from './admin/AdminAchievementsTab';
 import { AdminPpdbTab } from './admin/AdminPpdbTab';
+import { RealtimeSuccessModal, RealtimeSuccessInfo } from './RealtimeSuccessModal';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
   siteContent: SchoolSiteContent;
   onLogout: () => void;
+  onNavigateTab?: (tab: string, elementId?: string) => void;
 }
 
 type AdminTab = 
@@ -69,6 +71,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   onClose,
   siteContent,
   onLogout,
+  onNavigateTab,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [tabHistory, setTabHistory] = useState<AdminTab[]>(['overview']);
@@ -76,6 +79,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [globalFeedback, setGlobalFeedback] = useState<string | null>(null);
+  const [realtimeSuccessInfo, setRealtimeSuccessInfo] = useState<RealtimeSuccessInfo | null>(null);
 
   const navigateToTab = (tab: AdminTab) => {
     if (tab !== activeTab) {
@@ -112,43 +116,161 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Generic helper to update a part of siteContent and push to Firestore
-  const updateSiteSection = async (partial: Partial<SchoolSiteContent>) => {
+  // Generic helper to update a part of siteContent and push to Firestore with instant real-time notification
+  const updateSiteSection = async (
+    partial: Partial<SchoolSiteContent>,
+    meta?: {
+      sectionName: string;
+      title?: string;
+      action?: 'create' | 'update' | 'delete' | 'reset';
+      targetTab?: string;
+      targetElementId?: string;
+      details?: string;
+    }
+  ) => {
     const updated: SchoolSiteContent = {
       ...siteContent,
       ...partial,
-      updatedAt: new Date().toISOString(),
+      updatedAt: Date.now(),
       updatedBy: session?.username || 'admin_ilham',
     };
     await saveSiteContentToFirestore(updated);
+
+    if (meta) {
+      setRealtimeSuccessInfo({
+        isOpen: true,
+        sectionName: meta.sectionName,
+        itemTitle: meta.title,
+        actionType: meta.action || 'update',
+        timestamp: new Date().toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }) + ' WIB',
+        targetTab: meta.targetTab,
+        targetElementId: meta.targetElementId,
+        details: meta.details,
+      });
+    }
   };
 
   const handleSaveSlides = async (updatedSlides: HeroSlideContent[]) => {
-    await updateSiteSection({ heroSlides: updatedSlides });
+    await updateSiteSection(
+      { heroSlides: updatedSlides },
+      {
+        sectionName: 'Slide Banner Hero Beranda',
+        title: `${updatedSlides.length} Slide Aktif`,
+        action: 'update',
+        targetTab: 'beranda',
+        details: 'Seluruh banner visual utama di halaman depan website telah diperbarui dan langsung berganti secara real-time.',
+      }
+    );
   };
 
   const handleSavePrincipal = async (updatedPrincipal: PrincipalProfileContent) => {
-    await updateSiteSection({ principal: updatedPrincipal });
+    await updateSiteSection(
+      { principal: updatedPrincipal },
+      {
+        sectionName: 'Profil & Sambutan Kepala Sekolah',
+        title: updatedPrincipal.name,
+        action: 'update',
+        targetTab: 'profil',
+        details: 'Data foto profil resmi, nama lengkap, gelar, dan kutipan sambutan Kepala Sekolah telah disinkronkan secara langsung ke laman publik.',
+      }
+    );
   };
 
-  const handleSavePrograms = async (updatedPrograms: ProgramUnggulan[]) => {
-    await updateSiteSection({ programs: updatedPrograms });
+  const handleSavePrograms = async (
+    updatedPrograms: ProgramUnggulan[],
+    meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
+  ) => {
+    await updateSiteSection(
+      { programs: updatedPrograms },
+      {
+        sectionName: 'Program Unggulan Sekolah',
+        title: meta?.title || `${updatedPrograms.length} Program`,
+        action: meta?.action || 'update',
+        targetTab: 'program',
+        targetElementId: 'program',
+        details: 'Daftar program unggulan dan pembiasaan karakter peserta didik berhasil diperbarui dan disiarkan ke database Firestore.',
+      }
+    );
   };
 
-  const handleSaveNews = async (updatedNews: NewsItem[]) => {
-    await updateSiteSection({ news: updatedNews });
+  const handleSaveNews = async (
+    updatedNews: NewsItem[],
+    meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
+  ) => {
+    const actionText = meta?.action === 'create' 
+      ? 'diterbitkan' 
+      : meta?.action === 'delete' 
+      ? 'dihapus' 
+      : 'diperbarui';
+
+    await updateSiteSection(
+      { news: updatedNews },
+      {
+        sectionName: 'Warta, Prestasi & Agenda',
+        title: meta?.title || 'Daftar Berita Sekolah',
+        action: meta?.action || 'update',
+        targetTab: 'berita',
+        targetElementId: 'berita',
+        details: meta?.title 
+          ? `Artikel berita "${meta.title}" telah berhasil ${actionText} dan disiarkan secara real-time ke seluruh pengunjung web tanpa perlu refresh.`
+          : 'Pembaruan data warta sekolah berhasil tersimpan dan langsung sinkron ke seluruh layar pengunjung.',
+      }
+    );
   };
 
-  const handleSaveFacilities = async (updatedFacilities: FacilityItem[]) => {
-    await updateSiteSection({ facilities: updatedFacilities });
+  const handleSaveFacilities = async (
+    updatedFacilities: FacilityItem[],
+    meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
+  ) => {
+    await updateSiteSection(
+      { facilities: updatedFacilities },
+      {
+        sectionName: 'Sarana & Prasarana Kampus',
+        title: meta?.title || `${updatedFacilities.length} Fasilitas`,
+        action: meta?.action || 'update',
+        targetTab: 'fasilitas',
+        targetElementId: 'fasilitas',
+        details: 'Data fasilitas penunjang pembelajaran SMP PGRI 5 Cimahi berhasil diperbarui secara langsung.',
+      }
+    );
   };
 
-  const handleSaveExtracurriculars = async (updatedExtracurriculars: ExtracurricularItem[]) => {
-    await updateSiteSection({ extracurriculars: updatedExtracurriculars });
+  const handleSaveExtracurriculars = async (
+    updatedExtracurriculars: ExtracurricularItem[],
+    meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
+  ) => {
+    await updateSiteSection(
+      { extracurriculars: updatedExtracurriculars },
+      {
+        sectionName: 'Ekstrakurikuler Siswa',
+        title: meta?.title || `${updatedExtracurriculars.length} Pilihan Ekskul`,
+        action: meta?.action || 'update',
+        targetTab: 'kesiswaan',
+        targetElementId: 'ekskul',
+        details: 'Data jadwal pembina dan kegiatan ekstrakurikuler siswa telah disinkronkan secara real-time.',
+      }
+    );
   };
 
-  const handleSaveAchievements = async (updatedAchievements: AchievementItem[]) => {
-    await updateSiteSection({ achievements: updatedAchievements });
+  const handleSaveAchievements = async (
+    updatedAchievements: AchievementItem[],
+    meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
+  ) => {
+    await updateSiteSection(
+      { achievements: updatedAchievements },
+      {
+        sectionName: 'Prestasi Siswa',
+        title: meta?.title || `${updatedAchievements.length} Catatan Prestasi`,
+        action: meta?.action || 'update',
+        targetTab: 'prestasi',
+        targetElementId: 'prestasi',
+        details: 'Data perolehan medali dan penghargaan siswa berhasil dipublikasikan secara real-time ke galeri prestasi.',
+      }
+    );
   };
 
   const handleResetToDefaults = async () => {
@@ -156,6 +278,19 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       setIsResetting(true);
       await resetSiteContentToDefaults();
       setIsResetConfirmOpen(false);
+      setRealtimeSuccessInfo({
+        isOpen: true,
+        sectionName: 'Pemulihan Konfigurasi Standar',
+        itemTitle: 'Seluruh Konten SMP PGRI 5 Cimahi',
+        actionType: 'reset',
+        timestamp: new Date().toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }) + ' WIB',
+        targetTab: 'beranda',
+        details: 'Seluruh data slide, profil, program unggulan, berita, fasilitas, ekstrakurikuler, dan prestasi berhasil dikembalikan ke standar awal secara real-time.',
+      });
       setGlobalFeedback('Seluruh data website berhasil dikembalikan ke standar awal.');
       setTimeout(() => setGlobalFeedback(null), 5000);
     } catch (err) {
@@ -638,6 +773,18 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           </div>
         </div>
       )}
+
+      {/* Real-time Change Success Modal */}
+      <RealtimeSuccessModal
+        info={realtimeSuccessInfo}
+        onClose={() => setRealtimeSuccessInfo(null)}
+        onNavigatePublic={(tab, elementId) => {
+          onClose(); // Close admin dashboard to view the public site
+          if (onNavigateTab) {
+            onNavigateTab(tab, elementId);
+          }
+        }}
+      />
     </div>
   );
 };

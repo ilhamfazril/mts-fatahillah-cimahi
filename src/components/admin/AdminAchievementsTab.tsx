@@ -20,7 +20,7 @@ import { compressImageForStorage } from '../../services/siteContentService';
 
 interface AdminAchievementsTabProps {
   achievementsList: AchievementItem[];
-  onSaveAchievements: (updated: AchievementItem[]) => Promise<void>;
+  onSaveAchievements: (updated: AchievementItem[], meta?: { action?: 'create' | 'update' | 'delete'; title?: string }) => Promise<void>;
 }
 
 export const AdminAchievementsTab: React.FC<AdminAchievementsTabProps> = ({
@@ -92,11 +92,13 @@ export const AdminAchievementsTab: React.FC<AdminAchievementsTabProps> = ({
     }
 
     setItems(updatedList);
+    const actionType = isCreatingNew ? 'create' : 'update';
+    const itemTitle = `${editingItem.title} (${editingItem.studentName})`;
     setEditingItem(null);
 
     try {
       setIsSaving(true);
-      await onSaveAchievements(updatedList);
+      await onSaveAchievements(updatedList, { action: actionType, title: itemTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
@@ -110,13 +112,14 @@ export const AdminAchievementsTab: React.FC<AdminAchievementsTabProps> = ({
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
 
+    const deletedTitle = itemToDelete.title;
     const updatedList = items.filter((a) => a.id !== itemToDelete.id);
     setItems(updatedList);
     setItemToDelete(null);
 
     try {
       setIsSaving(true);
-      await onSaveAchievements(updatedList);
+      await onSaveAchievements(updatedList, { action: 'delete', title: deletedTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {

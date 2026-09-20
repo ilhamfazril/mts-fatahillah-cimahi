@@ -20,7 +20,7 @@ import { compressImageForStorage } from '../../services/siteContentService';
 
 interface AdminNewsTabProps {
   newsList: NewsItem[];
-  onSaveNews: (updated: NewsItem[]) => Promise<void>;
+  onSaveNews: (updated: NewsItem[], meta?: { action: 'create' | 'update' | 'delete'; title: string }) => Promise<void>;
 }
 
 export const AdminNewsTab: React.FC<AdminNewsTabProps> = ({
@@ -110,12 +110,15 @@ export const AdminNewsTab: React.FC<AdminNewsTabProps> = ({
       updatedList = items.map((n) => (n.id === finalItem.id ? finalItem : n));
     }
 
+    const actionType: 'create' | 'update' = isCreatingNew ? 'create' : 'update';
+    const itemTitle = finalItem.title;
+
     setItems(updatedList);
     setEditingItem(null);
 
     try {
       setIsSaving(true);
-      await onSaveNews(updatedList);
+      await onSaveNews(updatedList, { action: actionType, title: itemTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
@@ -129,13 +132,14 @@ export const AdminNewsTab: React.FC<AdminNewsTabProps> = ({
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
 
+    const deletedTitle = itemToDelete.title;
     const updatedList = items.filter((n) => n.id !== itemToDelete.id);
     setItems(updatedList);
     setItemToDelete(null);
 
     try {
       setIsSaving(true);
-      await onSaveNews(updatedList);
+      await onSaveNews(updatedList, { action: 'delete', title: deletedTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {

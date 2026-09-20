@@ -17,7 +17,7 @@ import { compressImageForStorage } from '../../services/siteContentService';
 
 interface AdminFacilitiesTabProps {
   facilitiesList: FacilityItem[];
-  onSaveFacilities: (updated: FacilityItem[]) => Promise<void>;
+  onSaveFacilities: (updated: FacilityItem[], meta?: { action?: 'create' | 'update' | 'delete'; title?: string }) => Promise<void>;
 }
 
 export const AdminFacilitiesTab: React.FC<AdminFacilitiesTabProps> = ({
@@ -84,11 +84,13 @@ export const AdminFacilitiesTab: React.FC<AdminFacilitiesTabProps> = ({
     }
 
     setItems(updatedList);
+    const actionType = isCreatingNew ? 'create' : 'update';
+    const itemTitle = editingItem.name;
     setEditingItem(null);
 
     try {
       setIsSaving(true);
-      await onSaveFacilities(updatedList);
+      await onSaveFacilities(updatedList, { action: actionType, title: itemTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
@@ -102,13 +104,14 @@ export const AdminFacilitiesTab: React.FC<AdminFacilitiesTabProps> = ({
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
 
+    const deletedTitle = itemToDelete.name;
     const updatedList = items.filter((f) => f.id !== itemToDelete.id);
     setItems(updatedList);
     setItemToDelete(null);
 
     try {
       setIsSaving(true);
-      await onSaveFacilities(updatedList);
+      await onSaveFacilities(updatedList, { action: 'delete', title: deletedTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {

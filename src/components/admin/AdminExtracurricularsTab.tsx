@@ -21,7 +21,7 @@ import { ExtracurricularItem } from '../../types';
 
 interface AdminExtracurricularsTabProps {
   extracurricularsList: ExtracurricularItem[];
-  onSaveExtracurriculars: (updated: ExtracurricularItem[]) => Promise<void>;
+  onSaveExtracurriculars: (updated: ExtracurricularItem[], meta?: { action?: 'create' | 'update' | 'delete'; title?: string }) => Promise<void>;
 }
 
 export const AdminExtracurricularsTab: React.FC<AdminExtracurricularsTabProps> = ({
@@ -97,11 +97,13 @@ export const AdminExtracurricularsTab: React.FC<AdminExtracurricularsTabProps> =
     }
 
     setItems(updatedList);
+    const actionType = isCreatingNew ? 'create' : 'update';
+    const itemTitle = editingItem.name;
     setEditingItem(null);
 
     try {
       setIsSaving(true);
-      await onSaveExtracurriculars(updatedList);
+      await onSaveExtracurriculars(updatedList, { action: actionType, title: itemTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
@@ -115,13 +117,14 @@ export const AdminExtracurricularsTab: React.FC<AdminExtracurricularsTabProps> =
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
 
+    const deletedTitle = itemToDelete.name;
     const updatedList = items.filter((item) => item.id !== itemToDelete.id);
     setItems(updatedList);
     setItemToDelete(null);
 
     try {
       setIsSaving(true);
-      await onSaveExtracurriculars(updatedList);
+      await onSaveExtracurriculars(updatedList, { action: 'delete', title: deletedTitle });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
