@@ -347,68 +347,82 @@ export interface PPDBRegistrationRecord {
   createdAt: number;
 }
 
-export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
-  {
-    id: 0,
-    title: 'Membentuk Generasi Cerdas, Disiplin, dan Berakhlak Mulia',
-    subtitle: 'SMP PGRI 5 Cimahi — YPLP PGRI Kota Cimahi',
-    description: 'Lembaga pendidikan formal tingkat menengah pertama yang mengintegrasikan Kurikulum Merdeka, pembiasaan religius, dan keteladanan budi pekerti luhur di Kota Cimahi.',
-    badge: 'Sekolah Berkarakter & Humanis',
-    bgImage: '/images/slide1_gedung.jpg',
-    alt: 'Gedung dan siswa SMP PGRI 5 Cimahi di tangga dan selasar',
-    primaryBtn: 'Pendaftaran PPDB 2025/2026',
-    secondaryBtn: 'Jelajahi Profil Sekolah',
-  },
-  {
-    id: 1,
-    title: 'Menumbuhkan Jiwa Nasionalisme & Kedisiplinan Karakter',
-    subtitle: 'Upacara Bendera, Sholat Berjamaah & Pembiasaan Positif',
-    description: 'Mendidik mental tangguh dan integritas melalui apel pagi rutin, upacara bendera merah putih, tadarus Al-Qur’an bersama, dan kepramukaan aktif.',
-    badge: 'Kedisiplinan & Integritas',
-    bgImage: '/images/slide2_upacara.jpg',
-    alt: 'Upacara bendera dan apel pagi siswa SMP PGRI 5 Cimahi',
-    primaryBtn: 'Lihat Aktivitas Kesiswaan',
-    secondaryBtn: 'Daftar Sekarang',
-  },
-  {
-    id: 2,
-    title: 'Fasilitas Laboratorium Komputer Siap Ujian CBT & ANBK',
-    subtitle: 'Mempersiapkan Literasi Digital & Asesmen Berbasis Komputer',
-    description: 'Didukung laboratorium komputer representatif dengan puluhan PC desktop siap pakai dan koneksi internet stabil untuk sukses Asesmen Nasional Berbasis Komputer (ANBK).',
-    badge: 'Teknologi & Literasi Digital',
-    bgImage: '/images/slide3_lab_komputer.jpg',
-    alt: 'Laboratorium komputer ANBK SMP PGRI 5 Cimahi',
-    primaryBtn: 'Sarana & Fasilitas',
-    secondaryBtn: 'Info Kurikulum',
-  },
-  {
-    id: 3,
-    title: 'Penerimaan Peserta Didik Baru (PPDB) 2025/2026',
-    subtitle: 'Mari Bergabung Menjadi Bagian dari SMP PGRI 5 Cimahi',
-    description: 'Biaya pendidikan terjangkau, lingkungan belajar kondusif dan aman, beasiswa afirmasi bagi keluarga kurang mampu, serta dibimbing guru-guru berpengalaman.',
-    badge: 'PPDB Telah Dibuka',
-    bgImage: '/images/slide4_lapangan.jpg',
-    alt: 'Halaman sekolah dan gedung 2 lantai SMP PGRI 5 Cimahi',
-    primaryBtn: 'Daftar PPDB Online',
-    secondaryBtn: 'Hubungi Panitia',
-  },
-];
+export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = (Array.isArray(PERSISTED_USER_CONTENT.heroSlides) && PERSISTED_USER_CONTENT.heroSlides.length > 0)
+  ? (PERSISTED_USER_CONTENT.heroSlides as HeroSlideContent[])
+  : [
+      {
+        id: 0,
+        title: 'Membentuk Generasi Cerdas, Disiplin, dan Berakhlak Mulia',
+        subtitle: 'SMP PGRI 5 Cimahi — YPLP PGRI Kota Cimahi',
+        description: 'Lembaga pendidikan formal tingkat menengah pertama yang mengintegrasikan Kurikulum Merdeka, pembiasaan religius, dan keteladanan budi pekerti luhur di Kota Cimahi.',
+        badge: 'Sekolah Berkarakter & Humanis',
+        bgImage: '/images/slide1_gedung.jpg',
+        alt: 'Gedung dan siswa SMP PGRI 5 Cimahi di tangga dan selasar',
+        primaryBtn: 'Pendaftaran PPDB 2025/2026',
+        secondaryBtn: 'Jelajahi Profil Sekolah',
+      },
+      {
+        id: 1,
+        title: 'Menumbuhkan Jiwa Nasionalisme & Kedisiplinan Karakter',
+        subtitle: 'Upacara Bendera, Sholat Berjamaah & Pembiasaan Positif',
+        description: 'Mendidik mental tangguh dan integritas melalui apel pagi rutin, upacara bendera merah putih, tadarus Al-Qur’an bersama, dan kepramukaan aktif.',
+        badge: 'Kedisiplinan & Integritas',
+        bgImage: '/images/slide2_upacara.jpg',
+        alt: 'Upacara bendera dan apel pagi siswa SMP PGRI 5 Cimahi',
+        primaryBtn: 'Lihat Aktivitas Kesiswaan',
+        secondaryBtn: 'Daftar Sekarang',
+      },
+      {
+        id: 2,
+        title: 'Fasilitas Laboratorium Komputer Siap Ujian CBT & ANBK',
+        subtitle: 'Mempersiapkan Literasi Digital & Asesmen Berbasis Komputer',
+        description: 'Didukung laboratorium komputer representatif dengan puluhan PC desktop siap pakai dan koneksi internet stabil untuk sukses Asesmen Nasional Berbasis Komputer (ANBK).',
+        badge: 'Teknologi & Literasi Digital',
+        bgImage: '/images/slide3_lab_komputer.jpg',
+        alt: 'Laboratorium komputer ANBK SMP PGRI 5 Cimahi',
+        primaryBtn: 'Sarana & Fasilitas',
+        secondaryBtn: 'Info Kurikulum',
+      },
+      {
+        id: 3,
+        title: 'Penerimaan Peserta Didik Baru (PPDB) 2025/2026',
+        subtitle: 'Mari Bergabung Menjadi Bagian dari SMP PGRI 5 Cimahi',
+        description: 'Biaya pendidikan terjangkau, lingkungan belajar kondusif dan aman, beasiswa afirmasi bagi keluarga kurang mampu, serta dibimbing guru-guru berpengalaman.',
+        badge: 'PPDB Telah Dibuka',
+        bgImage: '/images/slide4_lapangan.jpg',
+        alt: 'Halaman sekolah dan gedung 2 lantai SMP PGRI 5 Cimahi',
+        primaryBtn: 'Daftar PPDB Online',
+        secondaryBtn: 'Hubungi Panitia',
+      },
+    ];
 
 export const DEFAULT_PRINCIPAL_CONTENT: PrincipalProfileContent = {
-  name: PRINCIPAL_INFO.name,
-  role: PRINCIPAL_INFO.role,
-  quote: PRINCIPAL_INFO.quote,
-  photo: PRINCIPAL_INFO.photo,
+  name: PERSISTED_USER_CONTENT.principal?.name || PRINCIPAL_INFO.name,
+  role: PERSISTED_USER_CONTENT.principal?.role || PRINCIPAL_INFO.role,
+  quote: PERSISTED_USER_CONTENT.principal?.quote || PRINCIPAL_INFO.quote,
+  photo: PERSISTED_USER_CONTENT.principal?.photo || PRINCIPAL_INFO.photo,
 };
 
 export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
   heroSlides: DEFAULT_HERO_SLIDES,
   principal: DEFAULT_PRINCIPAL_CONTENT,
-  programs: PROGRAMS_UNGGULAN,
-  news: NEWS_LIST,
-  facilities: FACILITIES_LIST,
-  extracurriculars: EXTRACURRICULAR_LIST,
-  achievements: ACHIEVEMENTS_LIST,
+  programs: (Array.isArray(PERSISTED_USER_CONTENT.programs) && PERSISTED_USER_CONTENT.programs.length > 0)
+    ? (PERSISTED_USER_CONTENT.programs as ProgramUnggulan[])
+    : PROGRAMS_UNGGULAN,
+  news: (Array.isArray(PERSISTED_USER_CONTENT.news) && PERSISTED_USER_CONTENT.news.length > 0)
+    ? (PERSISTED_USER_CONTENT.news as NewsItem[])
+    : NEWS_LIST,
+  facilities: (Array.isArray(PERSISTED_USER_CONTENT.facilities) && PERSISTED_USER_CONTENT.facilities.length > 0)
+    ? (PERSISTED_USER_CONTENT.facilities as FacilityItem[])
+    : FACILITIES_LIST,
+  extracurriculars: (Array.isArray(PERSISTED_USER_CONTENT.extracurriculars) && PERSISTED_USER_CONTENT.extracurriculars.length > 0)
+    ? (PERSISTED_USER_CONTENT.extracurriculars as ExtracurricularItem[])
+    : EXTRACURRICULAR_LIST,
+  achievements: (Array.isArray(PERSISTED_USER_CONTENT.achievements) && PERSISTED_USER_CONTENT.achievements.length > 0)
+    ? (PERSISTED_USER_CONTENT.achievements as AchievementItem[])
+    : ACHIEVEMENTS_LIST,
+  updatedAt: PERSISTED_USER_CONTENT.updatedAt || Date.now(),
+  updatedBy: PERSISTED_USER_CONTENT.updatedBy || 'admin_ilham',
 };
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
@@ -451,27 +465,26 @@ let currentSiteContentMemory: SchoolSiteContent = (() => {
   return {
     heroSlides: Array.isArray(base.heroSlides) && base.heroSlides.length > 0 
       ? base.heroSlides 
-      : (PERSISTED_USER_CONTENT.heroSlides || DEFAULT_HERO_SLIDES),
+      : DEFAULT_HERO_SLIDES,
     principal: { 
       ...DEFAULT_PRINCIPAL_CONTENT, 
-      ...(PERSISTED_USER_CONTENT.principal || {}),
       ...(base.principal || {}) 
     },
     programs: Array.isArray(base.programs) && base.programs.length > 0 
       ? base.programs 
-      : (PERSISTED_USER_CONTENT.programs || PROGRAMS_UNGGULAN),
+      : DEFAULT_SITE_CONTENT.programs,
     news: Array.isArray(base.news) && base.news.length > 0 
       ? base.news 
-      : (PERSISTED_USER_CONTENT.news || NEWS_LIST),
+      : DEFAULT_SITE_CONTENT.news,
     facilities: Array.isArray(base.facilities) && base.facilities.length > 0 
       ? base.facilities 
-      : (PERSISTED_USER_CONTENT.facilities || FACILITIES_LIST),
+      : DEFAULT_SITE_CONTENT.facilities,
     extracurriculars: Array.isArray(base.extracurriculars) && base.extracurriculars.length > 0 
       ? base.extracurriculars 
-      : (PERSISTED_USER_CONTENT.extracurriculars || EXTRACURRICULAR_LIST),
+      : DEFAULT_SITE_CONTENT.extracurriculars,
     achievements: Array.isArray(base.achievements) && base.achievements.length > 0 
       ? base.achievements 
-      : (PERSISTED_USER_CONTENT.achievements || ACHIEVEMENTS_LIST),
+      : DEFAULT_SITE_CONTENT.achievements,
     updatedAt: base.updatedAt || Date.now(),
     updatedBy: base.updatedBy || 'admin_ilham',
   };
@@ -544,21 +557,21 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
     },
     programs: Array.isArray(sanitized.programs) && sanitized.programs.length > 0
       ? sanitized.programs
-      : (currentSiteContentMemory.programs || PROGRAMS_UNGGULAN),
+      : (currentSiteContentMemory.programs || DEFAULT_SITE_CONTENT.programs),
     news: Array.isArray(sanitized.news) && sanitized.news.length > 0
       ? sanitized.news
-      : (currentSiteContentMemory.news || NEWS_LIST),
+      : (currentSiteContentMemory.news || DEFAULT_SITE_CONTENT.news),
     facilities: Array.isArray(sanitized.facilities) && sanitized.facilities.length > 0
       ? sanitized.facilities
-      : (currentSiteContentMemory.facilities || FACILITIES_LIST),
+      : (currentSiteContentMemory.facilities || DEFAULT_SITE_CONTENT.facilities),
     extracurriculars: Array.isArray(sanitized.extracurriculars) && sanitized.extracurriculars.length > 0
       ? sanitized.extracurriculars
-      : (currentSiteContentMemory.extracurriculars || EXTRACURRICULAR_LIST),
+      : (currentSiteContentMemory.extracurriculars || DEFAULT_SITE_CONTENT.extracurriculars),
     achievements: Array.isArray(sanitized.achievements) && sanitized.achievements.length > 0
       ? sanitized.achievements
-      : (currentSiteContentMemory.achievements || ACHIEVEMENTS_LIST),
-    updatedAt: sanitized.updatedAt || Date.now(),
-    updatedBy: sanitized.updatedBy || 'admin_ilham',
+      : (currentSiteContentMemory.achievements || DEFAULT_SITE_CONTENT.achievements),
+    updatedAt: sanitized.updatedAt || currentSiteContentMemory.updatedAt || Date.now(),
+    updatedBy: sanitized.updatedBy || currentSiteContentMemory.updatedBy || 'admin_ilham',
   };
 }
 
@@ -662,15 +675,17 @@ export function subscribeToSiteContent(
     }
   });
 
-  // Also listen to main_config as fallback
+  // Also listen to main_config as legacy fallback (only if it has full content)
   try {
     const unsubMain = onSnapshot(
       CONTENT_DOC_REF,
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data() as Partial<SchoolSiteContent>;
-          const merged = mergeWithDefaults(data);
-          notifySubscribers(merged);
+          if (data && (Array.isArray(data.heroSlides) || Array.isArray(data.facilities))) {
+            const merged = mergeWithDefaults(data);
+            notifySubscribers(merged);
+          }
         }
       },
       (err) => {
