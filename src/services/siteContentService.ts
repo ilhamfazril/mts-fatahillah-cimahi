@@ -427,7 +427,17 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
 const PPDB_COLLECTION_REF = collection(db, 'ppdb_registrations');
-const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_site_content_cache';
+const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_content_live_v5';
+
+// Clear legacy caches that might contain old AI Unsplash images
+if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+  try {
+    localStorage.removeItem('smp_pgri_5_cimahi_site_content_cache');
+    localStorage.removeItem('smp_pgri_5_cimahi_content_v3_real');
+  } catch {
+    // ignore
+  }
+}
 
 // Clean object recursively to eliminate any `undefined` fields that break Firestore writes
 function cleanForFirestore<T>(input: T): T {
@@ -444,7 +454,15 @@ function safeGetLocalStorage(): Partial<SchoolSiteContent> | null {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return null;
   try {
     const raw = localStorage.getItem(CACHE_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Invalidate if cache contains legacy AI template Unsplash links
+    const firstHeroBg = parsed?.heroSlides?.[0]?.bgImage;
+    if (typeof firstHeroBg === 'string' && (firstHeroBg.includes('unsplash.com') || firstHeroBg.startsWith('/images/slide'))) {
+      localStorage.removeItem(CACHE_STORAGE_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }

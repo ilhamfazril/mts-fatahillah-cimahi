@@ -8,6 +8,7 @@ import {
   TestimonialItem,
   FaqItem
 } from '../types';
+import { PERSISTED_USER_CONTENT } from './persistedSchoolContent';
 
 export const SCHOOL_INFO = {
   name: 'SMP PGRI 5 Cimahi',
@@ -48,10 +49,10 @@ export const SCHOOL_INFO = {
 };
 
 export const PRINCIPAL_INFO = {
-  name: 'ILHAM FAZRIL',
-  role: 'Kepala SMP PGRI 5 Cimahi',
-  photo: '/images/kepala_sekolah.jpg',
-  quote: '"Di SMP PGRI 5 Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
+  name: PERSISTED_USER_CONTENT.principal?.name || 'ILHAM FAZRIL',
+  role: PERSISTED_USER_CONTENT.principal?.role || 'Kepala SMP PGRI 5 Cimahi',
+  photo: PERSISTED_USER_CONTENT.principal?.photo || '/images/slide1_gedung.jpg',
+  quote: PERSISTED_USER_CONTENT.principal?.quote || '"Di SMP PGRI 5 Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
   welcomeMessage: [
     'Assalamu’alaikum Warahmatullahi Wabarakatuh, Sampurasun, Salam Sejahtera untuk kita semua.',
     'Selamat datang di situs resmi SMP PGRI 5 Cimahi. Sebagai institusi pendidikan di bawah naungan Yayasan Pembina Lembaga Pendidikan (YPLP) PGRI Kota Cimahi, kami senantiasa berikhtiar memberikan layanan pendidikan berkualitas, terjangkau, dan humanis bagi seluruh peserta didik.',
@@ -60,7 +61,7 @@ export const PRINCIPAL_INFO = {
   ]
 };
 
-export const PROGRAMS_UNGGULAN: ProgramUnggulan[] = [
+const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
   {
     id: 'anbk',
     title: 'Laboratorium Komputer & Kesiapan ANBK / CBT',
@@ -123,7 +124,11 @@ export const PROGRAMS_UNGGULAN: ProgramUnggulan[] = [
   }
 ];
 
-export const NEWS_LIST: NewsItem[] = [
+export const PROGRAMS_UNGGULAN: ProgramUnggulan[] = (Array.isArray(PERSISTED_USER_CONTENT.programs) && PERSISTED_USER_CONTENT.programs.length > 0)
+  ? (PERSISTED_USER_CONTENT.programs as ProgramUnggulan[])
+  : DEFAULT_PROGRAMS_RAW;
+
+const DEFAULT_NEWS_RAW: NewsItem[] = [
   {
     id: 'news-1',
     title: 'Simulasi Asesmen Nasional Berbasis Komputer (ANBK) di SMP PGRI 5 Cimahi Berjalan Sukses',
@@ -227,6 +232,10 @@ export const NEWS_LIST: NewsItem[] = [
   }
 ];
 
+export const NEWS_LIST: NewsItem[] = (Array.isArray(PERSISTED_USER_CONTENT.news) && PERSISTED_USER_CONTENT.news.length > 0)
+  ? (PERSISTED_USER_CONTENT.news as NewsItem[])
+  : DEFAULT_NEWS_RAW;
+
 export const PSB_INFO = {
   academicYear: '2025 / 2026',
   status: 'Pendaftaran Dibuka',
@@ -293,7 +302,7 @@ export const PSB_INFO = {
   ]
 };
 
-export const FACILITIES_LIST: FacilityItem[] = [
+const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
   {
     id: 'fac-1',
     name: 'Gedung Sekolah Representatif 2 Lantai',
@@ -360,7 +369,11 @@ export const FACILITIES_LIST: FacilityItem[] = [
   }
 ];
 
-export const EXTRACURRICULAR_LIST: ExtracurricularItem[] = [
+export const FACILITIES_LIST: FacilityItem[] = (Array.isArray(PERSISTED_USER_CONTENT.facilities) && PERSISTED_USER_CONTENT.facilities.length > 0)
+  ? (PERSISTED_USER_CONTENT.facilities as FacilityItem[])
+  : DEFAULT_FACILITIES_RAW;
+
+const DEFAULT_EXTRACURRICULARS_RAW: ExtracurricularItem[] = [
   {
     id: 'ekskul-1',
     name: 'Pramuka Penggalang Gudep PGRI',
@@ -453,7 +466,11 @@ export const EXTRACURRICULAR_LIST: ExtracurricularItem[] = [
   }
 ];
 
-export const ACHIEVEMENTS_LIST: AchievementItem[] = [
+export const EXTRACURRICULAR_LIST: ExtracurricularItem[] = (Array.isArray(PERSISTED_USER_CONTENT.extracurriculars) && PERSISTED_USER_CONTENT.extracurriculars.length > 0)
+  ? (PERSISTED_USER_CONTENT.extracurriculars as ExtracurricularItem[])
+  : DEFAULT_EXTRACURRICULARS_RAW;
+
+const DEFAULT_ACHIEVEMENTS_RAW: AchievementItem[] = [
   {
     id: 'ach-1',
     title: 'Juara 1 Lomba Ketangkasan Baris Berbaris (LKBB)',
@@ -496,14 +513,18 @@ export const ACHIEVEMENTS_LIST: AchievementItem[] = [
   }
 ];
 
+export const ACHIEVEMENTS_LIST: AchievementItem[] = (Array.isArray(PERSISTED_USER_CONTENT.achievements) && PERSISTED_USER_CONTENT.achievements.length > 0)
+  ? (PERSISTED_USER_CONTENT.achievements as AchievementItem[])
+  : DEFAULT_ACHIEVEMENTS_RAW;
+
 export const TEACHERS_LIST: TeacherStaff[] = [
   {
     id: 't-1',
-    name: 'Dra. Hj. Sri Wahyuni, M.M.Pd.',
+    name: PERSISTED_USER_CONTENT.principal?.name || 'ILHAM FAZRIL',
     role: 'Kepala Sekolah',
     subject: 'Manajemen Pendidikan & Pembina Utama',
-    education: 'S2 Magister Manajemen Pendidikan',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'
+    education: 'S1 Pendidikan',
+    image: PERSISTED_USER_CONTENT.principal?.photo || '/images/slide1_gedung.jpg'
   },
   {
     id: 't-2',

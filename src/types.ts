@@ -76,3 +76,34 @@ export interface FaqItem {
   answer: string;
   category: string;
 }
+
+export interface HeroSlideContent {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  badge: string;
+  bgImage: string;
+  alt: string;
+  primaryBtn: string;
+  secondaryBtn: string;
+}
+
+export interface PrincipalProfileContent {
+  name: string;
+  role: string;
+  quote: string;
+  photo: string;
+}
+
+export interface SchoolSiteContent {
+  heroSlides: HeroSlideContent[];
+  principal: PrincipalProfileContent;
+  programs: ProgramUnggulan[];
+  news: NewsItem[];
+  facilities: FacilityItem[];
+  extracurriculars: ExtracurricularItem[];
+  achievements: AchievementItem[];
+  updatedAt?: number;
+  updatedBy?: string;
+}

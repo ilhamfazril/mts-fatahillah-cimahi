@@ -1,4 +1,4 @@
-import { SchoolSiteContent } from "../services/siteContentService";
+import { SchoolSiteContent } from "../types";
 
 export const PERSISTED_USER_CONTENT: Partial<SchoolSiteContent> = {
   "facilities": [
