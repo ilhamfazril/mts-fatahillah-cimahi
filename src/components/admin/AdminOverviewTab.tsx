@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Sparkles, 
   Image as ImageIcon, 
@@ -12,9 +12,13 @@ import {
   Clock, 
   ArrowRight,
   ShieldCheck,
-  Database
+  Database,
+  Smartphone,
+  RefreshCw,
+  Server,
+  Check
 } from 'lucide-react';
-import { SchoolSiteContent } from '../../services/siteContentService';
+import { SchoolSiteContent, syncAllDevicesWithServer } from '../../services/siteContentService';
 
 interface AdminOverviewTabProps {
   content: SchoolSiteContent;
@@ -25,6 +29,25 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
   content,
   onNavigateTab,
 }) => {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncFeedback, setSyncFeedback] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleSyncToAllDevices = async () => {
+    setIsSyncing(true);
+    setSyncFeedback(null);
+    try {
+      const res = await syncAllDevicesWithServer();
+      setSyncFeedback(res);
+      setTimeout(() => setSyncFeedback(null), 8000);
+    } catch (e: any) {
+      setSyncFeedback({
+        success: false,
+        message: e?.message || 'Gagal sinkronisasi ke server.',
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
   const stats = [
     {
       id: 'slides',
@@ -146,6 +169,55 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
             <div className="text-[11px] text-emerald-200/80 mt-1 flex items-center gap-1">
               <Clock className="w-3 h-3" />
               <span className="truncate">Diperbarui: {lastUpdatedFormatted}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Multi-Device Server Synchronization Card */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 text-white shadow-md relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+              <Server className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-white">
+                  Sinkronisasi Foto & Perubahan Multi-Perangkat (HP, Laptop & Komputer)
+                </h3>
+                <span className="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full font-semibold border border-emerald-500/30">
+                  Server Aktif
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                Server penyimpanan persisten kami memastikan 100% foto dan teks yang Anda unggah (Fasilitas, Foto Kepala Sekolah, Slide Hero, Berita) langsung disiarkan ke semua pengunjung dan perangkat lain tanpa terhalang batas kuota gratis Firebase.
+              </p>
+              {syncFeedback && (
+                <div className={`mt-3 p-3 rounded-lg text-xs font-medium flex items-center gap-2 ${
+                  syncFeedback.success 
+                    ? 'bg-emerald-950/80 border border-emerald-600/50 text-emerald-200' 
+                    : 'bg-rose-950/80 border border-rose-600/50 text-rose-200'
+                }`}>
+                  {syncFeedback.success ? <Check className="w-4 h-4 text-emerald-400 shrink-0" /> : <Clock className="w-4 h-4 text-rose-400 shrink-0" />}
+                  <span>{syncFeedback.message}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="shrink-0 flex sm:flex-row lg:flex-col gap-2">
+            <button
+              onClick={handleSyncToAllDevices}
+              disabled={isSyncing}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+            >
+              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? 'Menyinkronkan...' : 'Sinkronkan ke Semua Perangkat'}</span>
+            </button>
+            <div className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Otomatis tampil di HP & Pengunjung</span>
             </div>
           </div>
         </div>

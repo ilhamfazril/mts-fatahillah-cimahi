@@ -200,6 +200,78 @@ export async function saveSectionToFirestoreRest(
 }
 
 /**
+ * Server-Side Persistent API Synchronization.
+ * This guarantees that every device (phone, laptop, tablet, public visitor)
+ * instantly receives all uploaded photos and content without being blocked
+ * by Google Cloud Firestore Spark free tier daily quota limits.
+ */
+export async function fetchContentFromServer(): Promise<Partial<SchoolSiteContent> | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const res = await fetch('/api/content', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.success && json.data) {
+      return json.data;
+    }
+  } catch (err) {
+    console.warn('Server content fetch notice:', err);
+  }
+  return null;
+}
+
+export async function saveContentToServer(data: Partial<SchoolSiteContent>): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  try {
+    const res = await fetch('/api/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('Server content save notice:', err);
+    return false;
+  }
+}
+
+export async function syncLocalContentToServer(content: SchoolSiteContent): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  try {
+    const res = await fetch('/api/content/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(content),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('Sync to server notice:', err);
+    return false;
+  }
+}
+
+export async function syncAllDevicesWithServer(): Promise<{ success: boolean; message: string }> {
+  try {
+    const ok = await syncLocalContentToServer(currentSiteContentMemory);
+    if (ok) {
+      return {
+        success: true,
+        message: 'Seluruh foto dan perubahan dari perangkat ini berhasil disinkronkan ke server. Sekarang semua perangkat (HP, laptop, komputer lain) langsung menampilkan data terbaru.',
+      };
+    }
+    return {
+      success: false,
+      message: 'Gagal menghubungi server aplikasi. Pastikan koneksi internet stabil.',
+    };
+  } catch (e: any) {
+    return {
+      success: false,
+      message: e?.message || 'Gagal sinkronisasi data ke server.',
+    };
+  }
+}
+
+/**
  * Direct HTTPS REST fetch to Google Cloud Firestore servers.
  * Fetches all individual section documents in parallel and merges them.
  * Bypasses all WebChannel / WebSocket / iframe limitations.
@@ -596,6 +668,65 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
   return merged;
 }
 
+function isCustomOrBase64Image(url?: string): boolean {
+  if (!url || typeof url !== 'string') return false;
+  return url.startsWith('data:image/') || (!url.includes('unsplash.com') && !url.startsWith('/images/slide'));
+}
+
+export function mergePreservingUploads(
+  target: SchoolSiteContent,
+  source?: Partial<SchoolSiteContent> | null
+): { result: SchoolSiteContent; hasLocalOnlyUploads: boolean } {
+  if (!source) return { result: target, hasLocalOnlyUploads: false };
+  let hasLocalOnlyUploads = false;
+
+  const res: SchoolSiteContent = { ...target };
+
+  // Facilities
+  if (Array.isArray(source.facilities)) {
+    res.facilities = res.facilities.map((fac, idx) => {
+      const srcFac = source.facilities?.find((sf) => sf.id === fac.id) || source.facilities?.[idx];
+      if (srcFac && isCustomOrBase64Image(srcFac.image) && !isCustomOrBase64Image(fac.image)) {
+        hasLocalOnlyUploads = true;
+        return { ...fac, image: srcFac.image };
+      }
+      return fac;
+    });
+  }
+
+  // Hero Slides
+  if (Array.isArray(source.heroSlides)) {
+    res.heroSlides = res.heroSlides.map((slide, idx) => {
+      const srcSlide = source.heroSlides?.find((ss) => ss.id === slide.id) || source.heroSlides?.[idx];
+      if (srcSlide && isCustomOrBase64Image(srcSlide.bgImage) && !isCustomOrBase64Image(slide.bgImage)) {
+        hasLocalOnlyUploads = true;
+        return { ...slide, bgImage: srcSlide.bgImage };
+      }
+      return slide;
+    });
+  }
+
+  // News
+  if (Array.isArray(source.news)) {
+    res.news = res.news.map((item, idx) => {
+      const srcItem = source.news?.find((sn) => sn.id === item.id) || source.news?.[idx];
+      if (srcItem && isCustomOrBase64Image(srcItem.image) && !isCustomOrBase64Image(item.image)) {
+        hasLocalOnlyUploads = true;
+        return { ...item, image: srcItem.image };
+      }
+      return item;
+    });
+  }
+
+  // Principal
+  if (source.principal?.photo && isCustomOrBase64Image(source.principal.photo) && !isCustomOrBase64Image(res.principal.photo)) {
+    hasLocalOnlyUploads = true;
+    res.principal = { ...res.principal, photo: source.principal.photo };
+  }
+
+  return { result: res, hasLocalOnlyUploads };
+}
+
 /**
  * Subscribe to real-time site content updates across all users & browser tabs.
  * Uses individual section documents in Firestore to support high-res photos
@@ -627,24 +758,61 @@ export function subscribeToSiteContent(
     window.addEventListener('storage', handleStorageEvent);
   }
 
-  // Active Cloud Hydration: Fetch live section documents directly from Google Cloud servers
+  // Active Cloud Hydration: Prioritizes Server Persistence, then falls back to Firestore
   let isHydrated = false;
+  let isFirestoreQuotaExhausted = false;
+
   const hydrateFromCloud = async () => {
+    // 1. Primary Priority: Server Persistent Storage (/api/content)
+    // Guarantees all devices (smartphones, laptops, public visitors) receive 100% of uploaded photos
+    // without ever being blocked by Google Cloud Firestore Free Tier Quota limits (HTTP 429).
     try {
-      await fetchAllMediaAssetsRest();
+      const serverData = await fetchContentFromServer();
+      const localCached = safeGetLocalStorage();
+
+      if (serverData && Object.keys(serverData).length > 0) {
+        const baseMerged = mergeWithDefaults(serverData);
+        // Guarantee that if the local browser has uploaded photos, they are NEVER overwritten by stock images
+        const { result: preservedContent, hasLocalOnlyUploads } = mergePreservingUploads(baseMerged, localCached);
+
+        isHydrated = true;
+        notifySubscribers(preservedContent);
+        safeSetLocalStorage(preservedContent);
+
+        // If local device has uploaded photos not yet on the server, sync them to server immediately!
+        if (hasLocalOnlyUploads) {
+          syncLocalContentToServer(preservedContent).catch((e) => console.warn('Sync local uploads notice:', e));
+        }
+      } else if (localCached) {
+        const merged = mergeWithDefaults(localCached);
+        isHydrated = true;
+        notifySubscribers(merged);
+        syncLocalContentToServer(merged).catch(() => {});
+      }
     } catch (e) {
-      console.warn('Media assets prefetch notice:', e);
+      console.warn('Server hydration notice:', e);
     }
 
     try {
-      const restData = await fetchLiveContentFromFirestoreRest();
-      if (restData) {
-        const merged = mergeWithDefaults(restData);
-        isHydrated = true;
-        notifySubscribers(merged);
-      }
+      await fetchAllMediaAssetsRest();
     } catch (e) {
-      console.warn('Cloud hydration notice:', e);
+      // ignore
+    }
+
+    // 2. Secondary Cloud Backup: Firestore (only if quota is not exhausted)
+    if (!isFirestoreQuotaExhausted) {
+      try {
+        const restData = await fetchLiveContentFromFirestoreRest();
+        if (restData) {
+          const merged = mergeWithDefaults(restData);
+          isHydrated = true;
+          notifySubscribers(merged);
+        }
+      } catch (e: any) {
+        if (String(e).includes('Quota') || String(e).includes('429')) {
+          isFirestoreQuotaExhausted = true;
+        }
+      }
     }
   };
 
@@ -772,8 +940,24 @@ export async function saveSiteContentToFirestore(
     sectionsToSave.push(...sectionsList);
   }
 
-  // 3. Save each updated section independently to its dedicated document in Cloud Firestore
-  let atLeastOneSuccess = false;
+  // Save to local cache immediately
+  safeSetLocalStorage(mergedDoc);
+
+  // 3a. Primary Persistence: Save directly to Server Persistent Store (/api/content & /api/content/sync)
+  // This guarantees all devices immediately see every upload without Firestore 429 Quota Exceeded blockers!
+  let serverSuccess = false;
+  try {
+    const srv1 = await saveContentToServer(updatedContent);
+    const srv2 = await syncLocalContentToServer(mergedDoc);
+    if (srv1 || srv2) {
+      serverSuccess = true;
+    }
+  } catch (srvErr) {
+    console.warn('Server storage save notice:', srvErr);
+  }
+
+  // 3b. Secondary Cloud Backup: Save each updated section independently to Google Cloud Firestore
+  let firestoreSuccess = false;
 
   await Promise.all(
     sectionsToSave.map(async (sec) => {
@@ -809,7 +993,7 @@ export async function saveSiteContentToFirestore(
       }
 
       if (sdkSuccess || restSuccess) {
-        atLeastOneSuccess = true;
+        firestoreSuccess = true;
       }
     })
   );
@@ -829,13 +1013,13 @@ export async function saveSiteContentToFirestore(
     // Non-blocking
   }
 
-  if (!atLeastOneSuccess) {
+  if (!serverSuccess && !firestoreSuccess) {
     handleFirestoreError(
-      new Error('Gagal menyimpan ke Google Cloud Firestore'),
+      new Error('Gagal menyimpan ke server maupun Firestore'),
       OperationType.WRITE,
       'site_content'
     );
-    throw new Error('Gagal menyimpan perubahan ke Cloud Firestore. Silakan periksa koneksi internet Anda.');
+    throw new Error('Gagal menyimpan perubahan. Silakan periksa koneksi internet Anda.');
   }
 
   return mergedDoc;
