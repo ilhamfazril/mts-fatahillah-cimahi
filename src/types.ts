@@ -104,6 +104,7 @@ export interface SchoolSiteContent {
   facilities: FacilityItem[];
   extracurriculars: ExtracurricularItem[];
   achievements: AchievementItem[];
+  teachers?: TeacherStaff[];
   updatedAt?: number;
   updatedBy?: string;
 }

@@ -168,6 +168,9 @@ app.post('/api/content/sync', (req, res) => {
     if (Array.isArray(incoming.achievements)) {
       merged.achievements = mergeArrayPreservingImages(current.achievements || [], incoming.achievements, 'id');
     }
+    if (Array.isArray(incoming.teachers)) {
+      merged.teachers = mergeArrayPreservingImages(current.teachers || [], incoming.teachers, 'id');
+    }
 
     if (incoming.principal) {
       const curPrincipal = current.principal || {};

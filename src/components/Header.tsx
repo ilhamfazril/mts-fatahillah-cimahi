@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Phone, 
   Mail, 
@@ -52,10 +52,46 @@ export const Header: React.FC<HeaderProps> = ({
   const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
   const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
-  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
-  const [mobileAcademicOpen, setMobileAcademicOpen] = useState(false);
-  const [mobileStudentOpen, setMobileStudentOpen] = useState(false);
-  const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
+
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleOpenDropdown = (menu: 'profil' | 'akademik' | 'kesiswaan' | 'informasi') => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setProfileDropdownOpen(menu === 'profil');
+    setAcademicDropdownOpen(menu === 'akademik');
+    setStudentDropdownOpen(menu === 'kesiswaan');
+    setInfoDropdownOpen(menu === 'informasi');
+  };
+
+  const handleCloseDropdown = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    closeTimeoutRef.current = setTimeout(() => {
+      setProfileDropdownOpen(false);
+      setAcademicDropdownOpen(false);
+      setStudentDropdownOpen(false);
+      setInfoDropdownOpen(false);
+    }, 200); // 200ms grace period prevents accidental menu loss
+  };
+
+  const handleCancelClose = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,14 +104,14 @@ export const Header: React.FC<HeaderProps> = ({
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
     setMobileMenuOpen(false);
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     setProfileDropdownOpen(false);
     setAcademicDropdownOpen(false);
     setStudentDropdownOpen(false);
     setInfoDropdownOpen(false);
-    setMobileProfileOpen(false);
-    setMobileAcademicOpen(false);
-    setMobileStudentOpen(false);
-    setMobileInfoOpen(false);
     
     // Always land cleanly and accurately at the top of the selected page
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -83,47 +119,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="w-full sticky top-0 z-50 transition-all duration-300 shadow-md select-none">
-      
-      {/* Top Notification / Info Bar */}
-      <div className="bg-slate-950 text-slate-300 text-xs py-2 px-4 hidden lg:block border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          
-          {/* Contact Details Left */}
-          <div className="flex items-center space-x-6 text-[11px] text-slate-300">
-            <div className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <MapPin className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-              <span>Jl. RH Abdul Halim RT 03/03, Cigugur Tengah, Cimahi</span>
-            </div>
-            <div className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Phone className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-              <span>(022) 665-2408</span>
-            </div>
-            <div className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Mail className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-              <span>smppgri5cimahi@gmail.com</span>
-            </div>
-            <div className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Clock className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-              <span>Senin - Jumat 07.00 - 15.00 WIB</span>
-            </div>
-          </div>
-
-          {/* Accreditation & PPDB CTA Right */}
-          <div className="flex items-center space-x-3">
-            <span className="bg-emerald-900/80 text-emerald-200 font-bold px-2.5 py-0.5 rounded-full text-[10px] border border-emerald-700/60 shadow-sm">
-              NPSN: 20224096 • Akreditasi B BAN-S/M
-            </span>
-            <button 
-              onClick={onOpenPsbModal}
-              className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-3 py-1 rounded-md text-[11px] transition-all flex items-center gap-1 shadow hover:scale-105"
-            >
-              <GraduationCap className="w-3.5 h-3.5" />
-              <span>PPDB 2025/2026</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <nav className={`w-full bg-white transition-all duration-300 border-b border-slate-100 ${
         isScrolled ? 'py-2 sm:py-2.5 shadow-md' : 'py-3 sm:py-3.5'
@@ -178,9 +173,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* 2. Profil ▾ */}
             <div 
-              className="relative"
-              onMouseEnter={() => setProfileDropdownOpen(true)}
-              onMouseLeave={() => setProfileDropdownOpen(false)}
+              className="relative py-1"
+              onMouseEnter={() => handleOpenDropdown('profil')}
+              onMouseLeave={handleCloseDropdown}
             >
               <button
                 id="nav-profil-btn"
@@ -196,56 +191,62 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {profileDropdownOpen && (
-                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <button
-                    onClick={() => handleNavClick('profil')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Award className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Sambutan & Visi Misi</div>
-                      <div className="text-[10px] text-slate-400">Kepala Sekolah & Arah Tujuan</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('sejarah')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Sejarah PGRI & Sekolah</div>
-                      <div className="text-[10px] text-slate-400">Dedikasi pendidikan Cimahi</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('guru-staf')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Users className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Dewan Guru & Staf</div>
-                      <div className="text-[10px] text-slate-400">Tenaga pendidik berkompeten</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('fasilitas')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors border-t border-slate-100 mt-1 pt-2"
-                  >
-                    <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Sarana & Fasilitas</div>
-                      <div className="text-[10px] text-slate-400">Lab komputer, lapangan & kelas</div>
-                    </div>
-                  </button>
+                <div 
+                  className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  onMouseEnter={handleCancelClose}
+                  onMouseLeave={handleCloseDropdown}
+                >
+                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                    <button
+                      onClick={() => handleNavClick('profil')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Award className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Sambutan & Visi Misi</div>
+                        <div className="text-[10px] text-slate-400">Kepala Sekolah & Arah Tujuan</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('sejarah')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Sejarah PGRI & Sekolah</div>
+                        <div className="text-[10px] text-slate-400">Dedikasi pendidikan Cimahi</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('guru-staf')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Dewan Guru & Staf</div>
+                        <div className="text-[10px] text-slate-400">Tenaga pendidik berkompeten</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('fasilitas')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors border-t border-slate-100 mt-1 pt-2"
+                    >
+                      <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Sarana & Fasilitas</div>
+                        <div className="text-[10px] text-slate-400">Lab komputer, lapangan & kelas</div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* 3. Akademik ▾ */}
             <div 
-              className="relative"
-              onMouseEnter={() => setAcademicDropdownOpen(true)}
-              onMouseLeave={() => setAcademicDropdownOpen(false)}
+              className="relative py-1"
+              onMouseEnter={() => handleOpenDropdown('akademik')}
+              onMouseLeave={handleCloseDropdown}
             >
               <button
                 id="nav-akademik-btn"
@@ -261,46 +262,52 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {academicDropdownOpen && (
-                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <button
-                    onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Kurikulum Merdeka Mandiri</div>
-                      <div className="text-[10px] text-slate-400">Pembelajaran aktif berpusat siswa</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">ANBK & Literasi Digital</div>
-                      <div className="text-[10px] text-slate-400">Lab CBT & teknologi informatika</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Pembiasaan & Karakter</div>
-                      <div className="text-[10px] text-slate-400">Sholat dhuha & tadarus rutin</div>
-                    </div>
-                  </button>
+                <div 
+                  className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  onMouseEnter={handleCancelClose}
+                  onMouseLeave={handleCloseDropdown}
+                >
+                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                    <button
+                      onClick={() => handleNavClick('program')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Kurikulum Merdeka Mandiri</div>
+                        <div className="text-[10px] text-slate-400">Pembelajaran aktif berpusat siswa</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('program')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">ANBK & Literasi Digital</div>
+                        <div className="text-[10px] text-slate-400">Lab CBT & teknologi informatika</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('program')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Pembiasaan & Karakter</div>
+                        <div className="text-[10px] text-slate-400">Sholat dhuha & tadarus rutin</div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* 4. Kesiswaan ▾ */}
             <div 
-              className="relative"
-              onMouseEnter={() => setStudentDropdownOpen(true)}
-              onMouseLeave={() => setStudentDropdownOpen(false)}
+              className="relative py-1"
+              onMouseEnter={() => handleOpenDropdown('kesiswaan')}
+              onMouseLeave={handleCloseDropdown}
             >
               <button
                 id="nav-kesiswaan-btn"
@@ -316,36 +323,42 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {studentDropdownOpen && (
-                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <button
-                    onClick={() => handleNavClick('kesiswaan')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Users className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Ekstrakurikuler & OSIS</div>
-                      <div className="text-[10px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('prestasi')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
-                    <div>
-                      <div className="font-bold">Prestasi Siswa</div>
-                      <div className="text-[10px] text-slate-400">Juara akademik & non-akademik</div>
-                    </div>
-                  </button>
+                <div 
+                  className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  onMouseEnter={handleCancelClose}
+                  onMouseLeave={handleCloseDropdown}
+                >
+                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                    <button
+                      onClick={() => handleNavClick('kesiswaan')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Ekstrakurikuler & OSIS</div>
+                        <div className="text-[10px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('prestasi')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                      <div>
+                        <div className="font-bold">Prestasi Siswa</div>
+                        <div className="text-[10px] text-slate-400">Juara akademik & non-akademik</div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* 5. Informasi ▾ */}
             <div 
-              className="relative"
-              onMouseEnter={() => setInfoDropdownOpen(true)}
-              onMouseLeave={() => setInfoDropdownOpen(false)}
+              className="relative py-1"
+              onMouseEnter={() => handleOpenDropdown('informasi')}
+              onMouseLeave={handleCloseDropdown}
             >
               <button
                 id="nav-informasi-btn"
@@ -361,27 +374,33 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {infoDropdownOpen && (
-                <div className="absolute right-0 lg:left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <button
-                    onClick={() => handleNavClick('berita')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Newspaper className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Warta & Berita Sekolah</div>
-                      <div className="text-[10px] text-slate-400">Agenda kegiatan & kabar terbaru</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('kontak')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
-                  >
-                    <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Kontak & Lokasi Kampus</div>
-                      <div className="text-[10px] text-slate-400">Peta, kontak WhatsApp & pengaduan</div>
-                    </div>
-                  </button>
+                <div 
+                  className="absolute right-0 lg:left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  onMouseEnter={handleCancelClose}
+                  onMouseLeave={handleCloseDropdown}
+                >
+                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                    <button
+                      onClick={() => handleNavClick('berita')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Newspaper className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Warta & Berita Sekolah</div>
+                        <div className="text-[10px] text-slate-400">Agenda kegiatan & kabar terbaru</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('kontak')}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                    >
+                      <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <div className="font-bold">Kontak & Lokasi Kampus</div>
+                        <div className="text-[10px] text-slate-400">Peta, kontak WhatsApp & pengaduan</div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -459,9 +478,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-8 space-y-3.5 shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[82vh] overflow-y-auto overscroll-contain">
             {/* Quick PPDB banner */}
-            <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-2xl p-3.5 mb-3 shadow-sm">
+            <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-2xl p-3.5 shadow-sm">
               <div className="flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-amber-300" />
                 <div className="text-xs font-bold">PPDB 2025/2026 SMP PGRI 5 CIMAHI</div>
@@ -484,209 +503,213 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="mobile-nav-beranda"
               onClick={() => handleNavClick('beranda')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'beranda' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
+              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors flex items-center justify-between ${
+                activeTab === 'beranda' ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-800 bg-slate-100/90 hover:bg-slate-200/70'
               }`}
             >
-              Beranda
+              <span>Beranda</span>
+              <span className="text-[10px] font-normal opacity-80">Halaman Utama</span>
             </button>
 
-            {/* 2. Profil ▾ */}
-            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
-              <button
-                id="mobile-nav-profil-btn"
-                type="button"
-                onClick={() => setMobileProfileOpen(!mobileProfileOpen)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
-                  activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf' || activeTab === 'fasilitas'
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : 'text-slate-700 hover:bg-slate-100/70'
-                }`}
-              >
+            {/* 2. Profil Sekolah (Dibiarkan Terbuka Semua) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-2.5">
+              <div className="flex items-center gap-2 px-2 py-1 mb-1 text-[11px] font-black text-emerald-800 uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 <span>Profil</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileProfileOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
-              </button>
+              </div>
+              <div className="space-y-1.5">
+                <button
+                  onClick={() => handleNavClick('profil')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'profil'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Award className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Sambutan & Visi Misi</div>
+                    <div className="text-[10px] text-slate-500 truncate">Kepala Sekolah & Arah Tujuan</div>
+                  </div>
+                </button>
 
-              {mobileProfileOpen && (
-                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
-                  <button
-                    onClick={() => handleNavClick('profil')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Sambutan & Visi Misi</div>
-                      <div className="text-[10px] text-slate-400">Kepala Sekolah & Arah Tujuan</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('sejarah')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Sejarah PGRI & Sekolah</div>
-                      <div className="text-[10px] text-slate-400">Dedikasi pendidikan Cimahi</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('guru-staf')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Users className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Dewan Guru & Staf</div>
-                      <div className="text-[10px] text-slate-400">Tenaga pendidik berkompeten</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('fasilitas')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5 border-t border-slate-50 pt-1.5"
-                  >
-                    <Building2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Sarana & Fasilitas</div>
-                      <div className="text-[10px] text-slate-400">Lab komputer, lapangan & kelas</div>
-                    </div>
-                  </button>
-                </div>
-              )}
+                <button
+                  onClick={() => handleNavClick('sejarah')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'sejarah'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Sejarah PGRI & Sekolah</div>
+                    <div className="text-[10px] text-slate-500 truncate">Dedikasi pendidikan Cimahi</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleNavClick('guru-staf')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'guru-staf'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Dewan Guru & Staf</div>
+                    <div className="text-[10px] text-slate-500 truncate">Tenaga pendidik berkompeten</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleNavClick('fasilitas')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'fasilitas'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Sarana & Fasilitas</div>
+                    <div className="text-[10px] text-slate-500 truncate">Lab komputer, lapangan & kelas</div>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* 3. Akademik ▾ */}
-            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
-              <button
-                id="mobile-nav-akademik-btn"
-                type="button"
-                onClick={() => setMobileAcademicOpen(!mobileAcademicOpen)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
-                  activeTab === 'program'
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : 'text-slate-700 hover:bg-slate-100/70'
-                }`}
-              >
+            {/* 3. Akademik (Dibiarkan Terbuka Semua) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-2.5">
+              <div className="flex items-center gap-2 px-2 py-1 mb-1 text-[11px] font-black text-emerald-800 uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 <span>Akademik</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileAcademicOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
-              </button>
+              </div>
+              <div className="space-y-1.5">
+                <button
+                  onClick={() => handleNavClick('program')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'program'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Kurikulum Merdeka Mandiri</div>
+                    <div className="text-[10px] text-slate-500 truncate">Pembelajaran aktif berpusat siswa</div>
+                  </div>
+                </button>
 
-              {mobileAcademicOpen && (
-                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
-                  <button
-                    onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Kurikulum Merdeka Mandiri</div>
-                      <div className="text-[10px] text-slate-400">Pembelajaran aktif berpusat siswa</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">ANBK & Literasi Digital</div>
-                      <div className="text-[10px] text-slate-400">Lab CBT & teknologi informatika</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Pembiasaan & Karakter</div>
-                      <div className="text-[10px] text-slate-400">Sholat dhuha & tadarus rutin</div>
-                    </div>
-                  </button>
-                </div>
-              )}
+                <button
+                  onClick={() => handleNavClick('program')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'program'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">ANBK & Literasi Digital</div>
+                    <div className="text-[10px] text-slate-500 truncate">Lab CBT & teknologi informatika</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleNavClick('program')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'program'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Pembiasaan & Karakter</div>
+                    <div className="text-[10px] text-slate-500 truncate">Sholat dhuha & tadarus rutin</div>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* 4. Kesiswaan ▾ */}
-            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
-              <button
-                id="mobile-nav-kesiswaan-btn"
-                type="button"
-                onClick={() => setMobileStudentOpen(!mobileStudentOpen)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
-                  activeTab === 'kesiswaan' || activeTab === 'prestasi'
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : 'text-slate-700 hover:bg-slate-100/70'
-                }`}
-              >
+            {/* 4. Kesiswaan (Dibiarkan Terbuka Semua) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-2.5">
+              <div className="flex items-center gap-2 px-2 py-1 mb-1 text-[11px] font-black text-emerald-800 uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 <span>Kesiswaan</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileStudentOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
-              </button>
+              </div>
+              <div className="space-y-1.5">
+                <button
+                  onClick={() => handleNavClick('kesiswaan')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'kesiswaan'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Ekstrakurikuler & OSIS</div>
+                    <div className="text-[10px] text-slate-500 truncate">Paskibra, Pramuka, Futsal & Seni</div>
+                  </div>
+                </button>
 
-              {mobileStudentOpen && (
-                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
-                  <button
-                    onClick={() => handleNavClick('kesiswaan')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Users className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Ekstrakurikuler & OSIS</div>
-                      <div className="text-[10px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('prestasi')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <div>
-                      <div className="font-bold">Prestasi Siswa</div>
-                      <div className="text-[10px] text-slate-400">Juara akademik & non-akademik</div>
-                    </div>
-                  </button>
-                </div>
-              )}
+                <button
+                  onClick={() => handleNavClick('prestasi')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'prestasi'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Prestasi Siswa</div>
+                    <div className="text-[10px] text-slate-500 truncate">Juara akademik & non-akademik</div>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            {/* 5. Informasi ▾ */}
-            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
-              <button
-                id="mobile-nav-informasi-btn"
-                type="button"
-                onClick={() => setMobileInfoOpen(!mobileInfoOpen)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
-                  activeTab === 'berita' || activeTab === 'kontak'
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : 'text-slate-700 hover:bg-slate-100/70'
-                }`}
-              >
+            {/* 5. Informasi (Dibiarkan Terbuka Semua) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-2.5">
+              <div className="flex items-center gap-2 px-2 py-1 mb-1 text-[11px] font-black text-emerald-800 uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 <span>Informasi</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileInfoOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
-              </button>
+              </div>
+              <div className="space-y-1.5">
+                <button
+                  onClick={() => handleNavClick('berita')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'berita'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Newspaper className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Warta & Berita Sekolah</div>
+                    <div className="text-[10px] text-slate-500 truncate">Agenda kegiatan & kabar terbaru</div>
+                  </div>
+                </button>
 
-              {mobileInfoOpen && (
-                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
-                  <button
-                    onClick={() => handleNavClick('berita')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Newspaper className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Warta & Berita Sekolah</div>
-                      <div className="text-[10px] text-slate-400">Agenda kegiatan & kabar terbaru</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('kontak')}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <div>
-                      <div className="font-bold">Kontak & Lokasi Kampus</div>
-                      <div className="text-[10px] text-slate-400">Peta, kontak WhatsApp & pengaduan</div>
-                    </div>
-                  </button>
-                </div>
-              )}
+                <button
+                  onClick={() => handleNavClick('kontak')}
+                  className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
+                    activeTab === 'kontak'
+                      ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100'
+                  }`}
+                >
+                  <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-xs truncate">Kontak & Lokasi Kampus</div>
+                    <div className="text-[10px] text-slate-500 truncate">Peta, kontak WhatsApp & pengaduan</div>
+                  </div>
+                </button>
+              </div>
             </div>
 
             {/* Mobile Section: Akses Khusus Akun Admin */}

@@ -12,6 +12,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { loginAdmin } from '../services/adminAuthService';
+import { PgriLogo } from './PgriLogo';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -72,8 +73,11 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center mb-3 shadow-lg">
-            <Lock className="w-6 h-6" />
+          <div className="flex items-center gap-3 mb-3">
+            <PgriLogo size={52} />
+            <div className="w-10 h-10 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg">
+              <Lock className="w-5 h-5" />
+            </div>
           </div>
 
           <h3 className="text-xl font-black tracking-tight">Masuk Akun Admin</h3>

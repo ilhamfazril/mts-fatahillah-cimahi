@@ -1,0 +1,274 @@
+<svg viewBox="0 0 500 500" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Drop shadow for subtle depth -->
+    <filter id="badgeShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Perfectly Round Circular Base Badge -->
+  <circle cx="250" cy="250" r="246" fill="#FFFFFF" stroke="#047857" stroke-width="6" />
+  <circle cx="250" cy="250" r="238" fill="none" stroke="#F59E0B" stroke-width="2.5" />
+  <circle cx="250" cy="250" r="234" fill="none" stroke="#E2E8F0" stroke-width="1" />
+
+  <!-- Inner Group Scaled & Centered to Fit Perfectly within the Circle -->
+  <g transform="translate(250, 248) scale(0.72) translate(-250, -250)">
+    
+    <!-- 1. Daun Sayap Padi Emas (Kiri) -->
+    <!-- Outer Leaf 1 (Top Left) -->
+    <path
+      d="M 230,310 C 180,290 140,220 160,130 C 180,95 200,80 205,75 C 200,105 180,145 200,205 C 215,245 230,280 230,310 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Outer Leaf 2 (Upper Left) -->
+    <path
+      d="M 220,320 C 160,300 110,240 120,180 C 122,160 135,140 140,135 C 135,160 130,200 165,240 C 190,270 215,300 220,320 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Outer Leaf 3 (Mid Left) -->
+    <path
+      d="M 215,335 C 145,315 95,270 102,230 C 104,215 115,200 120,195 C 115,220 118,250 155,278 C 180,298 205,320 215,335 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Outer Leaf 4 (Lower Left) -->
+    <path
+      d="M 210,350 C 140,335 90,305 95,280 C 97,270 106,260 110,255 C 106,275 115,300 155,318 C 180,330 200,342 210,350 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Inner Leaf Layers Left -->
+    <path
+      d="M 228,315 C 195,290 170,240 185,170 C 195,145 205,130 208,125 C 200,150 190,190 210,240 C 220,265 228,295 228,315 Z"
+      fill="#FFEA20"
+      stroke="#1E293B"
+      stroke-width="3"
+    />
+    <path
+      d="M 220,330 C 180,305 148,265 158,215 C 165,195 174,180 176,175 C 170,198 165,230 195,268 C 210,288 220,315 220,330 Z"
+      fill="#FFEA20"
+      stroke="#1E293B"
+      stroke-width="3"
+    />
+
+    <!-- 2. Daun Sayap Padi Emas (Kanan - Symmetrical) -->
+    <!-- Outer Leaf 1 (Top Right) -->
+    <path
+      d="M 270,310 C 320,290 360,220 340,130 C 320,95 300,80 295,75 C 300,105 320,145 300,205 C 285,245 270,280 270,310 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Outer Leaf 2 (Upper Right) -->
+    <path
+      d="M 280,320 C 340,300 390,240 380,180 C 378,160 365,140 360,135 C 365,160 370,200 335,240 C 310,270 285,300 280,320 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Outer Leaf 3 (Mid Right) -->
+    <path
+      d="M 285,335 C 355,315 405,270 398,230 C 396,215 385,200 380,195 C 385,220 382,250 345,278 C 320,298 295,320 285,335 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Outer Leaf 4 (Lower Right) -->
+    <path
+      d="M 290,350 C 360,335 410,305 405,280 C 403,270 394,260 390,255 C 394,275 385,300 345,318 C 320,330 300,342 290,350 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Inner Leaf Layers Right -->
+    <path
+      d="M 272,315 C 305,290 330,240 315,170 C 305,145 295,130 292,125 C 300,150 310,190 290,240 C 280,265 272,295 272,315 Z"
+      fill="#FFEA20"
+      stroke="#1E293B"
+      stroke-width="3"
+    />
+    <path
+      d="M 280,330 C 320,305 352,265 342,215 C 335,195 326,180 324,175 C 330,198 335,230 305,268 C 290,288 280,315 280,330 Z"
+      fill="#FFEA20"
+      stroke="#1E293B"
+      stroke-width="3"
+    />
+
+    <!-- 3. Lingkaran Hijau Tengah (Center Green Circle) -->
+    <circle
+      cx="250"
+      cy="245"
+      r="115"
+      fill="#0FA83F"
+      stroke="#1E293B"
+      stroke-width="4.5"
+    />
+
+    <!-- 4. Gedung Putih Berundak (White Stepped Building/Gateway) -->
+    <!-- Left Wing Building -->
+    <g fill="#FFFFFF" stroke="#1E293B" stroke-width="3.5" stroke-linejoin="miter">
+      <!-- Left stepped silhouette -->
+      <path d="M 160,305 L 160,205 L 178,205 L 178,230 L 195,230 L 195,200 L 212,200 L 212,305 Z" />
+      <!-- Left internal block lines -->
+      <line x1="160" y1="230" x2="178" y2="230" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="160" y1="255" x2="212" y2="255" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="160" y1="280" x2="212" y2="280" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="185" y1="255" x2="185" y2="280" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="195" y1="280" x2="195" y2="305" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="172" y1="280" x2="172" y2="305" stroke="#1E293B" stroke-width="3.5" />
+
+      <!-- Right stepped silhouette -->
+      <path d="M 340,305 L 340,205 L 322,205 L 322,230 L 305,230 L 305,200 L 288,200 L 288,305 Z" />
+      <!-- Right internal block lines -->
+      <line x1="322" y1="230" x2="340" y2="230" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="288" y1="255" x2="340" y2="255" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="288" y1="280" x2="340" y2="280" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="315" y1="255" x2="315" y2="280" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="305" y1="280" x2="305" y2="305" stroke="#1E293B" stroke-width="3.5" />
+      <line x1="328" y1="280" x2="328" y2="305" stroke="#1E293B" stroke-width="3.5" />
+    </g>
+
+    <!-- 5. Tangkai Suluh Kuning Emas (Tapering Torch Cone Handle) -->
+    <polygon
+      points="233,188 267,188 250,378"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Center line on handle for 3D metallic feel -->
+    <line x1="250" y1="188" x2="250" y2="376" stroke="#D97706" stroke-width="2.5" />
+
+    <!-- 6. Cawan Suluh / Wadah Api (4-tier ribbed torch bowl) -->
+    <g stroke="#1E293B" stroke-width="3.5" stroke-linejoin="round">
+      <!-- Tier 4 (bottom) -->
+      <path d="M 230,172 C 230,172 238,188 250,188 C 262,188 270,172 270,172 Z" fill="#FFDE00" />
+      <!-- Tier 3 -->
+      <path d="M 224,158 C 224,158 234,173 250,173 C 266,173 276,158 276,158 Z" fill="#FFDE00" />
+      <!-- Tier 2 -->
+      <path d="M 218,144 C 218,144 230,159 250,159 C 270,159 282,144 282,144 Z" fill="#FFDE00" />
+      <!-- Tier 1 (top collar) -->
+      <path d="M 212,130 C 212,130 226,145 250,145 C 274,145 288,130 288,130 Z" fill="#FFDE00" />
+    </g>
+
+    <!-- 7. Nyala Api Merah Berkelopak Lima (5-Ray Pancasila Flame) -->
+    <!-- Outer solid red flame -->
+    <path
+      d="M 250,22
+         C 238,55 240,78 226,72
+         C 216,68 214,54 205,58
+         C 192,64 195,95 208,108
+         C 195,102 188,96 182,102
+         C 172,112 178,138 212,130
+         C 232,142 268,142 288,130
+         C 322,138 328,112 318,102
+         C 312,96 305,102 292,108
+         C 305,95 308,64 295,58
+         C 286,54 284,68 274,72
+         C 260,78 262,55 250,22 Z"
+      fill="#E52320"
+      stroke="#1E293B"
+      stroke-width="4.5"
+      stroke-linejoin="round"
+    />
+
+    <!-- Internal Flame Texture Accents (Solid Red/Orange) -->
+    <path
+      d="M 250,42 C 244,70 242,90 236,98 C 242,95 246,85 250,75 C 254,85 258,95 264,98 C 258,90 256,70 250,42 Z"
+      fill="#DC2626"
+      opacity="0.9"
+    />
+
+    <!-- 8. Pita Kuning "PGRI" (Curved Yellow Banner) -->
+    <path
+      d="M 125,358
+         C 170,395 330,395 375,358
+         C 390,398 375,418 360,424
+         C 320,442 180,442 140,424
+         C 125,418 110,398 125,358 Z"
+      fill="#FFDE00"
+      stroke="#1E293B"
+      stroke-width="4.5"
+      stroke-linejoin="round"
+    />
+
+    <!-- Text "PGRI" inside yellow ribbon -->
+    <text
+      x="250"
+      y="414"
+      font-family="'Arial Black', 'Impact', sans-serif"
+      font-weight="900"
+      font-size="44"
+      fill="#000000"
+      text-anchor="middle"
+      letter-spacing="4"
+    >
+      PGRI
+    </text>
+
+    <!-- 9. Pita Putih Bawah "PPLP DASAR & MENENGAH" (White Banner with Swallowtails) -->
+    <!-- Left Swallowtail Ribbon Fold -->
+    <path
+      d="M 75,444 L 28,422 L 68,452 L 25,482 L 95,475 Z"
+      fill="#FFFFFF"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Left Shadow Triangle fold -->
+    <polygon points="75,444 95,475 95,444" fill="#94A3B8" stroke="#1E293B" stroke-width="3" />
+
+    <!-- Right Swallowtail Ribbon Fold -->
+    <path
+      d="M 425,444 L 472,422 L 432,452 L 475,482 L 405,475 Z"
+      fill="#FFFFFF"
+      stroke="#1E293B"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- Right Shadow Triangle fold -->
+    <polygon points="425,444 405,475 405,444" fill="#94A3B8" stroke="#1E293B" stroke-width="3" />
+
+    <!-- Main White Ribbon Body (Spanning Center) -->
+    <path
+      d="M 85,440
+         C 140,455 360,455 415,440
+         L 415,485
+         C 360,498 140,498 85,485
+         Z"
+      fill="#FFFFFF"
+      stroke="#1E293B"
+      stroke-width="4.5"
+      stroke-linejoin="round"
+    />
+
+    <!-- Text "PPLP DASAR & MENENGAH" inside white ribbon -->
+    <text
+      x="250"
+      y="473"
+      font-family="'Arial Black', 'Arial', sans-serif"
+      font-weight="900"
+      font-size="20.5"
+      fill="#000000"
+      text-anchor="middle"
+      letter-spacing="1.5"
+    >
+      PPLP DASAR &amp; MENENGAH
+    </text>
+
+  </g>
+</svg>

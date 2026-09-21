@@ -173,7 +173,11 @@ export default function App() {
               onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
             />
             <HistorySection />
-            <TeachersSection />
+            <TeachersSection 
+              teachersData={currentContent.teachers}
+              isAdmin={isAdmin}
+              onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+            />
             <FacilitiesSection facilitiesData={currentContent.facilities} />
           </div>
         )}
@@ -211,7 +215,11 @@ export default function App() {
                 </h1>
               </div>
             </div>
-            <TeachersSection />
+            <TeachersSection 
+              teachersData={currentContent.teachers}
+              isAdmin={isAdmin}
+              onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+            />
           </div>
         )}
 

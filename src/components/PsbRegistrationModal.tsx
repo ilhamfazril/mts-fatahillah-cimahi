@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { PSB_INFO, SCHOOL_INFO } from '../data/schoolData';
 import { savePpdbRegistrationToFirestore } from '../services/siteContentService';
+import { PgriLogo } from './PgriLogo';
 
 interface PsbRegistrationModalProps {
   isOpen: boolean;
@@ -95,9 +96,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
         {/* Modal Top Header */}
         <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold shadow">
-              <GraduationCap className="w-6 h-6" />
-            </div>
+            <PgriLogo size={42} />
             <div>
               <h3 className="font-extrabold text-base sm:text-lg">
                 Formulir Pra-Pendaftaran PSB 2025/2026

@@ -36,7 +36,8 @@ import {
   NEWS_LIST, 
   FACILITIES_LIST, 
   EXTRACURRICULAR_LIST, 
-  ACHIEVEMENTS_LIST 
+  ACHIEVEMENTS_LIST,
+  TEACHERS_LIST
 } from '../data/schoolData';
 import { PERSISTED_USER_CONTENT } from '../data/persistedSchoolContent';
 import { 
@@ -44,7 +45,8 @@ import {
   NewsItem, 
   FacilityItem, 
   ExtracurricularItem, 
-  AchievementItem 
+  AchievementItem,
+  TeacherStaff
 } from '../types';
 
 export enum OperationType {
@@ -285,6 +287,7 @@ export async function fetchLiveContentFromFirestoreRest(): Promise<Partial<Schoo
     'news',
     'achievements',
     'extracurriculars',
+    'teachers',
   ];
 
   const result: Partial<SchoolSiteContent> = {};
@@ -340,6 +343,7 @@ export async function saveLiveContentToFirestoreRest(data: Partial<SchoolSiteCon
     'news',
     'achievements',
     'extracurriculars',
+    'teachers',
   ];
 
   const sectionsToSave = sections.filter((sec) => (data as any)[sec] !== undefined);
@@ -399,6 +403,7 @@ export interface SchoolSiteContent {
   facilities: FacilityItem[];
   extracurriculars: ExtracurricularItem[];
   achievements: AchievementItem[];
+  teachers?: TeacherStaff[];
   updatedAt?: number;
   updatedBy?: string;
 }
@@ -475,6 +480,10 @@ export const DEFAULT_PRINCIPAL_CONTENT: PrincipalProfileContent = {
   photo: PERSISTED_USER_CONTENT.principal?.photo || PRINCIPAL_INFO.photo,
 };
 
+export const DEFAULT_TEACHERS_CONTENT: TeacherStaff[] = (Array.isArray(PERSISTED_USER_CONTENT.teachers) && PERSISTED_USER_CONTENT.teachers.length > 0)
+  ? (PERSISTED_USER_CONTENT.teachers as TeacherStaff[])
+  : TEACHERS_LIST;
+
 export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
   heroSlides: DEFAULT_HERO_SLIDES,
   principal: DEFAULT_PRINCIPAL_CONTENT,
@@ -493,6 +502,7 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
   achievements: (Array.isArray(PERSISTED_USER_CONTENT.achievements) && PERSISTED_USER_CONTENT.achievements.length > 0)
     ? (PERSISTED_USER_CONTENT.achievements as AchievementItem[])
     : ACHIEVEMENTS_LIST,
+  teachers: DEFAULT_TEACHERS_CONTENT,
   updatedAt: PERSISTED_USER_CONTENT.updatedAt || Date.now(),
   updatedBy: PERSISTED_USER_CONTENT.updatedBy || 'admin_ilham',
 };
@@ -575,6 +585,9 @@ let currentSiteContentMemory: SchoolSiteContent = (() => {
     achievements: Array.isArray(base.achievements) && base.achievements.length > 0 
       ? base.achievements 
       : DEFAULT_SITE_CONTENT.achievements,
+    teachers: Array.isArray(base.teachers) && base.teachers.length > 0
+      ? base.teachers
+      : (DEFAULT_SITE_CONTENT.teachers || DEFAULT_TEACHERS_CONTENT),
     updatedAt: base.updatedAt || Date.now(),
     updatedBy: base.updatedBy || 'admin_ilham',
   };
@@ -660,6 +673,9 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
     achievements: Array.isArray(sanitized.achievements) && sanitized.achievements.length > 0
       ? sanitized.achievements
       : (currentSiteContentMemory.achievements || DEFAULT_SITE_CONTENT.achievements),
+    teachers: Array.isArray(sanitized.teachers) && sanitized.teachers.length > 0
+      ? sanitized.teachers
+      : (currentSiteContentMemory.teachers || DEFAULT_SITE_CONTENT.teachers || DEFAULT_TEACHERS_CONTENT),
     updatedAt: sanitized.updatedAt || currentSiteContentMemory.updatedAt || Date.now(),
     updatedBy: sanitized.updatedBy || currentSiteContentMemory.updatedBy || 'admin_ilham',
   };
@@ -722,6 +738,18 @@ export function mergePreservingUploads(
   if (source.principal?.photo && isCustomOrBase64Image(source.principal.photo) && !isCustomOrBase64Image(res.principal.photo)) {
     hasLocalOnlyUploads = true;
     res.principal = { ...res.principal, photo: source.principal.photo };
+  }
+
+  // Teachers
+  if (Array.isArray(source.teachers) && Array.isArray(res.teachers)) {
+    res.teachers = res.teachers.map((teacher, idx) => {
+      const srcTeacher = source.teachers?.find((st) => st.id === teacher.id) || source.teachers?.[idx];
+      if (srcTeacher && isCustomOrBase64Image(srcTeacher.image) && !isCustomOrBase64Image(teacher.image)) {
+        hasLocalOnlyUploads = true;
+        return { ...teacher, image: srcTeacher.image };
+      }
+      return teacher;
+    });
   }
 
   return { result: res, hasLocalOnlyUploads };
@@ -922,6 +950,7 @@ export async function saveSiteContentToFirestore(
     'news',
     'achievements',
     'extracurriculars',
+    'teachers',
   ];
 
   // 1. Immediately merge into memory & notify local subscribers (optimistic fast UI)
@@ -1037,6 +1066,7 @@ export async function resetSiteContentToDefaultInFirestore(): Promise<void> {
     facilities: FACILITIES_LIST,
     extracurriculars: EXTRACURRICULAR_LIST,
     achievements: ACHIEVEMENTS_LIST,
+    teachers: TEACHERS_LIST,
     updatedAt: Date.now(),
     updatedBy: 'admin_ilham (reset)',
   };

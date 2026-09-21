@@ -16,7 +16,8 @@ import {
   Smartphone,
   RefreshCw,
   Server,
-  Check
+  Check,
+  GraduationCap
 } from 'lucide-react';
 import { SchoolSiteContent, syncAllDevicesWithServer } from '../../services/siteContentService';
 
@@ -68,6 +69,16 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
       bgColor: 'bg-emerald-50',
       borderColor: 'border-emerald-200',
       description: 'Foto resmi, sambutan & kutipan',
+    },
+    {
+      id: 'teachers',
+      label: 'Dewan Guru & Staf',
+      count: content.teachers?.length || 4,
+      unit: 'Guru terdaftar',
+      icon: <GraduationCap className="w-5 h-5 text-indigo-600" />,
+      bgColor: 'bg-indigo-50',
+      borderColor: 'border-indigo-200',
+      description: 'Pendidik, mata pelajaran & gelar',
     },
     {
       id: 'programs',

@@ -20,7 +20,8 @@ import {
   ChevronRight,
   Menu,
   ArrowLeft,
-  GraduationCap
+  GraduationCap,
+  Users
 } from 'lucide-react';
 import { 
   SchoolSiteContent, 
@@ -32,13 +33,15 @@ import {
   DEFAULT_PRINCIPAL_CONTENT
 } from '../services/siteContentService';
 import { getAdminSession } from '../services/adminAuthService';
-import { ProgramUnggulan, NewsItem, FacilityItem, ExtracurricularItem, AchievementItem } from '../types';
-import { PROGRAMS_UNGGULAN, NEWS_LIST, FACILITIES_LIST, EXTRACURRICULAR_LIST, ACHIEVEMENTS_LIST } from '../data/schoolData';
+import { ProgramUnggulan, NewsItem, FacilityItem, ExtracurricularItem, AchievementItem, TeacherStaff } from '../types';
+import { PROGRAMS_UNGGULAN, NEWS_LIST, FACILITIES_LIST, EXTRACURRICULAR_LIST, ACHIEVEMENTS_LIST, TEACHERS_LIST } from '../data/schoolData';
+import { PgriLogo } from './PgriLogo';
 
 import { AdminOverviewTab } from './admin/AdminOverviewTab';
 import { AdminHeroSlidesTab } from './admin/AdminHeroSlidesTab';
 import { AdminPrincipalTab } from './admin/AdminPrincipalTab';
 import { AdminProgramsTab } from './admin/AdminProgramsTab';
+import { AdminTeachersTab } from './admin/AdminTeachersTab';
 import { AdminNewsTab } from './admin/AdminNewsTab';
 import { AdminFacilitiesTab } from './admin/AdminFacilitiesTab';
 import { AdminExtracurricularsTab } from './admin/AdminExtracurricularsTab';
@@ -59,6 +62,7 @@ type AdminTab =
   | 'slides' 
   | 'principal' 
   | 'programs' 
+  | 'teachers'
   | 'news' 
   | 'facilities' 
   | 'extracurriculars' 
@@ -273,6 +277,23 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     );
   };
 
+  const handleSaveTeachers = async (
+    updatedTeachers: TeacherStaff[],
+    meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
+  ) => {
+    await updateSiteSection(
+      { teachers: updatedTeachers },
+      {
+        sectionName: 'Dewan Guru & Tenaga Kependidikan',
+        title: meta?.title || `${updatedTeachers.length} Profil Pendidik`,
+        action: meta?.action || 'update',
+        targetTab: 'guru-staf',
+        targetElementId: 'guru-staf',
+        details: 'Data dewan guru, foto profil resmi, mata pelajaran, dan kualifikasi pendidikan berhasil diperbarui dan disinkronkan secara real-time.',
+      }
+    );
+  };
+
   const handleResetToDefaults = async () => {
     try {
       setIsResetting(true);
@@ -329,6 +350,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       label: 'Profil Kepala Sekolah',
       icon: <UserCheck className="w-4 h-4" />,
       badge: null,
+    },
+    {
+      id: 'teachers' as AdminTab,
+      label: 'Dewan Guru & Staf',
+      icon: <Users className="w-4 h-4" />,
+      badge: siteContent.teachers?.length || TEACHERS_LIST.length,
     },
     {
       id: 'programs' as AdminTab,
@@ -389,8 +416,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">
-              P5
+            <div className="flex-shrink-0">
+              <PgriLogo size={36} />
             </div>
 
             <div>
@@ -596,6 +623,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 <AdminProgramsTab
                   programs={siteContent.programs || PROGRAMS_UNGGULAN}
                   onSavePrograms={handleSavePrograms}
+                />
+              )}
+
+              {activeTab === 'teachers' && (
+                <AdminTeachersTab
+                  teachersList={siteContent.teachers || TEACHERS_LIST}
+                  onSaveTeachers={handleSaveTeachers}
                 />
               )}
 
