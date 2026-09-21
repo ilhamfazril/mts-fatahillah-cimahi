@@ -550,7 +550,7 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
   // Clean data in case legacy "media:" tokens were retrieved from previous iterations
   const sanitized = sanitizeMediaReferences(data as SchoolSiteContent);
 
-  return {
+  const merged: SchoolSiteContent = {
     heroSlides: Array.isArray(sanitized.heroSlides) && sanitized.heroSlides.length > 0
       ? sanitized.heroSlides.map((slide, idx) => {
           const fallback = DEFAULT_HERO_SLIDES[idx] || DEFAULT_HERO_SLIDES[0];
@@ -591,6 +591,9 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
     updatedAt: sanitized.updatedAt || currentSiteContentMemory.updatedAt || Date.now(),
     updatedBy: sanitized.updatedBy || currentSiteContentMemory.updatedBy || 'admin_ilham',
   };
+
+  currentSiteContentMemory = merged;
+  return merged;
 }
 
 /**
@@ -708,7 +711,6 @@ export function subscribeToSiteContent(
       },
       (err) => {
         handleFirestoreError(err, OperationType.GET, 'site_content/main_config');
-        hydrateFromCloud();
         if (onError) onError(err);
       }
     );
@@ -717,29 +719,10 @@ export function subscribeToSiteContent(
     handleFirestoreError(error, OperationType.GET, 'site_content/main_config');
   }
 
-  // Heartbeat & focus sync: ensures fresh cloud data even after device sleep or tab switch
-  const intervalId = setInterval(() => {
-    hydrateFromCloud();
-  }, 15000);
-
-  const handleVisibilityChange = () => {
-    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-      hydrateFromCloud();
-    }
-  };
-
-  if (typeof document !== 'undefined') {
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-  }
-
   return () => {
     localSubscribers.delete(onUpdate);
-    clearInterval(intervalId);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', handleStorageEvent);
-    }
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
     unsubs.forEach((u) => {
       try {
