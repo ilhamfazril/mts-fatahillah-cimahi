@@ -69,13 +69,8 @@ export const Header: React.FC<HeaderProps> = ({
     setStudentDropdownOpen(false);
     setInfoDropdownOpen(false);
     
-    // Scroll to top of window or specific section
-    const element = document.getElementById(tab);
-    if (element && tab !== 'beranda') {
-      element.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Always land cleanly and accurately at the top of the selected page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
