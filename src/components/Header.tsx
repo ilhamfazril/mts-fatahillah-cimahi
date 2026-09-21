@@ -52,6 +52,10 @@ export const Header: React.FC<HeaderProps> = ({
   const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
   const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
+  const [mobileAcademicOpen, setMobileAcademicOpen] = useState(false);
+  const [mobileStudentOpen, setMobileStudentOpen] = useState(false);
+  const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,6 +72,10 @@ export const Header: React.FC<HeaderProps> = ({
     setAcademicDropdownOpen(false);
     setStudentDropdownOpen(false);
     setInfoDropdownOpen(false);
+    setMobileProfileOpen(false);
+    setMobileAcademicOpen(false);
+    setMobileStudentOpen(false);
+    setMobileInfoOpen(false);
     
     // Always land cleanly and accurately at the top of the selected page
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -472,7 +480,9 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
+            {/* 1. Beranda */}
             <button
+              id="mobile-nav-beranda"
               onClick={() => handleNavClick('beranda')}
               className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
                 activeTab === 'beranda' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
@@ -480,78 +490,204 @@ export const Header: React.FC<HeaderProps> = ({
             >
               Beranda
             </button>
-            <button
-              onClick={() => handleNavClick('profil')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'profil' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Profil & Sambutan Kepala Sekolah
-            </button>
-            <button
-              onClick={() => handleNavClick('sejarah')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'sejarah' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Visi, Misi & Sejarah Sekolah
-            </button>
-            <button
-              onClick={() => handleNavClick('guru-staf')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'guru-staf' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Dewan Guru & Tenaga Kependidikan
-            </button>
-            <button
-              onClick={() => handleNavClick('program')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'program' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Program & Kurikulum (ANBK, P5)
-            </button>
-            <button
-              onClick={() => handleNavClick('kesiswaan')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'kesiswaan' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Kesiswaan & Ekstrakurikuler
-            </button>
-            <button
-              onClick={() => handleNavClick('fasilitas')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'fasilitas' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Fasilitas Kampus (Lab Komputer, Lapangan)
-            </button>
-            <button
-              onClick={() => handleNavClick('prestasi')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'prestasi' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Prestasi Siswa
-            </button>
-            <button
-              onClick={() => handleNavClick('berita')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'berita' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Berita & Informasi Terkini
-            </button>
-            <button
-              onClick={() => handleNavClick('kontak')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors ${
-                activeTab === 'kontak' ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Kontak & Lokasi Sekolah
-            </button>
+
+            {/* 2. Profil ▾ */}
+            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
+              <button
+                id="mobile-nav-profil-btn"
+                type="button"
+                onClick={() => setMobileProfileOpen(!mobileProfileOpen)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
+                  activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf' || activeTab === 'fasilitas'
+                    ? 'bg-emerald-50 text-emerald-800'
+                    : 'text-slate-700 hover:bg-slate-100/70'
+                }`}
+              >
+                <span>Profil</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileProfileOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
+              </button>
+
+              {mobileProfileOpen && (
+                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
+                  <button
+                    onClick={() => handleNavClick('profil')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Sambutan & Visi Misi</div>
+                      <div className="text-[10px] text-slate-400">Kepala Sekolah & Arah Tujuan</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('sejarah')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Sejarah PGRI & Sekolah</div>
+                      <div className="text-[10px] text-slate-400">Dedikasi pendidikan Cimahi</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('guru-staf')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Users className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Dewan Guru & Staf</div>
+                      <div className="text-[10px] text-slate-400">Tenaga pendidik berkompeten</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('fasilitas')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5 border-t border-slate-50 pt-1.5"
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Sarana & Fasilitas</div>
+                      <div className="text-[10px] text-slate-400">Lab komputer, lapangan & kelas</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Akademik ▾ */}
+            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
+              <button
+                id="mobile-nav-akademik-btn"
+                type="button"
+                onClick={() => setMobileAcademicOpen(!mobileAcademicOpen)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
+                  activeTab === 'program'
+                    ? 'bg-emerald-50 text-emerald-800'
+                    : 'text-slate-700 hover:bg-slate-100/70'
+                }`}
+              >
+                <span>Akademik</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileAcademicOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
+              </button>
+
+              {mobileAcademicOpen && (
+                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
+                  <button
+                    onClick={() => handleNavClick('program')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Kurikulum Merdeka Mandiri</div>
+                      <div className="text-[10px] text-slate-400">Pembelajaran aktif berpusat siswa</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('program')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">ANBK & Literasi Digital</div>
+                      <div className="text-[10px] text-slate-400">Lab CBT & teknologi informatika</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('program')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Pembiasaan & Karakter</div>
+                      <div className="text-[10px] text-slate-400">Sholat dhuha & tadarus rutin</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Kesiswaan ▾ */}
+            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
+              <button
+                id="mobile-nav-kesiswaan-btn"
+                type="button"
+                onClick={() => setMobileStudentOpen(!mobileStudentOpen)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
+                  activeTab === 'kesiswaan' || activeTab === 'prestasi'
+                    ? 'bg-emerald-50 text-emerald-800'
+                    : 'text-slate-700 hover:bg-slate-100/70'
+                }`}
+              >
+                <span>Kesiswaan</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileStudentOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
+              </button>
+
+              {mobileStudentOpen && (
+                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
+                  <button
+                    onClick={() => handleNavClick('kesiswaan')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Users className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Ekstrakurikuler & OSIS</div>
+                      <div className="text-[10px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('prestasi')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <div>
+                      <div className="font-bold">Prestasi Siswa</div>
+                      <div className="text-[10px] text-slate-400">Juara akademik & non-akademik</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Informasi ▾ */}
+            <div className="rounded-xl overflow-hidden border border-slate-100 bg-slate-50/40">
+              <button
+                id="mobile-nav-informasi-btn"
+                type="button"
+                onClick={() => setMobileInfoOpen(!mobileInfoOpen)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-bold transition-colors ${
+                  activeTab === 'berita' || activeTab === 'kontak'
+                    ? 'bg-emerald-50 text-emerald-800'
+                    : 'text-slate-700 hover:bg-slate-100/70'
+                }`}
+              >
+                <span>Informasi</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileInfoOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
+              </button>
+
+              {mobileInfoOpen && (
+                <div className="px-2 py-1.5 bg-white space-y-1 border-t border-slate-100">
+                  <button
+                    onClick={() => handleNavClick('berita')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Newspaper className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Warta & Berita Sekolah</div>
+                      <div className="text-[10px] text-slate-400">Agenda kegiatan & kabar terbaru</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('kontak')}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-lg flex items-center gap-2.5"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Kontak & Lokasi Kampus</div>
+                      <div className="text-[10px] text-slate-400">Peta, kontak WhatsApp & pengaduan</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Mobile Section: Akses Khusus Akun Admin */}
             <div className="pt-3 mt-3 border-t border-slate-200">
