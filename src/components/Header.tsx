@@ -157,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-beranda"
               onClick={() => handleNavClick('beranda')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'beranda'
                   ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -175,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-profil-btn"
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition-all ${
+                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
                   activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf'
                     ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -230,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-program-btn"
                 onClick={() => setAcademicDropdownOpen(!academicDropdownOpen)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition-all ${
+                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
                   activeTab === 'program'
                     ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -270,7 +270,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-kesiswaan"
               onClick={() => handleNavClick('kesiswaan')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'kesiswaan'
                   ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -282,7 +282,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-fasilitas"
               onClick={() => handleNavClick('fasilitas')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'fasilitas'
                   ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -294,7 +294,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-prestasi"
               onClick={() => handleNavClick('prestasi')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'prestasi'
                   ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -306,7 +306,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-berita"
               onClick={() => handleNavClick('berita')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'berita'
                   ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -318,7 +318,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-kontak"
               onClick={() => handleNavClick('kontak')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'kontak'
                   ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -327,37 +327,37 @@ export const Header: React.FC<HeaderProps> = ({
               Kontak
             </button>
 
-            {/* Tombol Navigasi Masuk Akun Admin */}
+            {/* Tombol Navigasi Login Admin */}
             {!isAdmin ? (
               <button
-                id="nav-masuk-admin"
+                id="nav-login-admin"
                 type="button"
                 onClick={onOpenAdminLogin}
-                className="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 transition-all flex items-center gap-1.5 border border-slate-200 shadow-sm"
-                title="Masuk Akun Admin untuk merubah foto & teks slide real-time"
+                className="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 transition-all flex items-center gap-1.5 border border-slate-200 shadow-sm whitespace-nowrap shrink-0"
+                title="Login Admin untuk merubah foto & teks slide real-time"
               >
-                <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Masuk Akun Admin</span>
+                <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Login Admin</span>
               </button>
             ) : (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   id="nav-panel-admin"
                   type="button"
                   onClick={onOpenAdminDashboard}
-                  className="px-3 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-700 hover:bg-emerald-800 text-white transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg hover:scale-105"
+                  className="px-3 py-2 rounded-xl text-xs sm:text-sm font-black bg-emerald-700 hover:bg-emerald-800 text-white transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg hover:scale-105 whitespace-nowrap"
                   title="Buka Panel Pengaturan Konten Real-Time"
                 >
-                  <ShieldCheck className="w-4 h-4 text-amber-300" />
+                  <ShieldCheck className="w-4 h-4 text-amber-300 shrink-0" />
                   <span>Panel Admin</span>
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
                 </button>
 
                 <button
                   id="nav-logout-admin"
                   type="button"
                   onClick={onLogoutAdmin}
-                  className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0"
                   title="Keluar dari Akun Admin"
                 >
                   <LogOut className="w-4 h-4" />
@@ -367,7 +367,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Action CTAs Desktop */}
-          <div className="hidden lg:flex items-center space-x-2.5">
+          <div className="hidden lg:flex items-center space-x-2">
             <button
               id="btn-search-header"
               onClick={onOpenSearch}
@@ -375,15 +375,6 @@ export const Header: React.FC<HeaderProps> = ({
               title="Pencarian Cepat"
             >
               <Search className="w-5 h-5" />
-            </button>
-
-            <button
-              id="btn-psb-header"
-              onClick={onOpenPsbModal}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 border border-emerald-600 hover:scale-105"
-            >
-              <GraduationCap className="w-4 h-4 text-amber-300" />
-              <span>PPDB Online</span>
             </button>
           </div>
 
@@ -521,10 +512,10 @@ export const Header: React.FC<HeaderProps> = ({
                     setMobileMenuOpen(false);
                     onOpenAdminLogin();
                   }}
-                  className="w-full py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-colors"
+                  className="w-full py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-colors whitespace-nowrap"
                 >
-                  <Lock className="w-4 h-4 text-emerald-700" />
-                  <span>Masuk Akun Admin</span>
+                  <Lock className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>Login Admin</span>
                 </button>
               ) : (
                 <div className="space-y-2 bg-emerald-900 text-white p-3.5 rounded-2xl">
