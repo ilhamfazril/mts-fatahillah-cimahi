@@ -79,7 +79,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     shortDesc: 'Pembiasaan apel pagi, sholat dhuha berjamaah, tadarus Al-Qur’an, serta penanaman akhlak karimah dalam keseharian siswa.',
     fullDesc: 'Program pembinaan akhlak mulia dilaksanakan setiap hari melalui pembiasaan sholat dhuha bersama di musala sekolah, tadarus surat-surat pendek sebelum jam pelajaran dimulai, pembacaan Asmaul Husna, serta bimbingan keputrian dan kepribadian santun 5S (Senyum, Salam, Sapa, Sopan, Santun).',
     icon: 'Heart',
-    image: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide2_upacara.jpg',
     highlights: ['Sholat Dhuha rutin berjamaah', 'Tadarus Al-Qur’an & Asmaul Husna', 'Pembiasaan Budaya 5S Santun', 'Peringatan Hari Besar Islam (PHBI)']
   },
   {
@@ -109,7 +109,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     shortDesc: 'Wadah pelestarian seni daerah Sunda (Jaipong, degung angklung) dan seni musik modern untuk melatih kepercayaan diri.',
     fullDesc: 'Sekolah memberikan ruang seluas-luasnya bagi peserta didik untuk mengeksplorasi bakat seni, baik tari kreasi tradisional Jawa Barat maupun ensemble musik modern yang kerap tampil pada pentas seni kenaikan kelas dan perpisahan sekolah.',
     icon: 'Trophy',
-    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide2_upacara.jpg',
     highlights: ['Sanggar tari tradisional Sunda', 'Band sekolah & vokal group', 'Pentas seni perpisahan akbar', 'Apresiasi karya lukis & kriya']
   },
   {
@@ -206,7 +206,7 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     author: 'Tim Fasilitator P5',
     readTime: '3 menit',
     featured: false,
-    image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide2_upacara.jpg',
     excerpt: 'Pameran gelar karya Projek Penguatan Profil Pelajar Pancasila menampilkan instalasi kerajinan anyaman bambu, makanan khas Jawa Barat, dan pagelaran rampak kendang.',
     content: [
       'Halaman dan selasar lantai 2 SMP PGRI 5 Cimahi disemarakkan oleh stan-stan pameran karya siswa dalam acara Gelar Karya P5 bertema "Kearifan Lokal dan Kewirausahaan".',
@@ -223,7 +223,7 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     author: 'OSIS & Rohis SMP PGRI 5',
     readTime: '3 menit',
     featured: false,
-    image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide1_gedung.jpg',
     excerpt: 'OSIS dan Rohis SMP PGRI 5 Cimahi membagikan ratusan paket sembako kepada warga dhuafa di lingkungan RT 03 RW 03 Kelurahan Cigugur Tengah.',
     content: [
       'Sebagai wujud pengamalan nilai empati dan kepedulian sosial, keluarga besar SMP PGRI 5 Cimahi menyerahkan bantuan paket sembako berkah kepada warga di sekitar lingkungan sekolah.',
@@ -332,7 +332,7 @@ const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
     name: 'Perpustakaan Sekolah & Sudut Baca Literasi',
     category: 'Akademik',
     description: 'Ruang sumber bacaan lengkap yang menyediakan buku paket Kurikulum Merdeka, buku fiksi, ensiklopedia pengetahuan, dan koran harian.',
-    image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide1_gedung.jpg',
     features: ['Buku Teks Pelajaran Terbitan Kemendikbud', 'Koleksi Cerita Rakyat & Sains Populer', 'Meja Baca Nyaman', 'Pelayanan Peminjaman Buku Mudah']
   },
   {
@@ -340,7 +340,7 @@ const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
     name: 'Musala Sekolah & Pembinaan Keagamaan',
     category: 'Penunjang',
     description: 'Sarana ibadah yang bersih dan tenang untuk melaksanakan sholat dhuha berjamaah, sholat dzuhur, bimbingan tadarus Al-Qur’an, serta keputrian.',
-    image: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide2_upacara.jpg',
     features: ['Tempat Wudhu Terpisah Putra/Putri', 'Karpet Sajadah Bersih & Wangi', 'Al-Qur’an & Buku Doa Harian', 'Jadwal Sholat Teratur']
   },
   {
@@ -348,7 +348,7 @@ const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
     name: 'Ruang UKS (Usaha Kesehatan Sekolah)',
     category: 'Penunjang',
     description: 'Ruang pertolongan pertama bagi siswa yang sakit atau membutuhkan istirahat, dilengkapi tempat tidur periksa dan obat-obatan dasar.',
-    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide1_gedung.jpg',
     features: ['Tempat Tidur Pasien Bersih', 'Kotak P3K Lengkap & Timbangan', 'Bekerjasama dengan Puskesmas Cigugur', 'Pemeriksaan Kesehatan Berkala']
   },
   {
@@ -356,7 +356,7 @@ const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
     name: 'Ruang Bimbingan Konseling (BK)',
     category: 'Penunjang',
     description: 'Ruangan konsultasi privat bagi siswa untuk berdiskusi mengenai hambatan belajar, pergaulan, serta pendampingan perkembangan psikologis anak.',
-    image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide1_gedung.jpg',
     features: ['Guru BK Ramah & Pengertian', 'Privasi Siswa Terjaga Penuh', 'Layanan Minat Bakat Siswa', 'Koordinasi Bersama Orang Tua']
   },
   {
@@ -364,7 +364,7 @@ const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
     name: 'Kantin Sekolah Bersih & Sehat',
     category: 'Penunjang',
     description: 'Area kantin sekolah yang menyajikan makanan dan minuman higienis, bergizi, dan ramah kantong bagi seluruh warga sekolah.',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
+    image: '/images/slide4_lapangan.jpg',
     features: ['Pilihan Makanan & Minuman Sehat', 'Tempat Cuci Tangan dengan Sabun', 'Harga Terjangkau untuk Pelajar', 'Area Bersih Terjaga']
   }
 ];
@@ -499,7 +499,7 @@ const DEFAULT_ACHIEVEMENTS_RAW: AchievementItem[] = [
     level: 'Kota',
     year: '2024',
     category: 'Keagamaan',
-    image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80'
+    image: '/images/slide2_upacara.jpg'
   },
   {
     id: 'ach-4',
@@ -509,7 +509,7 @@ const DEFAULT_ACHIEVEMENTS_RAW: AchievementItem[] = [
     level: 'Kota',
     year: '2024',
     category: 'Seni & Budaya',
-    image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80'
+    image: '/images/slide2_upacara.jpg'
   }
 ];
 
@@ -532,7 +532,7 @@ export const TEACHERS_LIST: TeacherStaff[] = [
     role: 'Wakil Kepala Sekolah Bidang Kurikulum',
     subject: 'Ilmu Pengetahuan Alam (IPA)',
     education: 'S2 Pendidikan IPA',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'
+    image: '/images/slide1_gedung.jpg'
   },
   {
     id: 't-3',
@@ -540,7 +540,7 @@ export const TEACHERS_LIST: TeacherStaff[] = [
     role: 'Wakil Kepala Sekolah Bidang Kesiswaan',
     subject: 'Pendidikan Jasmani, Olahraga & Kesehatan (PJOK)',
     education: 'S1 Pendidikan Kepelatihan Olahraga',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
+    image: '/images/slide4_lapangan.jpg'
   },
   {
     id: 't-4',
@@ -548,7 +548,7 @@ export const TEACHERS_LIST: TeacherStaff[] = [
     role: 'Koordinator Lab Komputer & Proktor ANBK',
     subject: 'Informatika & Komputer',
     education: 'S1 Teknik Informatika',
-    image: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=400&q=80'
+    image: '/images/slide3_lab_komputer.jpg'
   }
 ];
 
@@ -559,7 +559,7 @@ export const TESTIMONIALS_LIST: TestimonialItem[] = [
     author: 'Dicky Pratama',
     role: 'Alumnus & Siswa Berprestasi SMK Negeri 1 Cimahi',
     relation: 'Alumni Angkatan 2023',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'
+    image: ''
   },
   {
     id: 'testi-2',
@@ -567,7 +567,7 @@ export const TESTIMONIALS_LIST: TestimonialItem[] = [
     author: 'Ibu Aisyah & Bpk. Mulyadi',
     role: 'Orang Tua Siswa Kelas IX',
     relation: 'Wali Murid Angkatan 2024/2025',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80'
+    image: ''
   },
   {
     id: 'testi-3',
@@ -575,7 +575,7 @@ export const TESTIMONIALS_LIST: TestimonialItem[] = [
     author: 'Siti Nurhaliza, S.Pd.',
     role: 'Guru & Penggerak Literasi Pelajar',
     relation: 'Alumni SMP PGRI 5 Cimahi Angkatan 2017',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+    image: ''
   }
 ];
 

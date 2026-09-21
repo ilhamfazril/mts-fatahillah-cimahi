@@ -48,34 +48,35 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
-  const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
-  const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<'profil' | 'akademik' | 'kesiswaan' | 'informasi' | null>(null);
 
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navContainerRef = useRef<HTMLDivElement | null>(null);
 
   const handleOpenDropdown = (menu: 'profil' | 'akademik' | 'kesiswaan' | 'informasi') => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    setProfileDropdownOpen(menu === 'profil');
-    setAcademicDropdownOpen(menu === 'akademik');
-    setStudentDropdownOpen(menu === 'kesiswaan');
-    setInfoDropdownOpen(menu === 'informasi');
+    setActiveDropdown(menu);
+  };
+
+  const handleToggleDropdown = (menu: 'profil' | 'akademik' | 'kesiswaan' | 'informasi') => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setActiveDropdown((prev) => (prev === menu ? null : menu));
   };
 
   const handleCloseDropdown = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
     }
+    // 380ms generous buffer guarantees the submenu never detaches on laptop trackpads
     closeTimeoutRef.current = setTimeout(() => {
-      setProfileDropdownOpen(false);
-      setAcademicDropdownOpen(false);
-      setStudentDropdownOpen(false);
-      setInfoDropdownOpen(false);
-    }, 200); // 200ms grace period prevents accidental menu loss
+      setActiveDropdown(null);
+    }, 380);
   };
 
   const handleCancelClose = () => {
@@ -85,8 +86,23 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  // Close dropdown on click outside
   useEffect(() => {
+    const handlePointerDownOutside = (event: MouseEvent | TouchEvent) => {
+      if (navContainerRef.current && !navContainerRef.current.contains(event.target as Node)) {
+        if (closeTimeoutRef.current) {
+          clearTimeout(closeTimeoutRef.current);
+          closeTimeoutRef.current = null;
+        }
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDownOutside);
+    document.addEventListener('touchstart', handlePointerDownOutside);
     return () => {
+      document.removeEventListener('mousedown', handlePointerDownOutside);
+      document.removeEventListener('touchstart', handlePointerDownOutside);
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current);
       }
@@ -108,10 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    setProfileDropdownOpen(false);
-    setAcademicDropdownOpen(false);
-    setStudentDropdownOpen(false);
-    setInfoDropdownOpen(false);
+    setActiveDropdown(null);
     
     // Always land cleanly and accurately at the top of the selected page
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -156,15 +169,15 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Navigation Links (Option 2: 5 Consolidated Menu Groups) */}
-          <div className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+          {/* Desktop Navigation Links (With Seamless Hover Bridge & Zero Detachment) */}
+          <div ref={navContainerRef} className="hidden lg:flex items-center space-x-1 xl:space-x-2">
             {/* 1. Beranda */}
             <button
               id="nav-beranda"
               onClick={() => handleNavClick('beranda')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === 'beranda'
-                  ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                  ? 'text-emerald-800 bg-emerald-50 shadow-xs border border-emerald-200/60'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
               }`}
             >
@@ -179,62 +192,71 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <button
                 id="nav-profil-btn"
-                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
-                  activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf' || activeTab === 'fasilitas'
-                    ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                onClick={() => handleToggleDropdown('profil')}
+                className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                  activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf' || activeTab === 'fasilitas' || activeDropdown === 'profil'
+                    ? 'text-emerald-800 bg-emerald-50 shadow-xs border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
                 <span>Profil</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'profil' ? 'rotate-180 text-emerald-700' : ''}`} />
               </button>
 
-              {profileDropdownOpen && (
+              {activeDropdown === 'profil' && (
                 <div 
-                  className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  className="absolute left-0 top-full pt-2 w-72 z-50 animate-in fade-in zoom-in-95 duration-150 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-4 before:bg-transparent"
                   onMouseEnter={handleCancelClose}
                   onMouseLeave={handleCloseDropdown}
                 >
-                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                  <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 p-1.5 ring-1 ring-black/5">
                     <button
                       onClick={() => handleNavClick('profil')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Award className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Award className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Sambutan & Visi Misi</div>
-                        <div className="text-[10px] text-slate-400">Kepala Sekolah & Arah Tujuan</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Sambutan & Visi Misi</div>
+                        <div className="text-[11px] text-slate-400">Kepala Sekolah & Arah Kebijakan</div>
                       </div>
                     </button>
                     <button
                       onClick={() => handleNavClick('sejarah')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <BookOpen className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Sejarah PGRI & Sekolah</div>
-                        <div className="text-[10px] text-slate-400">Dedikasi pendidikan Cimahi</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Sejarah PGRI & Sekolah</div>
+                        <div className="text-[11px] text-slate-400">Dedikasi pendidikan sejak 1983</div>
                       </div>
                     </button>
                     <button
                       onClick={() => handleNavClick('guru-staf')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Users className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Dewan Guru & Staf</div>
-                        <div className="text-[10px] text-slate-400">Tenaga pendidik berkompeten</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Dewan Guru & Staf</div>
+                        <div className="text-[11px] text-slate-400">Pendidik profesional & berdedikasi</div>
                       </div>
                     </button>
+                    <div className="my-1 border-t border-slate-100" />
                     <button
                       onClick={() => handleNavClick('fasilitas')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors border-t border-slate-100 mt-1 pt-2"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Building2 className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Sarana & Fasilitas</div>
-                        <div className="text-[10px] text-slate-400">Lab komputer, lapangan & kelas</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Sarana & Fasilitas</div>
+                        <div className="text-[11px] text-slate-400">Lab CBT, lapangan & ruang kelas</div>
                       </div>
                     </button>
                   </div>
@@ -250,52 +272,58 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <button
                 id="nav-akademik-btn"
-                onClick={() => setAcademicDropdownOpen(!academicDropdownOpen)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
-                  activeTab === 'program'
-                    ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                onClick={() => handleToggleDropdown('akademik')}
+                className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                  activeTab === 'program' || activeDropdown === 'akademik'
+                    ? 'text-emerald-800 bg-emerald-50 shadow-xs border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
                 <span>Akademik</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${academicDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'akademik' ? 'rotate-180 text-emerald-700' : ''}`} />
               </button>
 
-              {academicDropdownOpen && (
+              {activeDropdown === 'akademik' && (
                 <div 
-                  className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  className="absolute left-0 top-full pt-2 w-72 z-50 animate-in fade-in zoom-in-95 duration-150 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-4 before:bg-transparent"
                   onMouseEnter={handleCancelClose}
                   onMouseLeave={handleCloseDropdown}
                 >
-                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                  <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 p-1.5 ring-1 ring-black/5">
                     <button
                       onClick={() => handleNavClick('program')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <BookOpen className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Kurikulum Merdeka Mandiri</div>
-                        <div className="text-[10px] text-slate-400">Pembelajaran aktif berpusat siswa</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Kurikulum Merdeka Mandiri</div>
+                        <div className="text-[11px] text-slate-400">Pembelajaran aktif & P5 kontekstual</div>
                       </div>
                     </button>
                     <button
                       onClick={() => handleNavClick('program')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">ANBK & Literasi Digital</div>
-                        <div className="text-[10px] text-slate-400">Lab CBT & teknologi informatika</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">ANBK & Literasi Digital</div>
+                        <div className="text-[11px] text-slate-400">Lab CBT, asesmen & digitalisasi</div>
                       </div>
                     </button>
                     <button
                       onClick={() => handleNavClick('program')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Clock className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Pembiasaan & Karakter</div>
-                        <div className="text-[10px] text-slate-400">Sholat dhuha & tadarus rutin</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Pembiasaan & Karakter</div>
+                        <div className="text-[11px] text-slate-400">Sholat dhuha berjamaah & tadarus</div>
                       </div>
                     </button>
                   </div>
@@ -311,42 +339,46 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <button
                 id="nav-kesiswaan-btn"
-                onClick={() => setStudentDropdownOpen(!studentDropdownOpen)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
-                  activeTab === 'kesiswaan' || activeTab === 'prestasi'
-                    ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                onClick={() => handleToggleDropdown('kesiswaan')}
+                className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                  activeTab === 'kesiswaan' || activeTab === 'prestasi' || activeDropdown === 'kesiswaan'
+                    ? 'text-emerald-800 bg-emerald-50 shadow-xs border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
                 <span>Kesiswaan</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${studentDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'kesiswaan' ? 'rotate-180 text-emerald-700' : ''}`} />
               </button>
 
-              {studentDropdownOpen && (
+              {activeDropdown === 'kesiswaan' && (
                 <div 
-                  className="absolute left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  className="absolute left-0 top-full pt-2 w-72 z-50 animate-in fade-in zoom-in-95 duration-150 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-4 before:bg-transparent"
                   onMouseEnter={handleCancelClose}
                   onMouseLeave={handleCloseDropdown}
                 >
-                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                  <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 p-1.5 ring-1 ring-black/5">
                     <button
                       onClick={() => handleNavClick('kesiswaan')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Users className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Ekstrakurikuler & OSIS</div>
-                        <div className="text-[10px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Ekstrakurikuler & OSIS</div>
+                        <div className="text-[11px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
                       </div>
                     </button>
                     <button
                       onClick={() => handleNavClick('prestasi')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                        <Trophy className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Prestasi Siswa</div>
-                        <div className="text-[10px] text-slate-400">Juara akademik & non-akademik</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Prestasi Siswa</div>
+                        <div className="text-[11px] text-slate-400">Juara kejuaraan kota & provinsi</div>
                       </div>
                     </button>
                   </div>
@@ -362,42 +394,46 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <button
                 id="nav-informasi-btn"
-                onClick={() => setInfoDropdownOpen(!infoDropdownOpen)}
-                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
-                  activeTab === 'berita' || activeTab === 'kontak'
-                    ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                onClick={() => handleToggleDropdown('informasi')}
+                className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                  activeTab === 'berita' || activeTab === 'kontak' || activeDropdown === 'informasi'
+                    ? 'text-emerald-800 bg-emerald-50 shadow-xs border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
                 <span>Informasi</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${infoDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === 'informasi' ? 'rotate-180 text-emerald-700' : ''}`} />
               </button>
 
-              {infoDropdownOpen && (
+              {activeDropdown === 'informasi' && (
                 <div 
-                  className="absolute right-0 lg:left-0 top-full pt-1.5 w-64 z-50 animate-in fade-in duration-150"
+                  className="absolute right-0 lg:left-0 top-full pt-2 w-72 z-50 animate-in fade-in zoom-in-95 duration-150 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-4 before:bg-transparent"
                   onMouseEnter={handleCancelClose}
                   onMouseLeave={handleCloseDropdown}
                 >
-                  <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2">
+                  <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 p-1.5 ring-1 ring-black/5">
                     <button
                       onClick={() => handleNavClick('berita')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Newspaper className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Newspaper className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Warta & Berita Sekolah</div>
-                        <div className="text-[10px] text-slate-400">Agenda kegiatan & kabar terbaru</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Warta & Berita Sekolah</div>
+                        <div className="text-[11px] text-slate-400">Agenda kegiatan & kabar terkini</div>
                       </div>
                     </button>
                     <button
                       onClick={() => handleNavClick('kontak')}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
-                      <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Phone className="w-4 h-4" />
+                      </div>
                       <div>
-                        <div className="font-bold">Kontak & Lokasi Kampus</div>
-                        <div className="text-[10px] text-slate-400">Peta, kontak WhatsApp & pengaduan</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Kontak & Lokasi Kampus</div>
+                        <div className="text-[11px] text-slate-400">Peta, WhatsApp resmi & layanan info</div>
                       </div>
                     </button>
                   </div>

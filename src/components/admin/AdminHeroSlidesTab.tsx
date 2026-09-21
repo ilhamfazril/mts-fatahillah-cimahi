@@ -170,8 +170,8 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
     { label: 'Upacara & Siswa', url: '/images/slide2_upacara.jpg' },
     { label: 'Lab Komputer ANBK', url: '/images/slide3_lab_komputer.jpg' },
     { label: 'Lapangan Olahraga', url: '/images/slide4_lapangan.jpg' },
-    { label: 'Perpustakaan', url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80' },
-    { label: 'Ruang Kelas Modern', url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80' }
+    { label: 'Kampus SMP PGRI 5', url: '/images/slide1_gedung.jpg' },
+    { label: 'Aktivitas Belajar Siswa', url: '/images/slide3_lab_komputer.jpg' }
   ];
 
   return (

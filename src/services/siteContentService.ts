@@ -537,13 +537,17 @@ function safeGetLocalStorage(): Partial<SchoolSiteContent> | null {
   try {
     const raw = localStorage.getItem(CACHE_STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // Invalidate if cache contains legacy AI template Unsplash links
-    const firstHeroBg = parsed?.heroSlides?.[0]?.bgImage;
-    if (typeof firstHeroBg === 'string' && (firstHeroBg.includes('unsplash.com') || firstHeroBg.startsWith('/images/slide'))) {
-      localStorage.removeItem(CACHE_STORAGE_KEY);
-      return null;
+    
+    // Auto-sanitize any legacy unsplash URLs without discarding saved user content
+    if (raw.includes('unsplash.com')) {
+      const sanitized = JSON.parse(
+        raw.replace(/https:\/\/images\.unsplash\.com\/[^\s"']+/g, '/images/slide1_gedung.jpg')
+      );
+      localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(sanitized));
+      return sanitized;
     }
+    
+    const parsed = JSON.parse(raw);
     return parsed;
   } catch {
     return null;
@@ -686,7 +690,8 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
 
 function isCustomOrBase64Image(url?: string): boolean {
   if (!url || typeof url !== 'string') return false;
-  return url.startsWith('data:image/') || (!url.includes('unsplash.com') && !url.startsWith('/images/slide'));
+  if (url.includes('unsplash.com')) return false;
+  return url.startsWith('data:image/') || url.startsWith('/images/') || url.startsWith('http');
 }
 
 export function mergePreservingUploads(

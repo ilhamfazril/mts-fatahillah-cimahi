@@ -44,11 +44,20 @@ export const TestimonialsSection: React.FC = () => {
               </div>
 
               <div className="mt-6 pt-5 border-t border-slate-100 flex items-center gap-3.5">
-                <img
-                  src={item.image}
-                  alt={item.author}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500"
-                />
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.author}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500 shadow-sm"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-bold flex items-center justify-center text-sm shadow-sm border-2 border-emerald-400/80 flex-shrink-0">
+                    {item.author.split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('')}
+                  </div>
+                )}
                 <div>
                   <div className="font-extrabold text-slate-900 text-sm">
                     {item.author}

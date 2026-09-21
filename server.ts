@@ -90,7 +90,8 @@ app.post('/api/content', (req, res) => {
 
 function isCustomOrBase64Image(url?: string): boolean {
   if (!url || typeof url !== 'string') return false;
-  return url.startsWith('data:image/') || (!url.includes('unsplash.com') && !url.startsWith('/images/slide'));
+  if (url.includes('unsplash.com')) return false;
+  return url.startsWith('data:image/') || url.startsWith('/images/') || url.startsWith('http');
 }
 
 function mergeArrayPreservingImages(currentArr: any[], incomingArr: any[], idKey = 'id'): any[] {
