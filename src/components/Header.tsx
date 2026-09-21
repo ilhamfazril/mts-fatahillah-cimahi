@@ -18,7 +18,9 @@ import {
   ShieldCheck,
   LogOut,
   User,
-  Sliders
+  Sliders,
+  Trophy,
+  Newspaper
 } from 'lucide-react';
 import { SCHOOL_INFO } from '../data/schoolData';
 import { PgriLogo } from './PgriLogo';
@@ -48,6 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
+  const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
+  const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +66,8 @@ export const Header: React.FC<HeaderProps> = ({
     setMobileMenuOpen(false);
     setProfileDropdownOpen(false);
     setAcademicDropdownOpen(false);
+    setStudentDropdownOpen(false);
+    setInfoDropdownOpen(false);
     
     // Scroll to top of window or specific section
     const element = document.getElementById(tab);
@@ -152,8 +158,9 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden xl:flex items-center space-x-1">
+          {/* Desktop Navigation Links (Option 2: 5 Consolidated Menu Groups) */}
+          <div className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+            {/* 1. Beranda */}
             <button
               id="nav-beranda"
               onClick={() => handleNavClick('beranda')}
@@ -166,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
               Beranda
             </button>
 
-            {/* Dropdown Profil */}
+            {/* 2. Profil ▾ */}
             <div 
               className="relative"
               onMouseEnter={() => setProfileDropdownOpen(true)}
@@ -176,32 +183,32 @@ export const Header: React.FC<HeaderProps> = ({
                 id="nav-profil-btn"
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
-                  activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf'
+                  activeTab === 'profil' || activeTab === 'sejarah' || activeTab === 'guru-staf' || activeTab === 'fasilitas'
                     ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
                 <span>Profil</span>
-                <ChevronDown className="w-4 h-4 transition-transform duration-200" />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {profileDropdownOpen && (
-                <div className="absolute left-0 mt-1 w-60 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <button
                     onClick={() => handleNavClick('profil')}
                     className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
                   >
-                    <Award className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <Award className="w-4 h-4 text-emerald-600 shrink-0" />
                     <div>
                       <div className="font-bold">Sambutan & Visi Misi</div>
-                      <div className="text-[10px] text-slate-400">Kepala Sekolah & Tujuan</div>
+                      <div className="text-[10px] text-slate-400">Kepala Sekolah & Arah Tujuan</div>
                     </div>
                   </button>
                   <button
                     onClick={() => handleNavClick('sejarah')}
                     className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
                   >
-                    <BookOpen className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
                     <div>
                       <div className="font-bold">Sejarah PGRI & Sekolah</div>
                       <div className="text-[10px] text-slate-400">Dedikasi pendidikan Cimahi</div>
@@ -211,24 +218,34 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => handleNavClick('guru-staf')}
                     className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
                   >
-                    <Users className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <Users className="w-4 h-4 text-emerald-600 shrink-0" />
                     <div>
                       <div className="font-bold">Dewan Guru & Staf</div>
                       <div className="text-[10px] text-slate-400">Tenaga pendidik berkompeten</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('fasilitas')}
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors border-t border-slate-100 mt-1 pt-2"
+                  >
+                    <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Sarana & Fasilitas</div>
+                      <div className="text-[10px] text-slate-400">Lab komputer, lapangan & kelas</div>
                     </div>
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Dropdown Program & Kurikulum */}
+            {/* 3. Akademik ▾ */}
             <div 
               className="relative"
               onMouseEnter={() => setAcademicDropdownOpen(true)}
               onMouseLeave={() => setAcademicDropdownOpen(false)}
             >
               <button
-                id="nav-program-btn"
+                id="nav-akademik-btn"
                 onClick={() => setAcademicDropdownOpen(!academicDropdownOpen)}
                 className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
                   activeTab === 'program'
@@ -236,104 +253,154 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
-                <span>Program & Kurikulum</span>
-                <ChevronDown className="w-4 h-4 transition-transform duration-200" />
+                <span>Akademik</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${academicDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {academicDropdownOpen && (
-                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <button
                     onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
                   >
-                    <div className="font-bold text-slate-900">Kurikulum Merdeka Mandiri</div>
-                    <div className="text-[10px] text-slate-500">Pembelajaran aktif berpusat pada siswa</div>
+                    <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Kurikulum Merdeka Mandiri</div>
+                      <div className="text-[10px] text-slate-400">Pembelajaran aktif berpusat siswa</div>
+                    </div>
                   </button>
                   <button
                     onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
                   >
-                    <div className="font-bold text-slate-900">ANBK & Literasi Digital</div>
-                    <div className="text-[10px] text-slate-500">Laboratorium komputer siap ujian CBT</div>
+                    <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">ANBK & Literasi Digital</div>
+                      <div className="text-[10px] text-slate-400">Lab CBT & teknologi informatika</div>
+                    </div>
                   </button>
                   <button
                     onClick={() => handleNavClick('program')}
-                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
                   >
-                    <div className="font-bold text-slate-900">Pembiasaan Sholat & Budi Pekerti</div>
-                    <div className="text-[10px] text-slate-500">Sholat dhuha & tadarus Al-Qur'an rutin</div>
+                    <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Pembiasaan & Karakter</div>
+                      <div className="text-[10px] text-slate-400">Sholat dhuha & tadarus rutin</div>
+                    </div>
                   </button>
                 </div>
               )}
             </div>
 
-            <button
-              id="nav-kesiswaan"
-              onClick={() => handleNavClick('kesiswaan')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === 'kesiswaan'
-                  ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
-              }`}
+            {/* 4. Kesiswaan ▾ */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setStudentDropdownOpen(true)}
+              onMouseLeave={() => setStudentDropdownOpen(false)}
             >
-              Kesiswaan & Ekskul
+              <button
+                id="nav-kesiswaan-btn"
+                onClick={() => setStudentDropdownOpen(!studentDropdownOpen)}
+                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                  activeTab === 'kesiswaan' || activeTab === 'prestasi'
+                    ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                    : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                }`}
+              >
+                <span>Kesiswaan</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${studentDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {studentDropdownOpen && (
+                <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <button
+                    onClick={() => handleNavClick('kesiswaan')}
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Ekstrakurikuler & OSIS</div>
+                      <div className="text-[10px] text-slate-400">Paskibra, Pramuka, Futsal & Seni</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('prestasi')}
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                    <div>
+                      <div className="font-bold">Prestasi Siswa</div>
+                      <div className="text-[10px] text-slate-400">Juara akademik & non-akademik</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Informasi ▾ */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setInfoDropdownOpen(true)}
+              onMouseLeave={() => setInfoDropdownOpen(false)}
+            >
+              <button
+                id="nav-informasi-btn"
+                onClick={() => setInfoDropdownOpen(!infoDropdownOpen)}
+                className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                  activeTab === 'berita' || activeTab === 'kontak'
+                    ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
+                    : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                }`}
+              >
+                <span>Informasi</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${infoDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {infoDropdownOpen && (
+                <div className="absolute right-0 lg:left-0 mt-1 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <button
+                    onClick={() => handleNavClick('berita')}
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Newspaper className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Warta & Berita Sekolah</div>
+                      <div className="text-[10px] text-slate-400">Agenda kegiatan & kabar terbaru</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('kontak')}
+                    className="w-full text-left px-4 py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="font-bold">Kontak & Lokasi Kampus</div>
+                      <div className="text-[10px] text-slate-400">Peta, kontak WhatsApp & pengaduan</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action CTAs Desktop Right (Search + Login Admin / Panel Admin) */}
+          <div className="hidden lg:flex items-center space-x-2 shrink-0">
+            <button
+              id="btn-search-header"
+              onClick={onOpenSearch}
+              className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors"
+              title="Pencarian Cepat"
+            >
+              <Search className="w-5 h-5" />
             </button>
 
-            <button
-              id="nav-fasilitas"
-              onClick={() => handleNavClick('fasilitas')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === 'fasilitas'
-                  ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
-              }`}
-            >
-              Fasilitas
-            </button>
-
-            <button
-              id="nav-prestasi"
-              onClick={() => handleNavClick('prestasi')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === 'prestasi'
-                  ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
-              }`}
-            >
-              Prestasi
-            </button>
-
-            <button
-              id="nav-berita"
-              onClick={() => handleNavClick('berita')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === 'berita'
-                  ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
-              }`}
-            >
-              Berita
-            </button>
-
-            <button
-              id="nav-kontak"
-              onClick={() => handleNavClick('kontak')}
-              className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === 'kontak'
-                  ? 'text-emerald-800 bg-emerald-50 shadow-sm border border-emerald-200/60'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
-              }`}
-            >
-              Kontak
-            </button>
-
-            {/* Tombol Navigasi Login Admin */}
             {!isAdmin ? (
               <button
                 id="nav-login-admin"
                 type="button"
                 onClick={onOpenAdminLogin}
-                className="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 transition-all flex items-center gap-1.5 border border-slate-200 shadow-sm whitespace-nowrap shrink-0"
+                className="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 transition-all flex items-center gap-1.5 border border-slate-200 shadow-sm whitespace-nowrap shrink-0"
                 title="Login Admin untuk merubah foto & teks slide real-time"
               >
                 <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -366,20 +433,8 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Action CTAs Desktop */}
-          <div className="hidden lg:flex items-center space-x-2">
-            <button
-              id="btn-search-header"
-              onClick={onOpenSearch}
-              className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 transition-colors"
-              title="Pencarian Cepat"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-          </div>
-
           {/* Mobile menu and search toggle */}
-          <div className="flex xl:hidden items-center space-x-1.5">
+          <div className="flex lg:hidden items-center space-x-1.5">
             <button
               id="btn-search-mobile"
               onClick={onOpenSearch}
@@ -401,7 +456,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-200">
             {/* Quick PPDB banner */}
             <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-2xl p-3.5 mb-3 shadow-sm">
               <div className="flex items-center gap-2">
