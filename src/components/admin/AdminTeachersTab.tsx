@@ -85,7 +85,7 @@ export const AdminTeachersTab: React.FC<AdminTeachersTabProps> = ({
       role: 'Guru Mata Pelajaran',
       subject: '',
       education: 'S1 Pendidikan',
-      image: '/images/slide1_gedung.jpg',
+      image: '',
     });
     setIsCreatingNew(true);
   };
@@ -261,17 +261,23 @@ export const AdminTeachersTab: React.FC<AdminTeachersTabProps> = ({
             >
               {/* Photo & Role Header */}
               <div>
-                <div className="relative h-48 bg-slate-100 overflow-hidden">
-                  <img
-                    src={teacher.image}
-                    alt={teacher.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/slide1_gedung.jpg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="relative h-48 bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center">
+                  {teacher.image && (teacher.image.startsWith('data:image/') || teacher.image.includes('principal_real.jpg')) ? (
+                    <img
+                      src={teacher.image}
+                      alt={teacher.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-4 text-center select-none">
+                      <div className="w-16 h-16 rounded-full bg-emerald-700/60 border border-emerald-400/40 flex items-center justify-center text-amber-300 shadow-inner mb-2">
+                        <GraduationCap className="w-8 h-8" />
+                      </div>
+                      <span className="text-[10px] font-semibold text-emerald-200">Belum Ada Foto</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
                   
                   {/* Subject Badge */}
                   <span className="absolute top-2.5 left-2.5 bg-slate-900/85 backdrop-blur-xs text-amber-300 font-bold px-2.5 py-1 rounded-lg text-[10px] border border-slate-700/50">

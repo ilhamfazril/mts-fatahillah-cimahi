@@ -88,10 +88,13 @@ app.post('/api/content', (req, res) => {
   }
 });
 
-function isCustomOrBase64Image(url?: string): boolean {
+function isUserUploadedPhoto(url?: string): boolean {
   if (!url || typeof url !== 'string') return false;
   if (url.includes('unsplash.com')) return false;
-  return url.startsWith('data:image/') || url.startsWith('/images/') || url.startsWith('http');
+  if (url.includes('slide1_gedung') || url.includes('slide2_upacara') || url.includes('slide3_lab_komputer') || url.includes('slide4_lapangan')) {
+    return false;
+  }
+  return url.startsWith('data:image/') || url.startsWith('blob:') || url.includes('principal_real.jpg');
 }
 
 function mergeArrayPreservingImages(currentArr: any[], incomingArr: any[], idKey = 'id'): any[] {
@@ -104,24 +107,24 @@ function mergeArrayPreservingImages(currentArr: any[], incomingArr: any[], idKey
 
     const mergedItem = { ...curItem, ...inItem };
 
-    // Check image field
-    if (curItem.image && isCustomOrBase64Image(curItem.image) && (!inItem.image || !isCustomOrBase64Image(inItem.image))) {
+    // Check image field: user uploaded photos are strictly preserved
+    if (isUserUploadedPhoto(curItem.image) && !isUserUploadedPhoto(inItem.image)) {
       mergedItem.image = curItem.image;
-    } else if (inItem.image && isCustomOrBase64Image(inItem.image)) {
+    } else if (isUserUploadedPhoto(inItem.image)) {
       mergedItem.image = inItem.image;
     }
 
     // Check bgImage field (for heroSlides)
-    if (curItem.bgImage && isCustomOrBase64Image(curItem.bgImage) && (!inItem.bgImage || !isCustomOrBase64Image(inItem.bgImage))) {
+    if (isUserUploadedPhoto(curItem.bgImage) && !isUserUploadedPhoto(inItem.bgImage)) {
       mergedItem.bgImage = curItem.bgImage;
-    } else if (inItem.bgImage && isCustomOrBase64Image(inItem.bgImage)) {
+    } else if (isUserUploadedPhoto(inItem.bgImage)) {
       mergedItem.bgImage = inItem.bgImage;
     }
 
     // Check photo field (for principal)
-    if (curItem.photo && isCustomOrBase64Image(curItem.photo) && (!inItem.photo || !isCustomOrBase64Image(inItem.photo))) {
+    if (isUserUploadedPhoto(curItem.photo) && !isUserUploadedPhoto(inItem.photo)) {
       mergedItem.photo = curItem.photo;
-    } else if (inItem.photo && isCustomOrBase64Image(inItem.photo)) {
+    } else if (isUserUploadedPhoto(inItem.photo)) {
       mergedItem.photo = inItem.photo;
     }
 
@@ -177,7 +180,7 @@ app.post('/api/content/sync', (req, res) => {
       const curPrincipal = current.principal || {};
       const inPrincipal = incoming.principal;
       merged.principal = { ...curPrincipal, ...inPrincipal };
-      if (curPrincipal.photo && isCustomOrBase64Image(curPrincipal.photo) && (!inPrincipal.photo || !isCustomOrBase64Image(inPrincipal.photo))) {
+      if (curPrincipal.photo && isUserUploadedPhoto(curPrincipal.photo) && (!inPrincipal.photo || !isUserUploadedPhoto(inPrincipal.photo))) {
         merged.principal.photo = curPrincipal.photo;
       }
     }

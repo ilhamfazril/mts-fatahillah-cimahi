@@ -57,17 +57,28 @@ export const TeachersSection: React.FC<TeachersSectionProps> = ({
               className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-lg transition-all text-center flex flex-col justify-between group"
             >
               <div>
-                <div className="relative h-64 w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={teacher.image}
-                    alt={teacher.name}
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/slide1_gedung.jpg';
-                    }}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="relative h-64 w-full overflow-hidden bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 flex flex-col items-center justify-center">
+                  {teacher.image && (teacher.image.startsWith('data:image/') || teacher.image.includes('principal_real.jpg')) ? (
+                    <img
+                      src={teacher.image}
+                      alt={teacher.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-6 text-center select-none">
+                      <div className="w-20 h-20 rounded-full bg-emerald-700/60 border-2 border-emerald-400/40 flex items-center justify-center text-white shadow-inner mb-3 group-hover:scale-105 transition-transform">
+                        <GraduationCap className="w-10 h-10 text-amber-300" />
+                      </div>
+                      <div className="text-[11px] font-semibold text-emerald-200 uppercase tracking-wider">
+                        Tenaga Pendidik
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        SMP PGRI 5 Cimahi
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
                   <span className="absolute bottom-3 inset-x-3 text-amber-300 font-bold text-xs bg-slate-950/70 backdrop-blur-xs py-1 px-2 rounded-lg truncate border border-slate-800/60 shadow-sm">
                     {teacher.role}
                   </span>

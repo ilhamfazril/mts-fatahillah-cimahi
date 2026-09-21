@@ -633,6 +633,36 @@ function sanitizeMediaReferences(content: SchoolSiteContent): SchoolSiteContent 
  * Safely merge live Firestore document or cached state with application fallbacks.
  * Preserves all user modifications and ensures no sections are ever null/undefined.
  */
+export function isUserUploadedPhoto(url?: string): boolean {
+  if (!url || typeof url !== 'string') return false;
+  if (url.includes('unsplash.com')) return false;
+  if (
+    url.includes('slide1_gedung') ||
+    url.includes('slide2_upacara') ||
+    url.includes('slide3_lab_komputer') ||
+    url.includes('slide4_lapangan')
+  ) {
+    return false;
+  }
+  return url.startsWith('data:image/') || url.startsWith('blob:') || url.includes('principal_real.jpg');
+}
+
+export function pickBestPhoto(
+  incomingUrl?: string,
+  currentUrl?: string,
+  persistedUrl?: string,
+  fallbackUrl?: string
+): string {
+  if (incomingUrl && isUserUploadedPhoto(incomingUrl)) return incomingUrl;
+  if (currentUrl && isUserUploadedPhoto(currentUrl)) return currentUrl;
+  if (persistedUrl && isUserUploadedPhoto(persistedUrl)) return persistedUrl;
+  return incomingUrl || currentUrl || persistedUrl || fallbackUrl || '';
+}
+
+/**
+ * Safely merge live Firestore document or cached state with application fallbacks.
+ * Preserves all user modifications and ensures no sections are ever null/undefined.
+ */
 export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): SchoolSiteContent {
   if (!data) return currentSiteContentMemory;
 
@@ -643,10 +673,9 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
     heroSlides: Array.isArray(sanitized.heroSlides) && sanitized.heroSlides.length > 0
       ? sanitized.heroSlides.map((slide, idx) => {
           const fallback = DEFAULT_HERO_SLIDES[idx] || DEFAULT_HERO_SLIDES[0];
-          // If bgImage is a broken token or empty, fallback gracefully
-          const bgImage = (slide.bgImage && !slide.bgImage.startsWith('media:')) 
-            ? slide.bgImage 
-            : (currentSiteContentMemory.heroSlides?.[idx]?.bgImage || fallback.bgImage);
+          const curSlide = currentSiteContentMemory.heroSlides?.find((s) => s.id === slide.id) || currentSiteContentMemory.heroSlides?.[idx];
+          const perSlide = PERSISTED_USER_CONTENT.heroSlides?.find((s) => s.id === slide.id) || PERSISTED_USER_CONTENT.heroSlides?.[idx];
+          const bgImage = pickBestPhoto(slide.bgImage, curSlide?.bgImage, perSlide?.bgImage, fallback.bgImage);
           return {
             ...fallback,
             ...slide,
@@ -657,41 +686,79 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
     principal: {
       ...DEFAULT_PRINCIPAL_CONTENT,
       ...(currentSiteContentMemory.principal || {}),
+      ...(PERSISTED_USER_CONTENT.principal || {}),
       ...(sanitized.principal || {}),
-      photo: (sanitized.principal?.photo && !sanitized.principal.photo.startsWith('media:'))
-        ? sanitized.principal.photo
-        : (currentSiteContentMemory.principal?.photo || DEFAULT_PRINCIPAL_CONTENT.photo),
+      photo: pickBestPhoto(
+        sanitized.principal?.photo,
+        currentSiteContentMemory.principal?.photo,
+        PERSISTED_USER_CONTENT.principal?.photo,
+        '/images/principal_real.jpg'
+      ),
     },
-    programs: Array.isArray(sanitized.programs) && sanitized.programs.length > 0
+    programs: (Array.isArray(sanitized.programs) && sanitized.programs.length > 0
       ? sanitized.programs
-      : (currentSiteContentMemory.programs || DEFAULT_SITE_CONTENT.programs),
-    news: Array.isArray(sanitized.news) && sanitized.news.length > 0
+      : (currentSiteContentMemory.programs || PERSISTED_USER_CONTENT.programs || DEFAULT_SITE_CONTENT.programs)
+    ).map((prog, idx) => {
+      const cur = currentSiteContentMemory.programs?.find((p) => p.id === prog.id) || currentSiteContentMemory.programs?.[idx];
+      const per = PERSISTED_USER_CONTENT.programs?.find((p) => p.id === prog.id) || PERSISTED_USER_CONTENT.programs?.[idx];
+      return {
+        ...prog,
+        image: pickBestPhoto(prog.image, cur?.image, per?.image, prog.image),
+      };
+    }),
+    news: (Array.isArray(sanitized.news) && sanitized.news.length > 0
       ? sanitized.news
-      : (currentSiteContentMemory.news || DEFAULT_SITE_CONTENT.news),
-    facilities: Array.isArray(sanitized.facilities) && sanitized.facilities.length > 0
+      : (currentSiteContentMemory.news || PERSISTED_USER_CONTENT.news || DEFAULT_SITE_CONTENT.news)
+    ).map((item, idx) => {
+      const cur = currentSiteContentMemory.news?.find((n) => n.id === item.id) || currentSiteContentMemory.news?.[idx];
+      const per = PERSISTED_USER_CONTENT.news?.find((n) => n.id === item.id) || PERSISTED_USER_CONTENT.news?.[idx];
+      return {
+        ...item,
+        image: pickBestPhoto(item.image, cur?.image, per?.image, item.image),
+      };
+    }),
+    facilities: (Array.isArray(sanitized.facilities) && sanitized.facilities.length > 0
       ? sanitized.facilities
-      : (currentSiteContentMemory.facilities || DEFAULT_SITE_CONTENT.facilities),
+      : (currentSiteContentMemory.facilities || PERSISTED_USER_CONTENT.facilities || DEFAULT_SITE_CONTENT.facilities)
+    ).map((fac, idx) => {
+      const cur = currentSiteContentMemory.facilities?.find((f) => f.id === fac.id) || currentSiteContentMemory.facilities?.[idx];
+      const per = PERSISTED_USER_CONTENT.facilities?.find((f) => f.id === fac.id) || PERSISTED_USER_CONTENT.facilities?.[idx];
+      return {
+        ...fac,
+        image: pickBestPhoto(fac.image, cur?.image, per?.image, fac.image),
+      };
+    }),
     extracurriculars: Array.isArray(sanitized.extracurriculars) && sanitized.extracurriculars.length > 0
       ? sanitized.extracurriculars
       : (currentSiteContentMemory.extracurriculars || DEFAULT_SITE_CONTENT.extracurriculars),
-    achievements: Array.isArray(sanitized.achievements) && sanitized.achievements.length > 0
+    achievements: (Array.isArray(sanitized.achievements) && sanitized.achievements.length > 0
       ? sanitized.achievements
-      : (currentSiteContentMemory.achievements || DEFAULT_SITE_CONTENT.achievements),
-    teachers: Array.isArray(sanitized.teachers) && sanitized.teachers.length > 0
+      : (currentSiteContentMemory.achievements || PERSISTED_USER_CONTENT.achievements || DEFAULT_SITE_CONTENT.achievements)
+    ).map((ach, idx) => {
+      const cur = currentSiteContentMemory.achievements?.find((a) => a.id === ach.id) || currentSiteContentMemory.achievements?.[idx];
+      const per = PERSISTED_USER_CONTENT.achievements?.find((a) => a.id === ach.id) || PERSISTED_USER_CONTENT.achievements?.[idx];
+      return {
+        ...ach,
+        image: pickBestPhoto(ach.image, cur?.image, per?.image, ach.image),
+      };
+    }),
+    teachers: (Array.isArray(sanitized.teachers) && sanitized.teachers.length > 0
       ? sanitized.teachers
-      : (currentSiteContentMemory.teachers || DEFAULT_SITE_CONTENT.teachers || DEFAULT_TEACHERS_CONTENT),
+      : (currentSiteContentMemory.teachers || PERSISTED_USER_CONTENT.teachers || DEFAULT_SITE_CONTENT.teachers || DEFAULT_TEACHERS_CONTENT)
+    ).map((teacher, idx) => {
+      const cur = currentSiteContentMemory.teachers?.find((t) => t.id === teacher.id) || currentSiteContentMemory.teachers?.[idx];
+      const per = PERSISTED_USER_CONTENT.teachers?.find((t) => t.id === teacher.id) || PERSISTED_USER_CONTENT.teachers?.[idx];
+      return {
+        ...teacher,
+        image: pickBestPhoto(teacher.image, cur?.image, per?.image, ''),
+      };
+    }),
     updatedAt: sanitized.updatedAt || currentSiteContentMemory.updatedAt || Date.now(),
     updatedBy: sanitized.updatedBy || currentSiteContentMemory.updatedBy || 'admin_ilham',
   };
 
   currentSiteContentMemory = merged;
   return merged;
-}
-
-function isCustomOrBase64Image(url?: string): boolean {
-  if (!url || typeof url !== 'string') return false;
-  if (url.includes('unsplash.com')) return false;
-  return url.startsWith('data:image/') || url.startsWith('/images/') || url.startsWith('http');
 }
 
 export function mergePreservingUploads(
@@ -707,7 +774,7 @@ export function mergePreservingUploads(
   if (Array.isArray(source.facilities)) {
     res.facilities = res.facilities.map((fac, idx) => {
       const srcFac = source.facilities?.find((sf) => sf.id === fac.id) || source.facilities?.[idx];
-      if (srcFac && isCustomOrBase64Image(srcFac.image) && !isCustomOrBase64Image(fac.image)) {
+      if (srcFac && isUserUploadedPhoto(srcFac.image) && !isUserUploadedPhoto(fac.image)) {
         hasLocalOnlyUploads = true;
         return { ...fac, image: srcFac.image };
       }
@@ -719,7 +786,7 @@ export function mergePreservingUploads(
   if (Array.isArray(source.heroSlides)) {
     res.heroSlides = res.heroSlides.map((slide, idx) => {
       const srcSlide = source.heroSlides?.find((ss) => ss.id === slide.id) || source.heroSlides?.[idx];
-      if (srcSlide && isCustomOrBase64Image(srcSlide.bgImage) && !isCustomOrBase64Image(slide.bgImage)) {
+      if (srcSlide && isUserUploadedPhoto(srcSlide.bgImage) && !isUserUploadedPhoto(slide.bgImage)) {
         hasLocalOnlyUploads = true;
         return { ...slide, bgImage: srcSlide.bgImage };
       }
@@ -731,7 +798,19 @@ export function mergePreservingUploads(
   if (Array.isArray(source.news)) {
     res.news = res.news.map((item, idx) => {
       const srcItem = source.news?.find((sn) => sn.id === item.id) || source.news?.[idx];
-      if (srcItem && isCustomOrBase64Image(srcItem.image) && !isCustomOrBase64Image(item.image)) {
+      if (srcItem && isUserUploadedPhoto(srcItem.image) && !isUserUploadedPhoto(item.image)) {
+        hasLocalOnlyUploads = true;
+        return { ...item, image: srcItem.image };
+      }
+      return item;
+    });
+  }
+
+  // Programs
+  if (Array.isArray(source.programs)) {
+    res.programs = res.programs.map((item, idx) => {
+      const srcItem = source.programs?.find((sp) => sp.id === item.id) || source.programs?.[idx];
+      if (srcItem && isUserUploadedPhoto(srcItem.image) && !isUserUploadedPhoto(item.image)) {
         hasLocalOnlyUploads = true;
         return { ...item, image: srcItem.image };
       }
@@ -740,7 +819,7 @@ export function mergePreservingUploads(
   }
 
   // Principal
-  if (source.principal?.photo && isCustomOrBase64Image(source.principal.photo) && !isCustomOrBase64Image(res.principal.photo)) {
+  if (source.principal?.photo && isUserUploadedPhoto(source.principal.photo) && !isUserUploadedPhoto(res.principal.photo)) {
     hasLocalOnlyUploads = true;
     res.principal = { ...res.principal, photo: source.principal.photo };
   }
@@ -749,7 +828,7 @@ export function mergePreservingUploads(
   if (Array.isArray(source.teachers) && Array.isArray(res.teachers)) {
     res.teachers = res.teachers.map((teacher, idx) => {
       const srcTeacher = source.teachers?.find((st) => st.id === teacher.id) || source.teachers?.[idx];
-      if (srcTeacher && isCustomOrBase64Image(srcTeacher.image) && !isCustomOrBase64Image(teacher.image)) {
+      if (srcTeacher && isUserUploadedPhoto(srcTeacher.image) && !isUserUploadedPhoto(teacher.image)) {
         hasLocalOnlyUploads = true;
         return { ...teacher, image: srcTeacher.image };
       }
@@ -897,28 +976,7 @@ export function subscribeToSiteContent(
     }
   });
 
-  // Also listen to main_config as legacy fallback (only if it has full content)
-  try {
-    const unsubMain = onSnapshot(
-      CONTENT_DOC_REF,
-      (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.data() as Partial<SchoolSiteContent>;
-          if (data && (Array.isArray(data.heroSlides) || Array.isArray(data.facilities))) {
-            const merged = mergeWithDefaults(data);
-            notifySubscribers(merged);
-          }
-        }
-      },
-      (err) => {
-        handleFirestoreError(err, OperationType.GET, 'site_content/main_config');
-        if (onError) onError(err);
-      }
-    );
-    unsubs.push(unsubMain);
-  } catch (error) {
-    handleFirestoreError(error, OperationType.GET, 'site_content/main_config');
-  }
+  // Section listeners handle individual section reactivity cleanly
 
   return () => {
     localSubscribers.delete(onUpdate);
