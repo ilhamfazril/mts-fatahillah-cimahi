@@ -67,7 +67,7 @@
     },
     {
       "category": "Penunjang",
-      "image": "/images/slide1_gedung.jpg",
+      "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
       "name": "Ruang UKS (Usaha Kesehatan Sekolah)",
       "description": "Ruang pertolongan pertama bagi siswa yang sakit atau membutuhkan istirahat, dilengkapi tempat tidur periksa dan obat-obatan dasar.",
       "id": "fac-6",
@@ -81,7 +81,7 @@
     {
       "name": "Ruang Bimbingan Konseling (BK)",
       "category": "Penunjang",
-      "image": "/images/slide1_gedung.jpg",
+      "image": "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80",
       "features": [
         "Guru BK Ramah & Pengertian",
         "Privasi Siswa Terjaga Penuh",
@@ -93,7 +93,7 @@
     },
     {
       "name": "Kantin Sekolah Bersih & Sehat",
-      "image": "/images/slide4_lapangan.jpg",
+      "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
       "features": [
         "Pilihan Makanan & Minuman Sehat",
         "Tempat Cuci Tangan dengan Sabun",
@@ -178,7 +178,7 @@
       "excerpt": "Pasukan Pengibar Bendera (Paskibra) SMP PGRI 5 Cimahi menorehkan prestasi membanggakan dengan meraih piala kejuaraan LKBB tingkat pelajar se-Bandung Raya.",
       "readTime": "3 menit",
       "title": "Siswa SMP PGRI 5 Cimahi Raih Juara Lomba LKBB & Ketangkasan Baris Berbaris",
-      "image": "/images/slide4_lapangan.jpg"
+      "image": "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=800&q=80"
     },
     {
       "featured": false,
@@ -189,7 +189,7 @@
         "Para siswa menampilkan kebolehan memasak kuliner tradisional Sunda seperti surabi, cilok bumbu kacang, bandros, serta kerajinan tangan dari bahan daur ulang ramah lingkungan.",
         "Kegiatan ini diapresiasi oleh perwakilan pengurus YPLP PGRI Kota Cimahi yang hadir dan mengagumi semangat kreativitas generasi muda di sekolah ini."
       ],
-      "image": "/images/slide2_upacara.jpg",
+      "image": "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80",
       "title": "Gelar Karya Projek P5: Melestarikan Warisan Budaya Sunda & Olahan Makanan Tradisional",
       "readTime": "3 menit",
       "excerpt": "Pameran gelar karya Projek Penguatan Profil Pelajar Pancasila menampilkan instalasi kerajinan anyaman bambu, makanan khas Jawa Barat, dan pagelaran rampak kendang.",
@@ -204,7 +204,7 @@
         "Donasi dihimpun dari infak sukarela para siswa, dewan guru, dan orang tua murid. Kepala Sekolah menyatakan bahwa kegiatan ini menjadi media pembelajaran nyata bagi siswa agar memiliki hati yang dermawan dan peduli terhadap sesama tetangga."
       ],
       "author": "OSIS & Rohis SMP PGRI 5",
-      "image": "/images/slide1_gedung.jpg",
+      "image": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
       "title": "Kegiatan Bakti Sosial & Penyaluran Paket Berkah Ramadhan untuk Warga Sekitar Cigugur Tengah",
       "readTime": "3 menit",
       "id": "news-6",
@@ -282,7 +282,7 @@
       "icon": "Trophy",
       "badge": "Bakat & Seni",
       "shortDesc": "Wadah pelestarian seni daerah Sunda (Jaipong, degung angklung) dan seni musik modern untuk melatih kepercayaan diri.",
-      "image": "/images/slide2_upacara.jpg",
+      "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80",
       "highlights": [
         "Sanggar tari tradisional Sunda",
         "Band sekolah & vokal group",
@@ -294,7 +294,7 @@
     {
       "icon": "Award",
       "title": "Pembinaan Olahraga Prestasi (Futsal & Voli)",
-      "image": "/images/slide4_lapangan.jpg",
+      "image": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80",
       "highlights": [
         "Pelatih ekstrakurikuler berdedikasi",
         "Turnamen antar kelas (Class Meeting)",
@@ -307,7 +307,7 @@
       "fullDesc": "Dengan sarana lapangan serbaguna di halaman kampus sekolah, tim futsal dan voli SMP PGRI 5 Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi."
     }
   ],
-  "updatedAt": 1789995366271,
+  "updatedAt": 1789998565831,
   "extracurriculars": [
     {
       "id": "ekskul-1",
@@ -455,7 +455,7 @@
       "level": "Provinsi",
       "year": "2025",
       "category": "Kesiswaan",
-      "image": "/images/slide2_upacara.jpg"
+      "image": "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=800&q=80"
     },
     {
       "id": "ach-2",
@@ -465,7 +465,7 @@
       "level": "Kota",
       "year": "2025",
       "category": "Olahraga",
-      "image": "/images/slide4_lapangan.jpg"
+      "image": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
     },
     {
       "id": "ach-3",
@@ -475,7 +475,7 @@
       "level": "Kota",
       "year": "2024",
       "category": "Keagamaan",
-      "image": "/images/slide2_upacara.jpg"
+      "image": "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80"
     },
     {
       "id": "ach-4",
@@ -485,7 +485,7 @@
       "level": "Kota",
       "year": "2024",
       "category": "Seni & Budaya",
-      "image": "/images/slide2_upacara.jpg"
+      "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80"
     }
   ],
   "teachers": [
@@ -503,7 +503,7 @@
       "role": "Wakil Kepala Sekolah Bidang Kurikulum",
       "subject": "Ilmu Pengetahuan Alam (IPA)",
       "education": "S2 Pendidikan IPA",
-      "image": "/images/slide1_gedung.jpg"
+      "image": ""
     },
     {
       "id": "t-3",
@@ -511,7 +511,7 @@
       "role": "Wakil Kepala Sekolah Bidang Kesiswaan",
       "subject": "Pendidikan Jasmani, Olahraga & Kesehatan (PJOK)",
       "education": "S1 Pendidikan Kepelatihan Olahraga",
-      "image": "/images/slide4_lapangan.jpg"
+      "image": ""
     },
     {
       "id": "t-4",
@@ -519,7 +519,7 @@
       "role": "Koordinator Lab Komputer & Proktor ANBK",
       "subject": "Informatika & Komputer",
       "education": "S1 Teknik Informatika",
-      "image": "/images/slide3_lab_komputer.jpg"
+      "image": ""
     }
   ]
 }

@@ -509,13 +509,14 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
 const PPDB_COLLECTION_REF = collection(db, 'ppdb_registrations');
-const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_content_live_v5';
+const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_content_live_v6';
 
-// Clear legacy caches that might contain old AI Unsplash images
+// Clear legacy caches that might contain old mismatched images or stale teacher cards
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   try {
     localStorage.removeItem('smp_pgri_5_cimahi_site_content_cache');
     localStorage.removeItem('smp_pgri_5_cimahi_content_v3_real');
+    localStorage.removeItem('smp_pgri_5_cimahi_content_live_v5');
   } catch {
     // ignore
   }
@@ -537,16 +538,6 @@ function safeGetLocalStorage(): Partial<SchoolSiteContent> | null {
   try {
     const raw = localStorage.getItem(CACHE_STORAGE_KEY);
     if (!raw) return null;
-    
-    // Auto-sanitize any legacy unsplash URLs without discarding saved user content
-    if (raw.includes('unsplash.com')) {
-      const sanitized = JSON.parse(
-        raw.replace(/https:\/\/images\.unsplash\.com\/[^\s"']+/g, '/images/slide1_gedung.jpg')
-      );
-      localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(sanitized));
-      return sanitized;
-    }
-    
     const parsed = JSON.parse(raw);
     return parsed;
   } catch {
@@ -656,6 +647,12 @@ export function pickBestPhoto(
   if (incomingUrl && isUserUploadedPhoto(incomingUrl)) return incomingUrl;
   if (currentUrl && isUserUploadedPhoto(currentUrl)) return currentUrl;
   if (persistedUrl && isUserUploadedPhoto(persistedUrl)) return persistedUrl;
+
+  // For teachers (where fallbackUrl is empty string), never allow building/court photos to be used
+  if (fallbackUrl === '') {
+    return '';
+  }
+
   return incomingUrl || currentUrl || persistedUrl || fallbackUrl || '';
 }
 
@@ -931,6 +928,55 @@ export function subscribeToSiteContent(
   // Run immediate hydration upon subscribing
   hydrateFromCloud();
 
+  // 3. Multi-Device Real-Time Sync via Server-Sent Events (/api/content/stream)
+  // Ensures all devices (smartphones, laptops, desktops) receive instant updates in real-time
+  let eventSource: EventSource | null = null;
+  if (typeof window !== 'undefined' && typeof window.EventSource !== 'undefined') {
+    try {
+      eventSource = new EventSource('/api/content/stream');
+      eventSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload && payload.type === 'content_updated' && payload.data) {
+            const merged = mergeWithDefaults(payload.data);
+            notifySubscribers(merged);
+            safeSetLocalStorage(merged);
+          }
+        } catch {
+          // ignore
+        }
+      };
+      eventSource.onerror = () => {
+        // EventSource will automatically attempt reconnection
+      };
+    } catch (e) {
+      console.warn('SSE stream setup notice:', e);
+    }
+  }
+
+  // 4. Background Version Polling fallback (every 3.5s) to guarantee real-time updates across all networks
+  let pollInterval: any = null;
+  if (typeof window !== 'undefined') {
+    pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/content/version', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.success && json.updatedAt > (currentSiteContentMemory.updatedAt || 0)) {
+            const latest = await fetchContentFromServer();
+            if (latest && Object.keys(latest).length > 0) {
+              const merged = mergeWithDefaults(latest);
+              notifySubscribers(merged);
+              safeSetLocalStorage(merged);
+            }
+          }
+        }
+      } catch {
+        // quiet fallback
+      }
+    }, 3500);
+  }
+
   // Real-time synchronization of media_assets
   const unsubscribeMedia = initMediaAssetsSync();
 
@@ -943,6 +989,7 @@ export function subscribeToSiteContent(
     'news',
     'achievements',
     'extracurriculars',
+    'teachers',
   ];
 
   const unsubs: (() => void)[] = [];
@@ -982,6 +1029,10 @@ export function subscribeToSiteContent(
     localSubscribers.delete(onUpdate);
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', handleStorageEvent);
+      if (pollInterval) clearInterval(pollInterval);
+      if (eventSource) {
+        eventSource.close();
+      }
     }
     unsubs.forEach((u) => {
       try {

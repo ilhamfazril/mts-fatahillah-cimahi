@@ -38,9 +38,77 @@ function writeLiveContent(data: any): boolean {
   }
 }
 
+// Active SSE connections for instant real-time sync across all devices and tabs
+const sseClients = new Set<express.Response>();
+
+function broadcastContentUpdate(content: any) {
+  if (!content) return;
+  const payload = JSON.stringify({
+    type: 'content_updated',
+    updatedAt: content.updatedAt || Date.now(),
+    data: content,
+  });
+
+  for (const client of sseClients) {
+    try {
+      client.write(`data: ${payload}\n\n`);
+    } catch (e) {
+      sseClients.delete(client);
+    }
+  }
+}
+
 // API Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: Date.now() });
+});
+
+/**
+ * GET /api/content/version
+ * Ultra-lightweight endpoint returning the current updatedAt timestamp.
+ * Allows other devices to poll effortlessly every few seconds without load.
+ */
+app.get('/api/content/version', (req, res) => {
+  const content = readLiveContent();
+  res.json({
+    success: true,
+    updatedAt: content?.updatedAt || 0,
+  });
+});
+
+/**
+ * GET /api/content/stream
+ * Server-Sent Events (SSE) persistent stream for zero-latency multi-device real-time updates.
+ * When anyone uploads a photo or edits text, every connected device updates instantly!
+ */
+app.get('/api/content/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+  });
+
+  const initialPayload = JSON.stringify({
+    type: 'connected',
+    updatedAt: Date.now(),
+  });
+  res.write(`data: ${initialPayload}\n\n`);
+  sseClients.add(res);
+
+  // Heartbeat ping every 20 seconds to prevent proxy timeouts
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(': heartbeat\n\n');
+    } catch (e) {
+      clearInterval(heartbeat);
+      sseClients.delete(res);
+    }
+  }, 20000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    sseClients.delete(res);
+  });
 });
 
 /**
@@ -60,7 +128,7 @@ app.get('/api/content', (req, res) => {
 
 /**
  * POST /api/content
- * Saves or updates sections in the server-side persistent store.
+ * Saves or updates sections in the server-side persistent store and broadcasts to all clients.
  */
 app.post('/api/content', (req, res) => {
   try {
@@ -79,6 +147,7 @@ app.post('/api/content', (req, res) => {
 
     const saved = writeLiveContent(updated);
     if (saved) {
+      broadcastContentUpdate(updated);
       res.json({ success: true, updatedAt: updated.updatedAt, data: updated });
     } else {
       res.status(500).json({ success: false, message: 'Gagal menulis data ke storage server.' });
@@ -187,6 +256,7 @@ app.post('/api/content/sync', (req, res) => {
 
     const saved = writeLiveContent(merged);
     if (saved) {
+      broadcastContentUpdate(merged);
       console.log('✓ Successfully synchronized live site content across all devices via /api/content/sync');
       res.json({ success: true, updatedAt: merged.updatedAt, data: merged });
     } else {
