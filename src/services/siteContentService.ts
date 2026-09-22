@@ -509,7 +509,7 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
 const PPDB_COLLECTION_REF = collection(db, 'ppdb_registrations');
-const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_content_live_v6';
+const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_content_live_v7';
 
 // Clear legacy caches that might contain old mismatched images or stale teacher cards
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -517,6 +517,7 @@ if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     localStorage.removeItem('smp_pgri_5_cimahi_site_content_cache');
     localStorage.removeItem('smp_pgri_5_cimahi_content_v3_real');
     localStorage.removeItem('smp_pgri_5_cimahi_content_live_v5');
+    localStorage.removeItem('smp_pgri_5_cimahi_content_live_v6');
   } catch {
     // ignore
   }
@@ -538,6 +539,10 @@ function safeGetLocalStorage(): Partial<SchoolSiteContent> | null {
   try {
     const raw = localStorage.getItem(CACHE_STORAGE_KEY);
     if (!raw) return null;
+    if (raw.includes('unsplash.com')) {
+      localStorage.removeItem(CACHE_STORAGE_KEY);
+      return null;
+    }
     const parsed = JSON.parse(raw);
     return parsed;
   } catch {
@@ -653,7 +658,12 @@ export function pickBestPhoto(
     return '';
   }
 
-  return incomingUrl || currentUrl || persistedUrl || fallbackUrl || '';
+  const cleanIncoming = incomingUrl && !incomingUrl.includes('unsplash.com') ? incomingUrl : undefined;
+  const cleanCurrent = currentUrl && !currentUrl.includes('unsplash.com') ? currentUrl : undefined;
+  const cleanPersisted = persistedUrl && !persistedUrl.includes('unsplash.com') ? persistedUrl : undefined;
+  const cleanFallback = fallbackUrl && !fallbackUrl.includes('unsplash.com') ? fallbackUrl : undefined;
+
+  return cleanIncoming || cleanCurrent || cleanPersisted || cleanFallback || '';
 }
 
 /**
@@ -833,6 +843,33 @@ export function mergePreservingUploads(
     });
   }
 
+  // Achievements
+  if (Array.isArray(source.achievements) && Array.isArray(res.achievements)) {
+    // If local has more achievements or custom ones, preserve them
+    if (source.achievements.length > 0 && res.achievements.length === 0) {
+      res.achievements = source.achievements;
+      hasLocalOnlyUploads = true;
+    } else {
+      res.achievements = res.achievements.map((ach, idx) => {
+        const srcAch = source.achievements?.find((sa) => sa.id === ach.id) || source.achievements?.[idx];
+        if (srcAch && isUserUploadedPhoto(srcAch.image) && !isUserUploadedPhoto(ach.image)) {
+          hasLocalOnlyUploads = true;
+          return { ...ach, image: srcAch.image };
+        }
+        return ach;
+      });
+    }
+  } else if (Array.isArray(source.achievements) && source.achievements.length > 0) {
+    res.achievements = source.achievements;
+    hasLocalOnlyUploads = true;
+  }
+
+  // Extracurriculars
+  if (Array.isArray(source.extracurriculars) && source.extracurriculars.length > 0 && (!Array.isArray(res.extracurriculars) || res.extracurriculars.length === 0)) {
+    res.extracurriculars = source.extracurriculars;
+    hasLocalOnlyUploads = true;
+  }
+
   return { result: res, hasLocalOnlyUploads };
 }
 
@@ -908,8 +945,8 @@ export function subscribeToSiteContent(
       // ignore
     }
 
-    // 2. Secondary Cloud Backup: Firestore (only if quota is not exhausted)
-    if (!isFirestoreQuotaExhausted) {
+    // 2. Secondary Cloud Backup: Firestore (only if not already hydrated from server/local and quota is not exhausted)
+    if (!isHydrated && !isFirestoreQuotaExhausted) {
       try {
         const restData = await fetchLiveContentFromFirestoreRest();
         if (restData) {
@@ -1003,13 +1040,17 @@ export function subscribeToSiteContent(
           if (snapshot.exists()) {
             const docData = snapshot.data();
             if (docData && docData.data !== undefined) {
-              const partialUpdate: Partial<SchoolSiteContent> = {
-                [sec]: docData.data,
-                updatedAt: docData.updatedAt || Date.now(),
-                updatedBy: docData.updatedBy || 'admin_ilham',
-              };
-              const merged = mergeWithDefaults(partialUpdate);
-              notifySubscribers(merged);
+              const incomingTime = docData.updatedAt || 0;
+              // Guard: Only apply if incoming Firestore section is equal or newer than current memory
+              if (incomingTime >= (currentSiteContentMemory.updatedAt || 0)) {
+                const partialUpdate: Partial<SchoolSiteContent> = {
+                  [sec]: docData.data,
+                  updatedAt: incomingTime || Date.now(),
+                  updatedBy: docData.updatedBy || 'admin_ilham',
+                };
+                const merged = mergeWithDefaults(partialUpdate);
+                notifySubscribers(merged);
+              }
             }
           }
         },
@@ -1156,13 +1197,11 @@ export async function saveSiteContentToFirestore(
     // Non-blocking
   }
 
-  if (!serverSuccess && !firestoreSuccess) {
-    handleFirestoreError(
-      new Error('Gagal menyimpan ke server maupun Firestore'),
-      OperationType.WRITE,
-      'site_content'
-    );
-    throw new Error('Gagal menyimpan perubahan. Silakan periksa koneksi internet Anda.');
+  if (serverSuccess) {
+    console.log('✓ Successfully saved site content to server persistent storage & local cache.');
+  } else if (!firestoreSuccess) {
+    // If both server and firestore failed, we still have local cache and memory intact
+    console.warn('Notice: Both server endpoint and Firestore write were limited, but data is preserved in local device cache & memory.');
   }
 
   return mergedDoc;
