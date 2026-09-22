@@ -18,35 +18,6 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) => {
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
-      
-      {/* Top Banner with Motto */}
-      <div className="bg-slate-900 border-b border-slate-800 py-6 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex items-center gap-3">
-            <PgriLogo size={42} />
-            <div>
-              <div className="text-white font-extrabold text-sm tracking-wide">
-                SMP PGRI 5 CIMAHI — KOTA CIMAHI
-              </div>
-              <div className="text-amber-400 text-xs font-bold tracking-widest uppercase">
-                Motto: {SCHOOL_INFO.motto}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-300">Pendaftaran Peserta Didik Baru telah dibuka!</span>
-            <button
-              onClick={onOpenPsbModal}
-              className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold transition-all shadow hover:scale-105 flex items-center gap-1.5"
-            >
-              <GraduationCap className="w-4 h-4" />
-              <span>Info PPDB 2025/2026</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
@@ -221,7 +192,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) =>
       {/* Bottom Bar */}
       <div className="border-t border-slate-800/80 py-6 px-4 bg-slate-950 text-[11px] text-slate-500 text-center sm:flex sm:justify-between sm:items-center max-w-7xl mx-auto">
         <div>
-          © {new Date().getFullYear()} SMP PGRI 5 Cimahi (YPLP PGRI Kota Cimahi). Seluruh hak cipta dilindungi.
+          © 2026 SMP PGRI 5 CIMAHI ( Developer By Ilham Fazril ) Hak Cipta Dilindungi Undang-Undang
         </div>
         <div className="mt-2 sm:mt-0 flex items-center justify-center gap-4">
           <span>Website Resmi: smppgri5cimahi.sch.id</span>

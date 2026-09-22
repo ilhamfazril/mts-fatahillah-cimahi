@@ -22,7 +22,7 @@ import { NewsDetailModal } from './components/NewsDetailModal';
 import { PsbRegistrationModal } from './components/PsbRegistrationModal';
 import { SearchModal } from './components/SearchModal';
 import { AdminLoginModal } from './components/AdminLoginModal';
-import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { AdminDashboardModal, AdminTab } from './components/AdminDashboardModal';
 import { isAdminLoggedIn, logoutAdmin } from './services/adminAuthService';
 import { 
   subscribeToSiteContent, 
@@ -46,6 +46,12 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState<boolean>(() => isAdminLoggedIn());
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
+  const [adminDashboardInitialTab, setAdminDashboardInitialTab] = useState<AdminTab>('overview');
+
+  const handleOpenAdminDashboard = (tab: AdminTab = 'overview') => {
+    setAdminDashboardInitialTab(tab);
+    setIsAdminDashboardOpen(true);
+  };
 
   // Real-time Firestore content state initialized with cached / saved state
   const [siteContent, setSiteContent] = useState<SchoolSiteContent>(() => getInitialSiteContent());
@@ -114,7 +120,7 @@ export default function App() {
         onOpenPsbModal={() => setIsPsbModalOpen(true)}
         isAdmin={isAdmin}
         onOpenAdminLogin={() => setIsAdminLoginOpen(true)}
-        onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+        onOpenAdminDashboard={() => handleOpenAdminDashboard('overview')}
         onLogoutAdmin={handleLogout}
       />
 
@@ -130,12 +136,12 @@ export default function App() {
               onPsbClick={() => setIsPsbModalOpen(true)}
               slidesData={currentContent.heroSlides}
               isAdmin={isAdmin}
-              onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+              onOpenAdminDashboard={() => handleOpenAdminDashboard('slides')}
             />
             <WelcomeSection 
               principalProfile={currentContent.principal}
               isAdmin={isAdmin}
-              onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+              onOpenAdminDashboard={() => handleOpenAdminDashboard('principal')}
             />
             <ProgramsSection programsData={currentContent.programs} />
             <PsbSection onOpenPsbModal={() => setIsPsbModalOpen(true)} />
@@ -360,10 +366,10 @@ export default function App() {
         <button
           onClick={() => setIsPsbModalOpen(true)}
           className="bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black py-2.5 px-4 rounded-full shadow-xl flex items-center gap-2 border border-amber-500 hover:scale-105 transition-transform"
-          title="Daftar PSB Online"
+          title="Daftar PPDB Online"
         >
           <GraduationCap className="w-4 h-4" />
-          <span className="hidden sm:inline">Daftar PSB</span>
+          <span className="hidden sm:inline">Daftar PPDB</span>
         </button>
 
         {showScrollTop && (
@@ -412,7 +418,7 @@ export default function App() {
         onLoginSuccess={() => {
           setIsAdmin(true);
           setIsAdminLoginOpen(false);
-          setIsAdminDashboardOpen(true);
+          handleOpenAdminDashboard('overview');
         }}
       />
 
@@ -423,6 +429,7 @@ export default function App() {
         siteContent={currentContent}
         onLogout={handleLogout}
         onNavigateTab={handleNavigate}
+        initialTab={adminDashboardInitialTab}
       />
     </div>
   );

@@ -164,7 +164,7 @@ export const AdminTeachersTab: React.FC<AdminTeachersTabProps> = ({
 
     try {
       setUploadStatus('Mengompresi dan mengoptimalkan foto guru...');
-      const base64 = await compressImageForStorage(file, 640, 0.8);
+      const base64 = await compressImageForStorage(file, 600, 600, 0.75);
       setEditingItem({
         ...editingItem,
         image: base64,

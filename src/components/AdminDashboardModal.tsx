@@ -49,15 +49,7 @@ import { AdminAchievementsTab } from './admin/AdminAchievementsTab';
 import { AdminPpdbTab } from './admin/AdminPpdbTab';
 import { RealtimeSuccessModal, RealtimeSuccessInfo } from './RealtimeSuccessModal';
 
-interface AdminDashboardModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  siteContent: SchoolSiteContent;
-  onLogout: () => void;
-  onNavigateTab?: (tab: string, elementId?: string) => void;
-}
-
-type AdminTab = 
+export type AdminTab = 
   | 'overview' 
   | 'slides' 
   | 'principal' 
@@ -70,20 +62,37 @@ type AdminTab =
   | 'ppdb'
   | 'settings';
 
+interface AdminDashboardModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  siteContent: SchoolSiteContent;
+  onLogout: () => void;
+  onNavigateTab?: (tab: string, elementId?: string) => void;
+  initialTab?: AdminTab;
+}
+
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   isOpen,
   onClose,
   siteContent,
   onLogout,
   onNavigateTab,
+  initialTab,
 }) => {
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
-  const [tabHistory, setTabHistory] = useState<AdminTab[]>(['overview']);
+  const [activeTab, setActiveTab] = useState<AdminTab>(initialTab || 'overview');
+  const [tabHistory, setTabHistory] = useState<AdminTab[]>([initialTab || 'overview']);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [globalFeedback, setGlobalFeedback] = useState<string | null>(null);
   const [realtimeSuccessInfo, setRealtimeSuccessInfo] = useState<RealtimeSuccessInfo | null>(null);
+
+  useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab);
+      setTabHistory([initialTab]);
+    }
+  }, [isOpen, initialTab]);
 
   const navigateToTab = (tab: AdminTab) => {
     if (tab !== activeTab) {
