@@ -17,7 +17,8 @@ import {
   RefreshCw,
   Server,
   Check,
-  GraduationCap
+  GraduationCap,
+  BarChart3
 } from 'lucide-react';
 import { SchoolSiteContent, syncAllDevicesWithServer } from '../../services/siteContentService';
 
@@ -59,6 +60,16 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
       bgColor: 'bg-amber-50',
       borderColor: 'border-amber-200',
       description: 'Banner foto utama halaman depan',
+    },
+    {
+      id: 'stats',
+      label: '4 Matriks Sekolah',
+      count: 4,
+      unit: 'Matriks aktif',
+      icon: <BarChart3 className="w-5 h-5 text-amber-600" />,
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200',
+      description: 'Siswa, Guru, Ekskul & Akreditasi',
     },
     {
       id: 'principal',

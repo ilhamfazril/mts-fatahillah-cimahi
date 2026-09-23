@@ -8,8 +8,7 @@ import {
   BookOpen, 
   CheckCircle,
   Quote,
-  ShieldCheck,
-  Sliders
+  ShieldCheck
 } from 'lucide-react';
 import { PRINCIPAL_INFO, SCHOOL_INFO } from '../data/schoolData';
 import { PrincipalProfileContent } from '../services/siteContentService';
@@ -101,19 +100,6 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({
                   <div className="text-[11px] text-slate-200">SMP PGRI 5 Cimahi</div>
                 </div>
               </div>
-
-              {/* Only shown for authenticated admin */}
-              {isAdmin && onOpenAdminDashboard && (
-                <button
-                  type="button"
-                  onClick={onOpenAdminDashboard}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300/80 px-3.5 py-1.5 rounded-full transition-all shadow-sm"
-                  title="Buka Panel Admin untuk merubah foto & profil Kepala Sekolah"
-                >
-                  <Sliders className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Ubah Profil di Panel Admin</span>
-                </button>
-              )}
 
               <h3 className="mt-5 text-lg sm:text-xl font-extrabold text-slate-900">
                 {currentPrincipal.name}

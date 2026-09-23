@@ -49,7 +49,7 @@ export const SCHOOL_INFO = {
 };
 
 export const PRINCIPAL_INFO = {
-  name: PERSISTED_USER_CONTENT.principal?.name || 'ILHAM FAZRIL',
+  name: PERSISTED_USER_CONTENT.principal?.name || 'Niken Isniyanti',
   role: PERSISTED_USER_CONTENT.principal?.role || 'Kepala SMP PGRI 5 Cimahi',
   photo: PERSISTED_USER_CONTENT.principal?.photo || '/images/principal_real.jpg',
   quote: PERSISTED_USER_CONTENT.principal?.quote || '"Di SMP PGRI 5 Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
@@ -520,7 +520,7 @@ export const ACHIEVEMENTS_LIST: AchievementItem[] = (Array.isArray(PERSISTED_USE
 export const TEACHERS_LIST: TeacherStaff[] = [
   {
     id: 't-1',
-    name: PERSISTED_USER_CONTENT.principal?.name || 'ILHAM FAZRIL',
+    name: PERSISTED_USER_CONTENT.principal?.name || 'Niken Isniyanti',
     role: 'Kepala Sekolah',
     subject: 'Manajemen Pendidikan & Pembina Utama',
     education: 'S1 Pendidikan',

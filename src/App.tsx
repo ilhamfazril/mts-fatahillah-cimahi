@@ -41,6 +41,7 @@ export default function App() {
   const [isPsbModalOpen, setIsPsbModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [academicFilter, setAcademicFilter] = useState<'all' | 'kurikulum' | 'anbk' | 'karakter'>('all');
 
   // Admin authentication state
   const [isAdmin, setIsAdmin] = useState<boolean>(() => isAdminLoggedIn());
@@ -82,12 +83,15 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNavigate = (tab: string, elementId?: string) => {
+  const handleNavigate = (tab: string, subFilterOrElementId?: string) => {
+    if (tab === 'program' && subFilterOrElementId && ['all', 'kurikulum', 'anbk', 'karakter'].includes(subFilterOrElementId)) {
+      setAcademicFilter(subFilterOrElementId as 'all' | 'kurikulum' | 'anbk' | 'karakter');
+    }
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (elementId) {
+    if (subFilterOrElementId && !['all', 'kurikulum', 'anbk', 'karakter'].includes(subFilterOrElementId)) {
       setTimeout(() => {
-        const el = document.getElementById(elementId);
+        const el = document.getElementById(subFilterOrElementId);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth' });
         }
@@ -122,6 +126,7 @@ export default function App() {
         onOpenAdminLogin={() => setIsAdminLoginOpen(true)}
         onOpenAdminDashboard={() => handleOpenAdminDashboard('overview')}
         onLogoutAdmin={handleLogout}
+        onSelectAcademicFilter={setAcademicFilter}
       />
 
       {/* Main Content Areas based on Tab or Full Home Page */}
@@ -129,21 +134,24 @@ export default function App() {
         {activeTab === 'beranda' && (
           <>
             <Hero
-              onExploreClick={() => {
-                const el = document.getElementById('profil');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              onPsbClick={() => setIsPsbModalOpen(true)}
+              onExploreClick={() => handleNavigate('profil')}
+              onPsbClick={() => handleNavigate('psb')}
+              onNavigate={handleNavigate}
               slidesData={currentContent.heroSlides}
+              statsData={currentContent.stats}
               isAdmin={isAdmin}
-              onOpenAdminDashboard={() => handleOpenAdminDashboard('slides')}
+              onOpenAdminDashboard={() => handleOpenAdminDashboard('stats')}
             />
             <WelcomeSection 
               principalProfile={currentContent.principal}
               isAdmin={isAdmin}
               onOpenAdminDashboard={() => handleOpenAdminDashboard('principal')}
             />
-            <ProgramsSection programsData={currentContent.programs} />
+            <ProgramsSection 
+              programsData={currentContent.programs} 
+              activeFilter={academicFilter}
+              onFilterChange={setAcademicFilter}
+            />
             <PsbSection onOpenPsbModal={() => setIsPsbModalOpen(true)} />
             <NewsSection 
               newsData={currentContent.news} 
@@ -231,21 +239,25 @@ export default function App() {
 
         {activeTab === 'program' && (
           <div className="animate-in fade-in duration-300">
+            {/* Dedicated Academic Banner */}
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
-                  Kurikulum & Karakter
+                  Informasi Khusus Akademik
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Program Unggulan & Pembiasaan Karakter
+                  Kurikulum Merdeka Mandiri, ANBK & Karakter Mulia
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
-                  Kurikulum Merdeka, ANBK CBT, P5, Pembiasaan Sholat Dhuha & Dzuhur Berjamaah, serta Pramuka Wajib.
+                  Pusat informasi kurikulum resmi terintegrasi, kesiapan asesmen komputer (CBT), dan pembiasaan karakter peserta didik SMP PGRI 5 Cimahi.
                 </p>
               </div>
             </div>
-            <ProgramsSection programsData={currentContent.programs} />
-            <PsbSection onOpenPsbModal={() => setIsPsbModalOpen(true)} />
+            <ProgramsSection 
+              programsData={currentContent.programs} 
+              activeFilter={academicFilter}
+              onFilterChange={setAcademicFilter}
+            />
           </div>
         )}
 
@@ -307,7 +319,7 @@ export default function App() {
                   Penerimaan Siswa Baru
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Portal PPDB 2025/2026 SMP PGRI 5 Cimahi
+                  Portal PPDB 2026/2027 SMP PGRI 5 Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
                   Informasi resmi pendaftaran peserta didik baru, kuota kelas, serta fasilitas seragam dan buku.

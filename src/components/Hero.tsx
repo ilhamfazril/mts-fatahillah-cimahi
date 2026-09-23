@@ -8,25 +8,34 @@ import {
   Sparkles, 
   HeartHandshake,
   Monitor,
-  Sliders
+  Award,
+  Users,
+  Building2,
+  BookOpen,
+  PhoneCall
 } from 'lucide-react';
 import { SCHOOL_INFO } from '../data/schoolData';
-import { HeroSlideContent, DEFAULT_HERO_SLIDES } from '../services/siteContentService';
+import { HeroSlideContent, DEFAULT_HERO_SLIDES, SchoolStatsContent } from '../services/siteContentService';
+import { AnimatedCounter } from './AnimatedCounter';
 
 interface HeroProps {
-  onExploreClick: () => void;
-  onPsbClick: () => void;
+  onExploreClick?: () => void;
+  onPsbClick?: () => void;
   slidesData?: HeroSlideContent[];
+  statsData?: SchoolStatsContent;
   isAdmin?: boolean;
   onOpenAdminDashboard?: () => void;
+  onNavigate?: (tab: string, subFilter?: string) => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({ 
   onExploreClick, 
   onPsbClick,
   slidesData,
+  statsData,
   isAdmin = false,
-  onOpenAdminDashboard
+  onOpenAdminDashboard,
+  onNavigate
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -58,6 +67,117 @@ export const Hero: React.FC<HeroProps> = ({
   };
 
   const activeSlide = slides[currentSlide] || slides[0];
+
+  // Specific buttons configuration matching the user requirements for SLIDE 1, 2, 3, and 4
+  const getPrimaryBtnInfo = (idx: number, customLabel?: string) => {
+    if (idx === 0) {
+      const label = (!customLabel || customLabel.includes('2025/2026')) 
+        ? 'Pendaftaran PPDB 2026/2027' 
+        : customLabel;
+      return {
+        label,
+        icon: <GraduationCap className="w-5 h-5 text-amber-300" />,
+        action: () => (onNavigate ? onNavigate('psb') : onPsbClick?.())
+      };
+    }
+    if (idx === 1) {
+      return {
+        label: customLabel || 'Lihat Aktivitas Kesiswaan',
+        icon: <Users className="w-5 h-5 text-amber-300" />,
+        action: () => (onNavigate ? onNavigate('kesiswaan') : onNavigate?.('kesiswaan'))
+      };
+    }
+    if (idx === 2) {
+      return {
+        label: customLabel || 'Sarana & Fasilitas',
+        icon: <Building2 className="w-5 h-5 text-amber-300" />,
+        action: () => (onNavigate ? onNavigate('fasilitas') : onNavigate?.('fasilitas'))
+      };
+    }
+    if (idx === 3) {
+      return {
+        label: customLabel || 'Daftar PPDB Online',
+        icon: <GraduationCap className="w-5 h-5 text-amber-300" />,
+        action: () => (onNavigate ? onNavigate('psb') : onPsbClick?.())
+      };
+    }
+    // Generic fallback for any additional slides
+    const text = (customLabel || '').toLowerCase();
+    if (text.includes('kesiswaan') || text.includes('ekskul')) {
+      return {
+        label: customLabel || 'Lihat Kesiswaan',
+        icon: <Users className="w-5 h-5 text-amber-300" />,
+        action: () => onNavigate?.('kesiswaan')
+      };
+    }
+    if (text.includes('sarana') || text.includes('fasilitas')) {
+      return {
+        label: customLabel || 'Sarana & Fasilitas',
+        icon: <Building2 className="w-5 h-5 text-amber-300" />,
+        action: () => onNavigate?.('fasilitas')
+      };
+    }
+    return {
+      label: customLabel || 'Pendaftaran PPDB',
+      icon: <GraduationCap className="w-5 h-5 text-amber-300" />,
+      action: () => (onNavigate ? onNavigate('psb') : onPsbClick?.())
+    };
+  };
+
+  const getSecondaryBtnInfo = (idx: number, customLabel?: string) => {
+    if (idx === 0) {
+      return {
+        label: customLabel || 'Jelajahi Profil Sekolah',
+        icon: <ChevronRight className="w-4 h-4 text-emerald-300" />,
+        action: () => (onNavigate ? onNavigate('profil') : onExploreClick?.())
+      };
+    }
+    if (idx === 1) {
+      return {
+        label: customLabel || 'Daftar Sekarang',
+        icon: <GraduationCap className="w-4 h-4 text-emerald-300" />,
+        action: () => (onNavigate ? onNavigate('psb') : onPsbClick?.())
+      };
+    }
+    if (idx === 2) {
+      return {
+        label: customLabel || 'Info Kurikulum',
+        icon: <BookOpen className="w-4 h-4 text-emerald-300" />,
+        action: () => (onNavigate ? onNavigate('program', 'kurikulum') : onNavigate?.('program', 'kurikulum'))
+      };
+    }
+    if (idx === 3) {
+      return {
+        label: customLabel || 'Hubungi Panitia',
+        icon: <PhoneCall className="w-4 h-4 text-emerald-300" />,
+        action: () => (onNavigate ? onNavigate('kontak') : onNavigate?.('kontak'))
+      };
+    }
+    // Generic fallback for any additional slides
+    const text = (customLabel || '').toLowerCase();
+    if (text.includes('kurikulum') || text.includes('akademik')) {
+      return {
+        label: customLabel || 'Info Kurikulum',
+        icon: <BookOpen className="w-4 h-4 text-emerald-300" />,
+        action: () => onNavigate?.('program', 'kurikulum')
+      };
+    }
+    if (text.includes('panitia') || text.includes('kontak') || text.includes('hubungi')) {
+      return {
+        label: customLabel || 'Hubungi Panitia',
+        icon: <PhoneCall className="w-4 h-4 text-emerald-300" />,
+        action: () => onNavigate?.('kontak')
+      };
+    }
+    return {
+      label: customLabel || 'Jelajahi Profil',
+      icon: <ChevronRight className="w-4 h-4 text-emerald-300" />,
+      action: () => (onNavigate ? onNavigate('profil') : onExploreClick?.())
+    };
+  };
+
+  const primaryBtnInfo = getPrimaryBtnInfo(currentSlide, activeSlide.primaryBtn);
+  const secondaryBtnInfo = getSecondaryBtnInfo(currentSlide, activeSlide.secondaryBtn);
 
   return (
     <div className="relative w-full overflow-hidden bg-slate-950 text-white">
@@ -104,20 +224,22 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="mt-8 flex flex-wrap items-center gap-3.5">
               <button
                 id="btn-hero-primary"
-                onClick={onPsbClick}
-                className="bg-emerald-700 hover:bg-emerald-600 text-white font-black px-6 py-3.5 rounded-xl shadow-xl hover:shadow-emerald-600/30 transition-all flex items-center gap-2 text-sm sm:text-base border border-emerald-500/40 hover:scale-105"
+                type="button"
+                onClick={primaryBtnInfo.action}
+                className="bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white font-black px-6 py-3.5 rounded-xl shadow-xl hover:shadow-emerald-600/30 transition-all flex items-center gap-2 text-sm sm:text-base border border-emerald-500/40 hover:scale-105 cursor-pointer"
               >
-                <GraduationCap className="w-5 h-5 text-amber-300" />
-                <span>{activeSlide.primaryBtn || 'Pendaftaran PPDB'}</span>
+                {primaryBtnInfo.icon}
+                <span>{primaryBtnInfo.label}</span>
               </button>
 
               <button
                 id="btn-hero-secondary"
-                onClick={onExploreClick}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold px-6 py-3.5 rounded-xl border border-white/25 hover:border-white/40 transition-all flex items-center gap-2 text-sm sm:text-base hover:scale-105"
+                type="button"
+                onClick={secondaryBtnInfo.action}
+                className="bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md text-white font-semibold px-6 py-3.5 rounded-xl border border-white/25 hover:border-white/40 transition-all flex items-center gap-2 text-sm sm:text-base hover:scale-105 cursor-pointer"
               >
-                <span>{activeSlide.secondaryBtn || 'Jelajahi Profil'}</span>
-                <ChevronRight className="w-4 h-4 text-emerald-300" />
+                <span>{secondaryBtnInfo.label}</span>
+                {secondaryBtnInfo.icon}
               </button>
             </div>
 
@@ -164,6 +286,7 @@ export const Hero: React.FC<HeroProps> = ({
               />
             ))}
           </div>
+
           <button
             onClick={nextSlide}
             className="w-10 h-10 rounded-full bg-black/50 hover:bg-emerald-700 text-white backdrop-blur border border-white/20 flex items-center justify-center transition-colors"
@@ -172,20 +295,6 @@ export const Hero: React.FC<HeroProps> = ({
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Admin floating quick editor badge if logged in */}
-        {isAdmin && onOpenAdminDashboard && (
-          <div className="absolute top-4 right-4 z-30 animate-in fade-in">
-            <button
-              type="button"
-              onClick={onOpenAdminDashboard}
-              className="bg-slate-900/90 hover:bg-emerald-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-emerald-500/60 shadow-xl backdrop-blur-md flex items-center gap-2 transition-all hover:scale-105"
-            >
-              <Sliders className="w-3.5 h-3.5 text-amber-300" />
-              <span>Edit Konten di Panel Admin</span>
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Slide Indicators for mobile */}
@@ -202,12 +311,15 @@ export const Hero: React.FC<HeroProps> = ({
         ))}
       </div>
 
-      {/* Quick Statistics Banner */}
-      <div className="w-full bg-slate-900 border-b border-slate-800 py-6 px-4">
+      {/* Quick Statistics Banner with Fast Animated Counters */}
+      <div className="w-full bg-slate-900 border-b border-slate-800 py-6 px-4 relative">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="p-3">
-            <div className="text-2xl sm:text-4xl font-black text-amber-400">
-              {SCHOOL_INFO.stats.students}
+            <div className="text-2xl sm:text-4xl font-black text-amber-400 tracking-tight">
+              <AnimatedCounter 
+                value={statsData?.students || SCHOOL_INFO.stats.students || '450+'} 
+                duration={850} 
+              />
             </div>
             <div className="text-xs sm:text-sm text-slate-300 font-medium mt-1">
               Peserta Didik Aktif
@@ -215,8 +327,11 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           <div className="p-3 border-l border-slate-800">
-            <div className="text-2xl sm:text-4xl font-black text-white">
-              {SCHOOL_INFO.stats.teachers}
+            <div className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              <AnimatedCounter 
+                value={statsData?.teachers || SCHOOL_INFO.stats.teachers || '26'} 
+                duration={850} 
+              />
             </div>
             <div className="text-xs sm:text-sm text-slate-300 font-medium mt-1">
               Tenaga Pendidik & Staf
@@ -224,8 +339,11 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           <div className="p-3 border-l border-slate-800">
-            <div className="text-2xl sm:text-4xl font-black text-amber-400">
-              {SCHOOL_INFO.stats.extracurriculars}
+            <div className="text-2xl sm:text-4xl font-black text-amber-400 tracking-tight">
+              <AnimatedCounter 
+                value={statsData?.extracurriculars || SCHOOL_INFO.stats.extracurriculars || '14'} 
+                duration={850} 
+              />
             </div>
             <div className="text-xs sm:text-sm text-slate-300 font-medium mt-1">
               Kegiatan Ekstrakurikuler
@@ -233,8 +351,12 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           <div className="p-3 border-l border-slate-800">
-            <div className="text-2xl sm:text-4xl font-black text-emerald-400">
-              {SCHOOL_INFO.akreditasi}
+            <div className="text-xl sm:text-3xl font-black text-emerald-400 tracking-tight flex items-center justify-center gap-1.5 flex-wrap">
+              <Award className="w-5 h-5 text-emerald-400 hidden sm:inline-block" />
+              <AnimatedCounter 
+                value={statsData?.accreditation || SCHOOL_INFO.akreditasi || 'Akreditasi B'} 
+                duration={850} 
+              />
             </div>
             <div className="text-xs sm:text-sm text-slate-300 font-medium mt-1">
               Status Akreditasi Sekolah

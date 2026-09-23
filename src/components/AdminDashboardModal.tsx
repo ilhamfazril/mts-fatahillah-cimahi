@@ -21,7 +21,8 @@ import {
   Menu,
   ArrowLeft,
   GraduationCap,
-  Users
+  Users,
+  BarChart3
 } from 'lucide-react';
 import { 
   SchoolSiteContent, 
@@ -39,6 +40,7 @@ import { PgriLogo } from './PgriLogo';
 
 import { AdminOverviewTab } from './admin/AdminOverviewTab';
 import { AdminHeroSlidesTab } from './admin/AdminHeroSlidesTab';
+import { AdminStatsTab } from './admin/AdminStatsTab';
 import { AdminPrincipalTab } from './admin/AdminPrincipalTab';
 import { AdminProgramsTab } from './admin/AdminProgramsTab';
 import { AdminTeachersTab } from './admin/AdminTeachersTab';
@@ -52,6 +54,7 @@ import { RealtimeSuccessModal, RealtimeSuccessInfo } from './RealtimeSuccessModa
 export type AdminTab = 
   | 'overview' 
   | 'slides' 
+  | 'stats'
   | 'principal' 
   | 'programs' 
   | 'teachers'
@@ -355,6 +358,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       badge: siteContent.heroSlides?.length || 4,
     },
     {
+      id: 'stats' as AdminTab,
+      label: '4 Matriks Sekolah',
+      icon: <BarChart3 className="w-4 h-4 text-amber-500" />,
+      badge: 'Animasi',
+    },
+    {
       id: 'principal' as AdminTab,
       label: 'Profil Kepala Sekolah',
       icon: <UserCheck className="w-4 h-4" />,
@@ -618,6 +627,29 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   slides={siteContent.heroSlides || DEFAULT_HERO_SLIDES}
                   onSaveSlides={handleSaveSlides}
                   onBack={handleGoBack}
+                />
+              )}
+
+              {activeTab === 'stats' && (
+                <AdminStatsTab
+                  siteContent={siteContent}
+                  onSuccessNotice={(info) => {
+                    setRealtimeSuccessInfo({
+                      isOpen: true,
+                      sectionName: info.sectionName || '4 Matriks Utama Sekolah',
+                      itemTitle: info.title || 'Statistik & Akreditasi',
+                      actionType: 'update',
+                      timestamp: new Date().toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      }) + ' WIB',
+                      targetTab: 'beranda',
+                      details: info.message || 'Perubahan matriks sekolah telah tersinkronisasi real-time.',
+                    });
+                    setGlobalFeedback(info.title);
+                    setTimeout(() => setGlobalFeedback(null), 4000);
+                  }}
                 />
               )}
 

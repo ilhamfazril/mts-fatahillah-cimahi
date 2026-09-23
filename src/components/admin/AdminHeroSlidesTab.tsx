@@ -39,8 +39,8 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
         subtitle: 'Terakreditasi "A" Unggul | Kurikulum Merdeka & Budipekerti Luhur',
         description: 'Mewujudkan generasi pembelajar yang berakhlak mulia, berprestasi akademik dan non-akademik, serta adaptif terhadap kemajuan teknologi.',
         badge: 'Profil Sekolah',
-        primaryBtn: 'Pendaftaran PPDB',
-        secondaryBtn: 'Jelajahi Profil'
+        primaryBtn: 'Pendaftaran PPDB 2026/2027',
+        secondaryBtn: 'Jelajahi Profil Sekolah'
       }
     ];
   });

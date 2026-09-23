@@ -34,6 +34,7 @@ interface HeaderProps {
   onOpenAdminLogin: () => void;
   onOpenAdminDashboard: () => void;
   onLogoutAdmin: () => void;
+  onSelectAcademicFilter?: (filter: 'all' | 'kurikulum' | 'anbk' | 'karakter') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAdminLogin,
   onOpenAdminDashboard,
   onLogoutAdmin,
+  onSelectAcademicFilter,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -117,8 +119,11 @@ export const Header: React.FC<HeaderProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (tab: string) => {
+  const handleNavClick = (tab: string, academicSub?: 'all' | 'kurikulum' | 'anbk' | 'karakter') => {
     setActiveTab(tab);
+    if (academicSub && onSelectAcademicFilter) {
+      onSelectAcademicFilter(academicSub);
+    }
     setMobileMenuOpen(false);
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
@@ -291,7 +296,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 p-1.5 ring-1 ring-black/5">
                     <button
-                      onClick={() => handleNavClick('program')}
+                      onClick={() => handleNavClick('program', 'kurikulum')}
                       className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
                       <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
@@ -302,8 +307,9 @@ export const Header: React.FC<HeaderProps> = ({
                         <div className="text-[11px] text-slate-400">Pembelajaran aktif & P5 kontekstual</div>
                       </div>
                     </button>
+
                     <button
-                      onClick={() => handleNavClick('program')}
+                      onClick={() => handleNavClick('program', 'anbk')}
                       className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
                       <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
@@ -314,8 +320,9 @@ export const Header: React.FC<HeaderProps> = ({
                         <div className="text-[11px] text-slate-400">Lab CBT, asesmen & digitalisasi</div>
                       </div>
                     </button>
+
                     <button
-                      onClick={() => handleNavClick('program')}
+                      onClick={() => handleNavClick('program', 'karakter')}
                       className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 flex items-center gap-3 transition-colors group"
                     >
                       <div className="w-8 h-8 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
@@ -535,16 +542,16 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            {/* 1. Beranda */}
+            {/* 1. Beranda (Tampilan HP biasa abu-putih) */}
             <button
               id="mobile-nav-beranda"
               onClick={() => handleNavClick('beranda')}
-              className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors flex items-center justify-between ${
-                activeTab === 'beranda' ? 'bg-emerald-700 text-white shadow-sm' : 'text-slate-800 bg-slate-100/90 hover:bg-slate-200/70'
-              }`}
+              className="w-full text-left px-3.5 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-colors flex items-center justify-between bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-xs active:bg-slate-100"
             >
-              <span>Beranda</span>
-              <span className="text-[10px] font-normal opacity-80">Halaman Utama</span>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-900 font-bold">Beranda</span>
+              </div>
+              <span className="text-[10px] font-medium text-slate-500">Halaman Utama</span>
             </button>
 
             {/* 2. Profil Sekolah (Dibiarkan Terbuka Semua) */}
@@ -618,13 +625,16 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* 3. Akademik (Dibiarkan Terbuka Semua) */}
             <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-2.5">
-              <div className="flex items-center gap-2 px-2 py-1 mb-1 text-[11px] font-black text-emerald-800 uppercase tracking-wider">
+              <div 
+                onClick={() => handleNavClick('program', 'all')}
+                className="flex items-center gap-2 px-2 py-1 mb-1 text-[11px] font-black text-emerald-800 uppercase tracking-wider cursor-pointer"
+              >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                 <span>Akademik</span>
               </div>
               <div className="space-y-1.5">
                 <button
-                  onClick={() => handleNavClick('program')}
+                  onClick={() => handleNavClick('program', 'kurikulum')}
                   className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
                     activeTab === 'program'
                       ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
@@ -639,7 +649,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <button
-                  onClick={() => handleNavClick('program')}
+                  onClick={() => handleNavClick('program', 'anbk')}
                   className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
                     activeTab === 'program'
                       ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'
@@ -654,7 +664,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <button
-                  onClick={() => handleNavClick('program')}
+                  onClick={() => handleNavClick('program', 'karakter')}
                   className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2.5 transition-colors ${
                     activeTab === 'program'
                       ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-300 shadow-xs'

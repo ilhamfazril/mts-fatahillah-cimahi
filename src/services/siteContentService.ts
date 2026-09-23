@@ -395,6 +395,14 @@ export interface PrincipalProfileContent {
   photo: string;
 }
 
+export interface SchoolStatsContent {
+  students: string;
+  teachers: string;
+  extracurriculars: string;
+  accreditation: string;
+  updatedAt?: number;
+}
+
 export interface SchoolSiteContent {
   heroSlides: HeroSlideContent[];
   principal: PrincipalProfileContent;
@@ -404,6 +412,7 @@ export interface SchoolSiteContent {
   extracurriculars: ExtracurricularItem[];
   achievements: AchievementItem[];
   teachers?: TeacherStaff[];
+  stats?: SchoolStatsContent;
   updatedAt?: number;
   updatedBy?: string;
 }
@@ -435,7 +444,7 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = (Array.isArray(PERSISTED_
         badge: 'Sekolah Berkarakter & Humanis',
         bgImage: '/images/slide1_gedung.jpg',
         alt: 'Gedung dan siswa SMP PGRI 5 Cimahi di tangga dan selasar',
-        primaryBtn: 'Pendaftaran PPDB 2025/2026',
+        primaryBtn: 'Pendaftaran PPDB 2026/2027',
         secondaryBtn: 'Jelajahi Profil Sekolah',
       },
       {
@@ -462,7 +471,7 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = (Array.isArray(PERSISTED_
       },
       {
         id: 3,
-        title: 'Penerimaan Peserta Didik Baru (PPDB) 2025/2026',
+        title: 'Penerimaan Peserta Didik Baru (PPDB) 2026/2027',
         subtitle: 'Mari Bergabung Menjadi Bagian dari SMP PGRI 5 Cimahi',
         description: 'Biaya pendidikan terjangkau, lingkungan belajar kondusif dan aman, beasiswa afirmasi bagi keluarga kurang mampu, serta dibimbing guru-guru berpengalaman.',
         badge: 'PPDB Telah Dibuka',
@@ -484,6 +493,13 @@ export const DEFAULT_TEACHERS_CONTENT: TeacherStaff[] = (Array.isArray(PERSISTED
   ? (PERSISTED_USER_CONTENT.teachers as TeacherStaff[])
   : TEACHERS_LIST;
 
+export const DEFAULT_STATS_CONTENT: SchoolStatsContent = {
+  students: (PERSISTED_USER_CONTENT as any).stats?.students || '450+',
+  teachers: (PERSISTED_USER_CONTENT as any).stats?.teachers || '26',
+  extracurriculars: (PERSISTED_USER_CONTENT as any).stats?.extracurriculars || '14',
+  accreditation: (PERSISTED_USER_CONTENT as any).stats?.accreditation || 'Akreditasi B',
+};
+
 export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
   heroSlides: DEFAULT_HERO_SLIDES,
   principal: DEFAULT_PRINCIPAL_CONTENT,
@@ -503,6 +519,7 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
     ? (PERSISTED_USER_CONTENT.achievements as AchievementItem[])
     : ACHIEVEMENTS_LIST,
   teachers: DEFAULT_TEACHERS_CONTENT,
+  stats: DEFAULT_STATS_CONTENT,
   updatedAt: PERSISTED_USER_CONTENT.updatedAt || Date.now(),
   updatedBy: PERSISTED_USER_CONTENT.updatedBy || 'admin_ilham',
 };
@@ -683,9 +700,14 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
           const curSlide = currentSiteContentMemory.heroSlides?.find((s) => s.id === slide.id) || currentSiteContentMemory.heroSlides?.[idx];
           const perSlide = PERSISTED_USER_CONTENT.heroSlides?.find((s) => s.id === slide.id) || PERSISTED_USER_CONTENT.heroSlides?.[idx];
           const bgImage = pickBestPhoto(slide.bgImage, curSlide?.bgImage, perSlide?.bgImage, fallback.bgImage);
+          let primaryBtn = slide.primaryBtn || fallback.primaryBtn;
+          if (idx === 0 && (!primaryBtn || primaryBtn.includes('2025/2026'))) {
+            primaryBtn = 'Pendaftaran PPDB 2026/2027';
+          }
           return {
             ...fallback,
             ...slide,
+            primaryBtn,
             bgImage,
           };
         })
@@ -1027,6 +1049,7 @@ export function subscribeToSiteContent(
     'achievements',
     'extracurriculars',
     'teachers',
+    'stats',
   ];
 
   const unsubs: (() => void)[] = [];
@@ -1106,6 +1129,7 @@ export async function saveSiteContentToFirestore(
     'achievements',
     'extracurriculars',
     'teachers',
+    'stats',
   ];
 
   // 1. Immediately merge into memory & notify local subscribers (optimistic fast UI)
