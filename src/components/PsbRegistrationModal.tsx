@@ -31,7 +31,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
     parentName: '',
     parentPhone: '',
     parentEmail: '',
-    selectedTrack: 'Jalur Prestasi (PPSB)',
+    selectedTrack: 'Jalur Prestasi',
     notes: ''
   });
   const [registrationCode, setRegistrationCode] = useState('');
@@ -45,7 +45,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
 
     try {
       setIsSubmitting(true);
-      const randomCode = `PSB-PGRI5-${Math.floor(100000 + Math.random() * 900000)}`;
+      const randomCode = `PPDB-PGRI5-${Math.floor(100000 + Math.random() * 900000)}`;
       setRegistrationCode(randomCode);
 
       // Save to Firebase Firestore in real-time
@@ -60,7 +60,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
         parentEmail: formData.parentEmail || '',
         selectedTrack: formData.selectedTrack,
         notes: formData.notes || '',
-        status: 'Baru',
+        status: 'Menunggu',
       });
 
       setStep('success');
@@ -83,7 +83,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
       parentName: '',
       parentPhone: '',
       parentEmail: '',
-      selectedTrack: 'Jalur Prestasi (PPSB)',
+      selectedTrack: 'Jalur Prestasi',
       notes: ''
     });
     onClose();
@@ -99,7 +99,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
             <PgriLogo size={42} />
             <div>
               <h3 className="font-extrabold text-base sm:text-lg">
-                Formulir Pra-Pendaftaran PSB 2025/2026
+                Formulir Pra-Pendaftaran PPDB 2027/2028
               </h3>
               <p className="text-xs text-emerald-200">
                 SMP PGRI 5 Cimahi — YPLP PGRI Kota Cimahi
@@ -121,7 +121,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
               <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 text-emerald-700 flex-shrink-0 mt-0.5" />
                 <span>
-                  Isi formulir pra-pendaftaran awal di bawah ini. Tim panitia PSB akan memverifikasi dan mengirimkan panduan lengkap akun seleksi ke nomor WhatsApp Anda.
+                  Isi formulir pra-pendaftaran awal di bawah ini. Tim panitia PPDB akan memverifikasi dan mengirimkan informasi tindak lanjut ke nomor WhatsApp Anda.
                 </span>
               </div>
 
@@ -132,38 +132,38 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-colors ${
-                    formData.selectedTrack === 'Jalur Prestasi (PPSB)'
+                    formData.selectedTrack === 'Jalur Prestasi'
                       ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold'
                       : 'border-slate-200 bg-white text-slate-700'
                   }`}>
                     <input
                       type="radio"
                       name="track"
-                      checked={formData.selectedTrack === 'Jalur Prestasi (PPSB)'}
-                      onChange={() => setFormData({ ...formData, selectedTrack: 'Jalur Prestasi (PPSB)' })}
+                      checked={formData.selectedTrack === 'Jalur Prestasi'}
+                      onChange={() => setFormData({ ...formData, selectedTrack: 'Jalur Prestasi' })}
                       className="text-emerald-600"
                     />
                     <div className="text-xs">
-                      <div>Jalur Prestasi (PPSB)</div>
+                      <div>Jalur Prestasi</div>
                       <div className="text-[10px] text-slate-500 font-normal">Rapor / Sertifikat Kejuaraan</div>
                     </div>
                   </label>
 
                   <label className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-colors ${
-                    formData.selectedTrack === 'Jalur Tes Seleksi Mandiri'
+                    formData.selectedTrack === 'Jalur Reguler & Afirmasi'
                       ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold'
                       : 'border-slate-200 bg-white text-slate-700'
                   }`}>
                     <input
                       type="radio"
                       name="track"
-                      checked={formData.selectedTrack === 'Jalur Tes Seleksi Mandiri'}
-                      onChange={() => setFormData({ ...formData, selectedTrack: 'Jalur Tes Seleksi Mandiri' })}
+                      checked={formData.selectedTrack === 'Jalur Reguler & Afirmasi'}
+                      onChange={() => setFormData({ ...formData, selectedTrack: 'Jalur Reguler & Afirmasi' })}
                       className="text-emerald-600"
                     />
                     <div className="text-xs">
-                      <div>Jalur Tes Seleksi</div>
-                      <div className="text-[10px] text-slate-500 font-normal">Tes Akademik & Psikologis</div>
+                      <div>Jalur Reguler & Afirmasi</div>
+                      <div className="text-[10px] text-slate-500 font-normal">Zonasi, Domisili / KIP & PKH</div>
                     </div>
                   </label>
                 </div>

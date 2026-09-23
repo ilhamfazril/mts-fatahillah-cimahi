@@ -221,7 +221,7 @@ export const ContactSection: React.FC = () => {
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-700"
                       >
                         <option value="Pertanyaan Umum">Pertanyaan Umum</option>
-                        <option value="Informasi PSB">Informasi PSB 2025/2026</option>
+                        <option value="Informasi PPDB">Informasi PPDB 2027/2028</option>
                         <option value="Kurikulum & Pembelajaran">Kurikulum & Pembelajaran</option>
                         <option value="Kunjungan Studi Banding">Kunjungan Studi Banding</option>
                         <option value="Lainnya">Lainnya</option>

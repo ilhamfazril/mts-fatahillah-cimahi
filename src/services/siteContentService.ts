@@ -429,7 +429,7 @@ export interface PPDBRegistrationRecord {
   parentEmail?: string;
   selectedTrack: string;
   notes?: string;
-  status: 'Baru' | 'Diverifikasi' | 'Diterima' | 'Menunggu';
+  status: 'Menunggu' | 'Diterima' | 'Ditolak';
   createdAt: number;
 }
 
@@ -1300,17 +1300,28 @@ export function subscribeToPpdbRegistrations(
   onError?: (error: Error) => void
 ): () => void {
   try {
-    const q = query(PPDB_COLLECTION_REF, orderBy('createdAt', 'desc'));
+    // Sort chronological: oldest at top, newest at bottom (asc)
+    const q = query(PPDB_COLLECTION_REF, orderBy('createdAt', 'asc'));
     return onSnapshot(
       q,
       (snapshot) => {
         const items: PPDBRegistrationRecord[] = [];
         snapshot.forEach((docSnap) => {
+          const raw = docSnap.data() as any;
+          // Normalize legacy statuses to Menunggu / Diterima / Ditolak
+          let normalizedStatus: 'Menunggu' | 'Diterima' | 'Ditolak' = 'Menunggu';
+          if (raw.status === 'Diterima') normalizedStatus = 'Diterima';
+          else if (raw.status === 'Ditolak') normalizedStatus = 'Ditolak';
+          else normalizedStatus = 'Menunggu';
+
           items.push({
             id: docSnap.id,
-            ...(docSnap.data() as Omit<PPDBRegistrationRecord, 'id'>),
+            ...raw,
+            status: normalizedStatus,
           });
         });
+        // Extra safeguard: ensure strictly sorted by createdAt ascending
+        items.sort((a, b) => (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0));
         onUpdate(items);
       },
       (err) => {
@@ -1329,7 +1340,7 @@ export function subscribeToPpdbRegistrations(
  */
 export async function updatePpdbRegistrationStatus(
   docId: string, 
-  status: 'Baru' | 'Diverifikasi' | 'Diterima' | 'Menunggu'
+  status: 'Menunggu' | 'Diterima' | 'Ditolak'
 ): Promise<void> {
   try {
     const regDocRef = doc(db, 'ppdb_registrations', docId);

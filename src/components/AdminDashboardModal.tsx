@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   LayoutDashboard, 
@@ -90,31 +90,88 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [globalFeedback, setGlobalFeedback] = useState<string | null>(null);
   const [realtimeSuccessInfo, setRealtimeSuccessInfo] = useState<RealtimeSuccessInfo | null>(null);
 
+  // References for scroll position management between tabs
+  const mainContentRef = useRef<HTMLElement | null>(null);
+  const tabScrollPositionsRef = useRef<Map<string, number>>(new Map());
+  const isNavigatingBackRef = useRef<boolean>(false);
+
   useEffect(() => {
-    if (isOpen && initialTab) {
-      setActiveTab(initialTab);
-      setTabHistory([initialTab]);
+    if (isOpen) {
+      if (initialTab) {
+        setActiveTab(initialTab);
+        setTabHistory([initialTab]);
+      } else {
+        setActiveTab('overview');
+        setTabHistory(['overview']);
+      }
+      isNavigatingBackRef.current = false;
+      // Always start from the very top when entering admin panel/features
+      requestAnimationFrame(() => {
+        if (mainContentRef.current) {
+          mainContentRef.current.scrollTop = 0;
+        }
+      });
     }
   }, [isOpen, initialTab]);
 
+  // Rule 1: Whenever activeTab changes (forward navigation), always start from the top
+  useEffect(() => {
+    if (!isNavigatingBackRef.current && mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
+
   const navigateToTab = (tab: AdminTab) => {
+    // Save current scroll position before moving to a new tab
+    if (mainContentRef.current) {
+      tabScrollPositionsRef.current.set(activeTab, mainContentRef.current.scrollTop);
+    }
+    isNavigatingBackRef.current = false;
+
     if (tab !== activeTab) {
       setTabHistory((prev) => [...prev, tab]);
       setActiveTab(tab);
     }
     setIsMobileNavOpen(false);
+
+    // Rule 1: Always start from the very top when entering features
+    const resetToTop = () => {
+      if (mainContentRef.current && !isNavigatingBackRef.current) {
+        mainContentRef.current.scrollTop = 0;
+      }
+    };
+    requestAnimationFrame(resetToTop);
+    setTimeout(resetToTop, 40);
   };
 
   const handleGoBack = () => {
+    let targetTab: AdminTab = 'overview';
     if (tabHistory.length > 1) {
       const nextHistory = [...tabHistory];
       nextHistory.pop(); // remove current tab
-      const prev = nextHistory[nextHistory.length - 1];
+      targetTab = nextHistory[nextHistory.length - 1] || 'overview';
       setTabHistory(nextHistory);
-      setActiveTab(prev || 'overview');
     } else {
-      setActiveTab('overview');
+      targetTab = 'overview';
     }
+
+    // Retrieve the position where user ended on the target tab
+    const savedScrollPosition = tabScrollPositionsRef.current.get(targetTab) ?? 0;
+    isNavigatingBackRef.current = true;
+    setActiveTab(targetTab);
+
+    // Rule 3: Do NOT scroll automatically to top, but restore position where user ended
+    const restoreScroll = () => {
+      if (mainContentRef.current) {
+        mainContentRef.current.scrollTop = savedScrollPosition;
+      }
+    };
+    requestAnimationFrame(restoreScroll);
+    setTimeout(restoreScroll, 30);
+    setTimeout(() => {
+      restoreScroll();
+      isNavigatingBackRef.current = false;
+    }, 120);
   };
 
   const session = getAdminSession();
@@ -579,22 +636,29 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           )}
 
           {/* Tab Content View Area */}
-          <main className="flex-1 bg-slate-100/70 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
+          <main ref={mainContentRef} className="flex-1 bg-slate-100/70 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
             <div className="max-w-6xl mx-auto">
-              {/* Sticky Top Back Bar (Permanently visible at the top without scrolling) */}
+              {/* Top Navigation Bar for Admin Features (Non-floating, Live Sync at the top-left) */}
               {activeTab !== 'overview' && (
-                <div className="sticky top-0 z-30 -mt-2 mb-6 backdrop-blur-md bg-white/95 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 px-3.5 sm:px-4 shadow-sm flex items-center justify-between transition-all">
-                  <div className="flex items-center gap-2 sm:gap-3">
+                <div className="mb-6 bg-white border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 px-3.5 sm:px-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    {/* Button Kembali on the left */}
                     <button
                       type="button"
-                      id="btn-admin-sticky-back"
+                      id="btn-admin-top-back"
                       onClick={handleGoBack}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98]"
-                      title="Kembali ke halaman sebelumnya tanpa perlu scroll"
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
+                      title="Kembali"
                     >
                       <ArrowLeft className="w-4 h-4 text-amber-400" />
-                      <span>Kembali ke Halaman Sebelumnya</span>
+                      <span>Kembali</span>
                     </button>
+
+                    {/* Live Sync badge placed on the right of the Kembali button */}
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/90 px-3 py-1.5 rounded-xl shadow-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Live Sync</span>
+                    </span>
 
                     <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium pl-2 border-l border-slate-200">
                       <span className="text-slate-400">Panel</span>
@@ -603,14 +667,6 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         {navItems.find((n) => n.id === activeTab)?.label || activeTab}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="hidden md:inline">Live Cloud Firestore</span>
-                      <span className="md:hidden">Live Sync</span>
-                    </span>
                   </div>
                 </div>
               )}
@@ -794,21 +850,23 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Floating Quick Return Pill: accessible anywhere on long pages without scrolling */}
-            {activeTab !== 'overview' && (
-              <button
-                type="button"
-                id="btn-admin-floating-back"
-                onClick={handleGoBack}
-                className="fixed bottom-6 right-6 z-40 bg-slate-900/95 hover:bg-emerald-700 text-white shadow-2xl rounded-full px-4 py-2.5 text-xs font-bold flex items-center gap-2 border border-slate-700 backdrop-blur-md transition-all hover:scale-105 active:scale-95 group"
-                title="Kembali ke halaman sebelumnya tanpa scroll"
-              >
-                <ArrowLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
-                <span>Kembali</span>
-              </button>
-            )}
+              {/* Bottom Back Button (Non-floating, placed at the bottom-left in a suitable position) */}
+              {activeTab !== 'overview' && (
+                <div className="mt-8 pt-5 pb-4 border-t border-slate-200/90 flex items-center justify-start">
+                  <button
+                    type="button"
+                    id="btn-admin-bottom-back"
+                    onClick={handleGoBack}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98] group"
+                    title="Kembali"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+                    <span>Kembali</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </main>
         </div>
       </div>

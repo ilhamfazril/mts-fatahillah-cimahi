@@ -165,17 +165,17 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
   },
   {
     id: 'news-3',
-    title: 'Informasi Penerimaan Peserta Didik Baru (PPDB) SMP PGRI 5 Cimahi Tahun Pelajaran 2025/2026',
-    slug: 'ppdb-smp-pgri-5-cimahi-2025-2026',
+    title: 'Informasi Penerimaan Peserta Didik Baru (PPDB) SMP PGRI 5 Cimahi Tahun Pelajaran 2027/2028',
+    slug: 'ppdb-smp-pgri-5-cimahi-2027-2028',
     category: 'Pengumuman',
-    date: '15 Agustus 2025',
-    author: 'Panitia PPDB 2025/2026',
+    date: '15 Januari 2027',
+    author: 'Panitia PPDB 2027/2028',
     readTime: '5 menit',
     featured: true,
     image: '/images/slide1_gedung.jpg',
     excerpt: 'Pendaftaran PPDB SMP PGRI 5 Cimahi telah dibuka. Tersedia jalur reguler, prestasi akademik/non-akademik, serta afirmasi bagi keluarga kurang mampu dengan biaya terjangkau.',
     content: [
-      'Panitia Penerimaan Peserta Didik Baru (PPDB) SMP PGRI 5 Cimahi secara resmi membuka pendaftaran bagi lulusan SD/MI di wilayah Kota Cimahi, Bandung Barat, dan sekitarnya untuk Tahun Pelajaran 2025/2026.',
+      'Panitia Penerimaan Peserta Didik Baru (PPDB) SMP PGRI 5 Cimahi secara resmi membuka pendaftaran bagi lulusan SD/MI di wilayah Kota Cimahi, Bandung Barat, dan sekitarnya untuk Tahun Pelajaran 2027/2028.',
       'SMP PGRI 5 Cimahi menawarkan keunggulan lingkungan belajar yang aman, bimbingan akhlak intensif, laboratorium komputer lengkap untuk ujian digital, serta beragam beasiswa kemudahan biaya pendidikan bagi siswa berprestasi dan keluarga pemegang KIP/PKH.',
       'Pendaftaran dapat dilakukan langsung di loket Tata Usaha kampus SMP PGRI 5 Cimahi Jl. RH Abdul Halim Cigugur Tengah atau secara online melalui formulir resmi website ini.'
     ]
@@ -237,30 +237,30 @@ export const NEWS_LIST: NewsItem[] = (Array.isArray(PERSISTED_USER_CONTENT.news)
   : DEFAULT_NEWS_RAW;
 
 export const PSB_INFO = {
-  academicYear: '2025 / 2026',
+  academicYear: '2027 / 2028',
   status: 'Pendaftaran Dibuka',
   batches: [
     {
       name: 'Gelombang I (Pendaftaran Awal & Jalur Prestasi)',
       desc: 'Bagi lulusan SD/MI berprestasi akademik rapor atau kejuaraan lomba seni, olahraga, dan tahfidz.',
-      startDate: '1 Januari 2025',
-      endDate: '30 April 2025',
-      announcementDate: 'Mei 2025',
+      startDate: '1 Januari 2027',
+      endDate: '30 April 2027',
+      announcementDate: 'Mei 2027',
       status: 'Aktif',
       color: 'emerald'
     },
     {
       name: 'Gelombang II (Jalur Reguler & Afirmasi)',
       desc: 'Pendaftaran jalur reguler dan afirmasi bantuan KIP/PKH bagi warga Kota Cimahi dan sekitarnya.',
-      startDate: '1 Mei 2025',
-      endDate: '10 Juli 2025',
-      announcementDate: 'Juli 2025',
+      startDate: '1 Mei 2027',
+      endDate: '10 Juli 2027',
+      announcementDate: 'Juli 2027',
       status: 'Segera Dibuka',
       color: 'amber'
     }
   ],
   requirements: [
-    'Siswa lulusan SD/MI atau sederajat tahun 2024 atau 2025.',
+    'Siswa lulusan SD/MI atau sederajat tahun 2026 atau 2027.',
     'Fotokopi Ijazah / Surat Keterangan Lulus (SKL) dari SD asal (2 lembar).',
     'Fotokopi Akta Kelahiran dan Kartu Keluarga (KK) calon siswa (2 lembar).',
     'Fotokopi KTP kedua orang tua/wali.',
@@ -581,9 +581,9 @@ export const TESTIMONIALS_LIST: TestimonialItem[] = [
 
 export const FAQ_LIST: FaqItem[] = [
   {
-    question: 'Kapan pendaftaran siswa baru (PPDB) SMP PGRI 5 Cimahi dibuka?',
-    answer: 'Pendaftaran PPDB SMP PGRI 5 Cimahi dibuka mulai bulan Januari untuk Gelombang I (Jalur Prestasi & Awal) hingga bulan Juli untuk Gelombang II (Jalur Reguler dan Afirmasi). Pendaftaran dapat dilakukan langsung di sekolah maupun secara online.',
-    category: 'PSB'
+    question: 'Kapan pendaftaran peserta didik baru (PPDB) SMP PGRI 5 Cimahi dibuka?',
+    answer: 'Pendaftaran PPDB SMP PGRI 5 Cimahi Tahun Pelajaran 2027/2028 dibuka mulai bulan Januari 2027 untuk Gelombang I (Jalur Prestasi & Awal) hingga bulan Juli 2027 untuk Gelombang II (Jalur Reguler dan Afirmasi). Pendaftaran dapat dilakukan langsung di sekolah maupun secara online.',
+    category: 'PPDB'
   },
   {
     question: 'Kurikulum apa yang diterapkan di SMP PGRI 5 Cimahi?',
@@ -603,6 +603,6 @@ export const FAQ_LIST: FaqItem[] = [
   {
     question: 'Apakah ada kemudahan biaya atau beasiswa di SMP PGRI 5 Cimahi?',
     answer: 'Ya, sebagai sekolah di bawah naungan YPLP PGRI Kota Cimahi yang berkomitmen pada pendidikan inklusif, sekolah menyediakan skema biaya terjangkau serta fasilitas afirmasi/keringanan biaya bagi keluarga pemegang Kartu Indonesia Pintar (KIP/PKH).',
-    category: 'PSB'
+    category: 'PPDB'
   }
 ];

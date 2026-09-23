@@ -12,6 +12,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { PSB_INFO } from '../data/schoolData';
+import { downloadPpdbGuidePdf } from '../utils/downloadPpdbGuide';
 
 interface PsbSectionProps {
   onOpenPsbModal: () => void;
@@ -22,10 +23,15 @@ export const PsbSection: React.FC<PsbSectionProps> = ({ onOpenPsbModal }) => {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   const handleDownloadBrochure = () => {
-    setDownloadSuccess(true);
-    setTimeout(() => {
-      setDownloadSuccess(false);
-    }, 4000);
+    try {
+      downloadPpdbGuidePdf();
+      setDownloadSuccess(true);
+      setTimeout(() => {
+        setDownloadSuccess(false);
+      }, 4000);
+    } catch (err) {
+      console.error('Error generating PDF:', err);
+    }
   };
 
   return (
@@ -40,7 +46,7 @@ export const PsbSection: React.FC<PsbSectionProps> = ({ onOpenPsbModal }) => {
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider mb-3 border border-emerald-500/30">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Penerimaan Siswa Baru (PSB)</span>
+            <span>Penerimaan Peserta Didik Baru (PPDB)</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             Penerimaan Peserta Didik Baru <br className="hidden sm:inline" />
@@ -59,7 +65,7 @@ export const PsbSection: React.FC<PsbSectionProps> = ({ onOpenPsbModal }) => {
             </div>
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-emerald-300">Status Pendaftaran</div>
-              <div className="text-sm font-semibold text-white">Jalur Prestasi (PPSB) & Jalur Tes 2025/2026 Dibuka</div>
+              <div className="text-sm font-semibold text-white">Jalur Prestasi & Jalur Reguler 2027/2028 Dibuka</div>
             </div>
           </div>
           <button
@@ -68,7 +74,7 @@ export const PsbSection: React.FC<PsbSectionProps> = ({ onOpenPsbModal }) => {
             className="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-1.5"
           >
             <GraduationCap className="w-4 h-4" />
-            <span>Formulir Pra-Pendaftaran</span>
+            <span>Formulir Pra-Pendaftaran PPDB</span>
           </button>
         </div>
 
@@ -201,21 +207,21 @@ export const PsbSection: React.FC<PsbSectionProps> = ({ onOpenPsbModal }) => {
         {/* Bottom Action Cards */}
         <div className="mt-12 pt-8 border-t border-slate-800 max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
-            <div className="text-sm font-bold text-white">Butuh Panduan Lengkap PSB 2025/2026?</div>
-            <p className="text-xs text-slate-400">Unduh booklet informasi resmi, tabel biaya, dan kisi-kisi tes seleksi.</p>
+            <div className="text-sm font-bold text-white">Butuh Panduan Lengkap PPDB 2027/2028?</div>
+            <p className="text-xs text-slate-400">Unduh booklet informasi resmi, tabel biaya, dan panduan seleksi.</p>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={handleDownloadBrochure}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white text-xs font-bold flex items-center gap-2 transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
             >
               <Download className="w-4 h-4 text-amber-400" />
-              <span>{downloadSuccess ? 'Panduan Berhasil Diunduh!' : 'Unduh Pedoman PSB'}</span>
+              <span>{downloadSuccess ? 'Panduan Berhasil Diunduh!' : 'Unduh Pedoman PPDB'}</span>
             </button>
             <button
               onClick={onOpenPsbModal}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg transition-colors flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <UserCheck className="w-4 h-4" />
               <span>Daftar Sekarang</span>

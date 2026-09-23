@@ -83,7 +83,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) =>
                   className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
                 >
                   <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Visi, Misi & Nilai Dasar</span>
+                  <span>Sejarah PGRI & Sekolah</span>
                 </button>
               </li>
               <li>
@@ -128,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) =>
                   className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Informasi PPDB 2025/2026</span>
+                  <span>Informasi PPDB 2027/2028</span>
                 </button>
               </li>
               <li>

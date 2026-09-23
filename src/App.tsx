@@ -33,7 +33,7 @@ import {
   getInitialSiteContent
 } from './services/siteContentService';
 import { NewsItem } from './types';
-import { ArrowUp, GraduationCap } from 'lucide-react';
+import { ArrowUp, GraduationCap, ArrowLeft } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('beranda');
@@ -42,6 +42,26 @@ export default function App() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [academicFilter, setAcademicFilter] = useState<'all' | 'kurikulum' | 'anbk' | 'karakter'>('all');
+
+  // Helper to return to the very top of the homepage
+  const handleBackToHome = () => {
+    setActiveTab('beranda');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const renderSubpageTopBackButton = () => (
+    <div className="mb-4 flex items-center justify-start">
+      <button
+        type="button"
+        onClick={handleBackToHome}
+        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-800 text-white text-xs font-bold transition-all border border-white/20 hover:scale-[1.02] active:scale-[0.98] group shadow-xs"
+        title="Kembali ke Beranda"
+      >
+        <ArrowLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+        <span>Kembali</span>
+      </button>
+    </div>
+  );
 
   // Admin authentication state
   const [isAdmin, setIsAdmin] = useState<boolean>(() => isAdminLoggedIn());
@@ -170,14 +190,15 @@ export default function App() {
             {/* Breadcrumb banner */}
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
-                  Profil Sekolah
+                  Profil Lembaga
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  SMP PGRI 5 Cimahi
+                  Sambutan Kepala Sekolah & Visi Misi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
-                  Mengenal kepemimpinan, visi, misi, dan nilai-nilai pembentukan karakter siswa.
+                  Mengenal kepemimpinan kepala sekolah, komitmen mutu pendidikan, visi misi unggul, dan nilai-nilai pembentukan budi pekerti luhur.
                 </p>
               </div>
             </div>
@@ -186,13 +207,6 @@ export default function App() {
               isAdmin={isAdmin}
               onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
             />
-            <HistorySection />
-            <TeachersSection 
-              teachersData={currentContent.teachers}
-              isAdmin={isAdmin}
-              onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
-            />
-            <FacilitiesSection facilitiesData={currentContent.facilities} />
           </div>
         )}
 
@@ -200,20 +214,19 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
                   Kilas Sejarah
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Sejarah & Nilai Luhur SMP PGRI 5 Cimahi
+                  Sejarah PGRI & Berdirinya SMP PGRI 5 Cimahi
                 </h1>
+                <p className="text-xs sm:text-sm text-emerald-200 mt-1">
+                  Dedikasi pengabdian YPLP PGRI Kota Cimahi dalam mencerdaskan dan membentuk generasi berkarakter sejak tahun 1983.
+                </p>
               </div>
             </div>
             <HistorySection />
-            <WelcomeSection 
-              principalProfile={currentContent.principal}
-              isAdmin={isAdmin}
-              onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
-            />
           </div>
         )}
 
@@ -221,12 +234,16 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
-                  Dewan Guru & Tenaga Kependidikan
+                  Tenaga Pendidik & Staf
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Pendidik Profesional SMP PGRI 5 Cimahi
+                  Dewan Guru & Tenaga Kependidikan
                 </h1>
+                <p className="text-xs sm:text-sm text-emerald-200 mt-1">
+                  Tenaga pendidik profesional, berpengalaman, dan berdedikasi tinggi membimbing potensi akademik serta moral siswa.
+                </p>
               </div>
             </div>
             <TeachersSection 
@@ -242,6 +259,7 @@ export default function App() {
             {/* Dedicated Academic Banner */}
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
                   Informasi Khusus Akademik
                 </div>
@@ -265,16 +283,19 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
-                  Kesiswaan
+                  Kesiswaan & Organisasi
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Aktivitas Siswa & Ekstrakurikuler Pilihan
+                  Ekstrakurikuler & OSIS SMP PGRI 5 Cimahi
                 </h1>
+                <p className="text-xs sm:text-sm text-emerald-200 mt-1">
+                  Wadah pengembangan minat, bakat, kepemimpinan, kepramukaan, dan kreativitas siswa.
+                </p>
               </div>
             </div>
             <ExtracurricularSection extracurricularsData={currentContent.extracurriculars} />
-            <AchievementsSection achievementsData={currentContent.achievements} />
           </div>
         )}
 
@@ -282,16 +303,19 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
-                  Pencapaian Siswa
+                  Pencapaian & Prestasi
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Prestasi Siswa SMP PGRI 5 Cimahi
+                  Prestasi Membanggakan Siswa SMP PGRI 5 Cimahi
                 </h1>
+                <p className="text-xs sm:text-sm text-emerald-200 mt-1">
+                  Bukti nyata komitmen bimbingan dalam melahirkan juara akademik maupun non-akademik di tingkat kota hingga provinsi.
+                </p>
               </div>
             </div>
             <AchievementsSection achievementsData={currentContent.achievements} />
-            <TestimonialsSection />
           </div>
         )}
 
@@ -299,12 +323,16 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
                   Sarana & Prasarana
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Fasilitas Kampus SMP PGRI 5 Cimahi
+                  Sarana & Fasilitas Kampus SMP PGRI 5 Cimahi
                 </h1>
+                <p className="text-xs sm:text-sm text-emerald-200 mt-1">
+                  Dukungan sarana laboratorium komputer CBT/ANBK, ruang kelas nyaman, perpustakaan, dan lapangan olahraga.
+                </p>
               </div>
             </div>
             <FacilitiesSection facilitiesData={currentContent.facilities} />
@@ -315,19 +343,19 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
-                  Penerimaan Siswa Baru
+                  Penerimaan Peserta Didik Baru (PPDB)
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Portal PPDB 2026/2027 SMP PGRI 5 Cimahi
+                  Portal PPDB 2027/2028 SMP PGRI 5 Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
-                  Informasi resmi pendaftaran peserta didik baru, kuota kelas, serta fasilitas seragam dan buku.
+                  Informasi resmi pendaftaran peserta didik baru, kuota kelas, serta fasilitas beasiswa pendidikan.
                 </p>
               </div>
             </div>
             <PsbSection onOpenPsbModal={() => setIsPsbModalOpen(true)} />
-            <ContactSection />
           </div>
         )}
 
@@ -335,6 +363,7 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
                   Warta & Publikasi
                 </div>
@@ -344,7 +373,7 @@ export default function App() {
               </div>
             </div>
             <NewsSection 
-              newsData={currentContent.news}
+              newsData={currentContent.news} 
               onSelectArticle={(article) => setSelectedArticle(article)} 
             />
           </div>
@@ -354,6 +383,7 @@ export default function App() {
           <div className="animate-in fade-in duration-300">
             <div className="bg-emerald-950 text-white py-8 px-4 border-b border-emerald-800">
               <div className="max-w-7xl mx-auto">
+                {renderSubpageTopBackButton()}
                 <div className="text-xs text-amber-400 font-bold uppercase tracking-wider">
                   Layanan Publik
                 </div>
@@ -363,6 +393,23 @@ export default function App() {
               </div>
             </div>
             <ContactSection />
+          </div>
+        )}
+
+        {/* Bottom Back Button for Sub-navigation pages (Non-floating, placed at bottom-left) */}
+        {activeTab !== 'beranda' && (
+          <div className="bg-slate-50 border-t border-slate-200 py-6 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto flex items-center justify-start">
+              <button
+                type="button"
+                onClick={handleBackToHome}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98] group"
+                title="Kembali ke Beranda"
+              >
+                <ArrowLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+                <span>Kembali</span>
+              </button>
+            </div>
           </div>
         )}
       </main>

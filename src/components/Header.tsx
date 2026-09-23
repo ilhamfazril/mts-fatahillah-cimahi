@@ -526,7 +526,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-2xl p-3.5 shadow-sm">
               <div className="flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-amber-300" />
-                <div className="text-xs font-bold">PPDB 2025/2026 SMP PGRI 5 CIMAHI</div>
+                <div className="text-xs font-bold">PPDB 2027/2028 SMP PGRI 5 CIMAHI</div>
               </div>
               <p className="text-[11px] text-emerald-100 mt-1">
                 Penerimaan Peserta Didik Baru telah dibuka. Biaya terjangkau & fasilitas lengkap.

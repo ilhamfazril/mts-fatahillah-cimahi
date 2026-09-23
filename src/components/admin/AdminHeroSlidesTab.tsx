@@ -184,7 +184,7 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
               type="button"
               onClick={onBack}
               className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-              title="Kembali ke Ringkasan"
+              title="Kembali"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>

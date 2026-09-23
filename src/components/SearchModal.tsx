@@ -87,7 +87,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari program, berita, ekskul, PSB, atau fasilitas..."
+            placeholder="Cari program, berita, ekskul, PPDB, atau fasilitas..."
             className="w-full bg-transparent text-sm sm:text-base text-slate-800 placeholder-slate-400 focus:outline-none"
           />
           {query && (
@@ -111,7 +111,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           {!query ? (
             <div className="text-center py-8 text-slate-400 text-xs">
               <Sparkles className="w-8 h-8 text-emerald-400/40 mx-auto mb-2" />
-              <p>Ketik kata kunci pencarian, misalnya: "Trip Observasi", "PSB", "Robotik", "ACEX", atau "Beasiswa"</p>
+              <p>Ketik kata kunci pencarian, misalnya: "Profil", "PPDB", "Pramuka", "Kurikulum", atau "Beasiswa"</p>
             </div>
           ) : !hasResults ? (
             <div className="text-center py-8 text-slate-400 text-xs">
