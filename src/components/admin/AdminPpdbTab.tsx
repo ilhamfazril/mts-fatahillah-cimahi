@@ -3,7 +3,7 @@ import {
   Search, 
   GraduationCap, 
   CheckCircle2, 
-  XCircle,
+  XCircle, 
   Clock, 
   Trash2, 
   Download, 
@@ -11,7 +11,9 @@ import {
   Eye,
   AlertCircle,
   Check,
-  X
+  X,
+  MessageCircle,
+  Mail
 } from 'lucide-react';
 import { 
   PPDBRegistrationRecord, 
@@ -48,11 +50,24 @@ export const AdminPpdbTab: React.FC = () => {
     setTimeout(() => setNotification(null), 3500);
   };
 
+  const getWhatsAppUrl = (phone: string, candidateName: string, regCode: string) => {
+    let clean = (phone || '').replace(/\D/g, '');
+    if (clean.startsWith('0')) {
+      clean = '62' + clean.slice(1);
+    } else if (!clean.startsWith('62')) {
+      clean = '62' + clean;
+    }
+    const msg = encodeURIComponent(
+      `Halo Bapak/Ibu orang tua dari ananda *${candidateName}* (Kode Registrasi: ${regCode}), kami dari Panitia PPDB SMP PGRI 5 Cimahi ingin mengonfirmasi terkait pendaftaran PPDB TP 2027/2028.`
+    );
+    return `https://wa.me/${clean}?text=${msg}`;
+  };
+
   const handleStatusChange = async (docId: string, newStatus: 'Menunggu' | 'Diterima' | 'Ditolak') => {
     try {
       setIsUpdating(true);
       await updatePpdbRegistrationStatus(docId, newStatus);
-      showToast(`Status pendaftaran berhasil diperbarui menjadi "${newStatus}".`);
+      showToast(`Status pendaftaran berhasil diperbarui menjadi "${newStatus}" (Permanen).`);
       if (selectedItem && selectedItem.id === docId) {
         setSelectedItem({ ...selectedItem, status: newStatus });
       }
@@ -285,13 +300,15 @@ export const AdminPpdbTab: React.FC = () => {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold">
                   <th className="py-3 px-3 text-center w-12">No.</th>
-                  <th className="py-3 px-4 min-w-[140px]">Waktu Daftar</th>
-                  <th className="py-3 px-4 min-w-[180px]">Calon Siswa</th>
-                  <th className="py-3 px-4 min-w-[150px]">Asal Sekolah</th>
-                  <th className="py-3 px-4 min-w-[140px]">Jalur</th>
-                  <th className="py-3 px-4 min-w-[150px]">Kontak Ortu</th>
-                  <th className="py-3 px-4 text-center min-w-[110px]">Status</th>
-                  <th className="py-3 px-4 text-center min-w-[210px]">Aksi</th>
+                  <th className="py-3 px-3 min-w-[130px]">Waktu Daftar</th>
+                  <th className="py-3 px-3 min-w-[170px]">Calon Siswa</th>
+                  <th className="py-3 px-3 text-center min-w-[90px]">L / P</th>
+                  <th className="py-3 px-3 min-w-[140px]">Asal SD/MI</th>
+                  <th className="py-3 px-3 min-w-[130px]">Jalur</th>
+                  <th className="py-3 px-3 min-w-[190px]">Kontak & WhatsApp</th>
+                  <th className="py-3 px-3 min-w-[160px]">Email</th>
+                  <th className="py-3 px-3 text-center min-w-[110px]">Status</th>
+                  <th className="py-3 px-3 text-center min-w-[210px]">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -314,7 +331,7 @@ export const AdminPpdbTab: React.FC = () => {
                       </td>
 
                       {/* 2. Kolom Waktu Pendaftaran */}
-                      <td className="py-3 px-4 text-slate-600 text-xs">
+                      <td className="py-3 px-3 text-slate-600 text-xs">
                         <div className="flex items-center gap-1.5 font-medium text-slate-700">
                           <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                           <span>{regDate}</span>
@@ -322,7 +339,7 @@ export const AdminPpdbTab: React.FC = () => {
                       </td>
 
                       {/* 3. Calon Siswa */}
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3">
                         <div 
                           onClick={() => setSelectedItem(item)}
                           className="font-bold text-slate-900 hover:text-emerald-700 cursor-pointer flex items-center gap-1.5"
@@ -334,26 +351,65 @@ export const AdminPpdbTab: React.FC = () => {
                         <div className="text-[11px] text-slate-500 font-mono">{item.registrationCode}</div>
                       </td>
 
-                      {/* 4. Asal Sekolah */}
-                      <td className="py-3 px-4 text-slate-700">
+                      {/* 4. Jenis Kelamin (L/P) */}
+                      <td className="py-3 px-3 text-center">
+                        <span className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                          item.gender === 'Perempuan'
+                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                            : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        }`}>
+                          {item.gender === 'Perempuan' ? 'Perempuan (P)' : 'Laki-laki (L)'}
+                        </span>
+                      </td>
+
+                      {/* 5. Asal Sekolah */}
+                      <td className="py-3 px-3 text-slate-700">
                         {item.originSchool}
                       </td>
 
-                      {/* 5. Jalur */}
-                      <td className="py-3 px-4">
+                      {/* 6. Jalur */}
+                      <td className="py-3 px-3">
                         <span className="px-2 py-0.5 rounded-md text-[11px] bg-slate-100 text-slate-700 font-medium">
                           {item.selectedTrack}
                         </span>
                       </td>
 
-                      {/* 6. Kontak Ortu */}
-                      <td className="py-3 px-4">
-                        <div className="text-slate-800 font-medium">{item.parentName}</div>
-                        <div className="text-xs text-slate-500">{item.parentPhone}</div>
+                      {/* 7. Kontak Ortu & Tombol Chat WhatsApp */}
+                      <td className="py-3 px-3">
+                        <div className="text-slate-800 font-semibold">{item.parentName}</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-slate-600 font-mono">{item.parentPhone}</span>
+                          <a
+                            href={getWhatsAppUrl(item.parentPhone, item.candidateName, item.registrationCode)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold shadow-xs transition hover:scale-105 active:scale-95 cursor-pointer"
+                            title={`Chat WhatsApp langsung ke ${item.parentPhone}`}
+                          >
+                            <MessageCircle className="w-3 h-3" />
+                            <span>Chat WA</span>
+                          </a>
+                        </div>
                       </td>
 
-                      {/* 7. Status Pendaftaran (HANYA Menunggu, Diterima, Ditolak) */}
-                      <td className="py-3 px-4 text-center">
+                      {/* 8. Email */}
+                      <td className="py-3 px-3">
+                        {item.parentEmail ? (
+                          <a
+                            href={`mailto:${item.parentEmail}`}
+                            className="inline-flex items-center gap-1 text-xs text-slate-700 hover:text-emerald-700 hover:underline font-medium break-all"
+                            title={`Kirim email ke ${item.parentEmail}`}
+                          >
+                            <Mail className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                            <span>{item.parentEmail}</span>
+                          </a>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">-</span>
+                        )}
+                      </td>
+
+                      {/* 9. Status Pendaftaran */}
+                      <td className="py-3 px-3 text-center">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                           item.status === 'Diterima'
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
@@ -368,48 +424,60 @@ export const AdminPpdbTab: React.FC = () => {
                         </span>
                       </td>
 
-                      {/* 8. Tombol Aksi (Terima, Tolak, Hapus) */}
-                      <td className="py-3 px-4 text-center">
+                      {/* 10. Tombol Aksi (1x Klik Permanen Terima/Tolak, Hapus Tetap Aktif) */}
+                      <td className="py-3 px-3 text-center">
                         <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                          {/* Tombol Terima */}
-                          <button
-                            type="button"
-                            disabled={isUpdating || item.status === 'Diterima'}
-                            onClick={() => setItemToAccept(item)}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-xs cursor-pointer ${
-                              item.status === 'Diterima'
-                                ? 'bg-emerald-100 text-emerald-700 opacity-60 cursor-not-allowed'
-                                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                            }`}
-                            title="Terima pendaftar ini"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Terima</span>
-                          </button>
+                          {item.status === 'Menunggu' ? (
+                            <>
+                              {/* Tombol Terima (1x klik -> permanen) */}
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() => setItemToAccept(item)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-xs cursor-pointer"
+                                title="Terima pendaftar ini (Permanen)"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                                <span>Terima</span>
+                              </button>
 
-                          {/* Tombol Tolak */}
-                          <button
-                            type="button"
-                            disabled={isUpdating || item.status === 'Ditolak'}
-                            onClick={() => setItemToReject(item)}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-xs cursor-pointer ${
-                              item.status === 'Ditolak'
-                                ? 'bg-amber-100 text-amber-700 opacity-60 cursor-not-allowed'
-                                : 'bg-amber-500 hover:bg-amber-600 text-white'
-                            }`}
-                            title="Tolak pendaftar ini"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                            <span>Tolak</span>
-                          </button>
+                              {/* Tombol Tolak (1x klik -> permanen) */}
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() => setItemToReject(item)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs cursor-pointer"
+                                title="Tolak pendaftar ini (Permanen)"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                <span>Tolak</span>
+                              </button>
+                            </>
+                          ) : item.status === 'Diterima' ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs"
+                              title="Status pendaftaran telah Diterima secara permanen"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Diterima (Permanen)</span>
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs"
+                              title="Status pendaftaran telah Ditolak secara permanen"
+                            >
+                              <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                              <span>Ditolak (Permanen)</span>
+                            </span>
+                          )}
 
-                          {/* Tombol Hapus */}
+                          {/* Tombol Hapus (Tetap Dipertahankan) */}
                           <button
                             type="button"
                             disabled={isUpdating}
                             onClick={() => setItemToDelete(item)}
                             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 hover:border-rose-600 transition shadow-xs cursor-pointer"
-                            title="Hapus data pendaftaran ini"
+                            title="Hapus data pendaftaran ini dari database"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>Hapus</span>
@@ -494,7 +562,19 @@ export const AdminPpdbTab: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium">WhatsApp Orang Tua</span>
-                  <p className="font-semibold text-slate-800 font-mono">{selectedItem.parentPhone}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="font-semibold text-slate-800 font-mono">{selectedItem.parentPhone}</p>
+                    <a
+                      href={getWhatsAppUrl(selectedItem.parentPhone, selectedItem.candidateName, selectedItem.registrationCode)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition hover:scale-105 active:scale-95 cursor-pointer"
+                      title="Buka Chat WhatsApp"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>Chat WA</span>
+                    </a>
+                  </div>
                 </div>
                 <div className="col-span-2">
                   <span className="text-xs text-slate-500 font-medium">Alamat Email</span>
@@ -550,7 +630,11 @@ export const AdminPpdbTab: React.FC = () => {
             <p className="text-xs text-slate-600 mb-5 leading-relaxed">
               Apakah Anda yakin ingin menerima calon siswa atas nama{' '}
               <strong className="text-slate-900">{itemToAccept.candidateName}</strong> ({itemToAccept.registrationCode}) pada jalur{' '}
-              <strong className="text-emerald-700">{itemToAccept.selectedTrack}</strong>? Status pendaftaran akan diubah menjadi <span className="font-bold text-emerald-700">Diterima</span>.
+              <strong className="text-emerald-700">{itemToAccept.selectedTrack}</strong>?
+              <br />
+              <span className="inline-block mt-2 font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                ⚠️ Aksi ini bersifat permanen (1× klik). Status Diterima tidak dapat diubah kembali.
+              </span>
             </p>
             <div className="flex justify-end gap-2.5">
               <button
@@ -586,7 +670,11 @@ export const AdminPpdbTab: React.FC = () => {
             </div>
             <p className="text-xs text-slate-600 mb-5 leading-relaxed">
               Apakah Anda yakin ingin menolak pendaftaran calon siswa atas nama{' '}
-              <strong className="text-slate-900">{itemToReject.candidateName}</strong> ({itemToReject.registrationCode})? Status pendaftaran akan diubah menjadi <span className="font-bold text-rose-600">Ditolak</span>.
+              <strong className="text-slate-900">{itemToReject.candidateName}</strong> ({itemToReject.registrationCode})?
+              <br />
+              <span className="inline-block mt-2 font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
+                ⚠️ Aksi ini bersifat permanen (1× klik). Status Ditolak tidak dapat diubah kembali.
+              </span>
             </p>
             <div className="flex justify-end gap-2.5">
               <button

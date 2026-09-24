@@ -189,6 +189,43 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
                   />
                 </div>
 
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Jenis Kelamin *
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className={`p-2.5 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-colors ${
+                      formData.gender === 'Laki-laki'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="gender"
+                        checked={formData.gender === 'Laki-laki'}
+                        onChange={() => setFormData({ ...formData, gender: 'Laki-laki' })}
+                        className="text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <span className="text-xs">Laki-laki (L)</span>
+                    </label>
+
+                    <label className={`p-2.5 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-colors ${
+                      formData.gender === 'Perempuan'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="gender"
+                        checked={formData.gender === 'Perempuan'}
+                        onChange={() => setFormData({ ...formData, gender: 'Perempuan' })}
+                        className="text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <span className="text-xs">Perempuan (P)</span>
+                    </label>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
