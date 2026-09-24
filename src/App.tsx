@@ -227,10 +227,10 @@ export default function App() {
                   Kilas Sejarah
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Sejarah PGRI & Berdirinya SMP PGRI 5 Cimahi
+                  Sejarah & Profil MTs Fatahillah Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
-                  Dedikasi pengabdian YPLP PGRI Kota Cimahi dalam mencerdaskan dan membentuk generasi berkarakter sejak tahun 1983.
+                  Dedikasi pengabdian Yayasan Fatahillah Cimahi dalam mencerdaskan dan membentuk generasi berkarakter sejak tahun 1983.
                 </p>
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function App() {
                   Kurikulum Merdeka Mandiri, ANBK & Karakter Mulia
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
-                  Pusat informasi kurikulum resmi terintegrasi, kesiapan asesmen komputer (CBT), dan pembiasaan karakter peserta didik SMP PGRI 5 Cimahi.
+                  Pusat informasi kurikulum resmi terintegrasi, kesiapan asesmen komputer (CBT), dan pembiasaan karakter peserta didik MTs Fatahillah Cimahi.
                 </p>
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function App() {
                   Kesiswaan & Organisasi
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Ekstrakurikuler & OSIS SMP PGRI 5 Cimahi
+                  Ekstrakurikuler & OSIS MTs Fatahillah Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
                   Wadah pengembangan minat, bakat, kepemimpinan, kepramukaan, dan kreativitas siswa.
@@ -316,7 +316,7 @@ export default function App() {
                   Pencapaian & Prestasi
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Prestasi Membanggakan Siswa SMP PGRI 5 Cimahi
+                  Prestasi Membanggakan Siswa MTs Fatahillah Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
                   Bukti nyata komitmen bimbingan dalam melahirkan juara akademik maupun non-akademik di tingkat kota hingga provinsi.
@@ -336,7 +336,7 @@ export default function App() {
                   Sarana & Prasarana
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Sarana & Fasilitas Kampus SMP PGRI 5 Cimahi
+                  Sarana & Fasilitas Kampus MTs Fatahillah Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
                   Dukungan sarana laboratorium komputer CBT/ANBK, ruang kelas nyaman, perpustakaan, dan lapangan olahraga.
@@ -356,7 +356,7 @@ export default function App() {
                   Penerimaan Peserta Didik Baru (PPDB)
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Portal PPDB 2027/2028 SMP PGRI 5 Cimahi
+                  Portal PPDB 2027/2028 MTs Fatahillah Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
                   Informasi resmi pendaftaran peserta didik baru, kuota kelas, serta fasilitas beasiswa pendidikan.
@@ -509,7 +509,7 @@ export default function App() {
               </div>
               <div>
                 <h3 className="font-extrabold text-slate-900 text-base leading-tight">Konfirmasi Keluar</h3>
-                <p className="text-[11px] text-slate-500">Panel Admin SMP PGRI 5 Cimahi</p>
+                <p className="text-[11px] text-slate-500">Panel Admin MTs Fatahillah Cimahi</p>
               </div>
             </div>
 

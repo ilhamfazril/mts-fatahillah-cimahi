@@ -169,7 +169,7 @@ export const AdminAchievementsTab: React.FC<AdminAchievementsTabProps> = ({
             <span>Kelola Prestasi & Pencapaian Siswa ({items.length})</span>
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            Abadikan rekam jejak juara siswa SMP PGRI 5 Cimahi dalam perlombaan akademik dan non-akademik.
+            Abadikan rekam jejak juara siswa MTs Fatahillah Cimahi dalam perlombaan akademik dan non-akademik.
           </p>
         </div>
 

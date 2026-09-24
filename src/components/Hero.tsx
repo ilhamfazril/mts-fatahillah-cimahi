@@ -247,11 +247,11 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="mt-10 pt-6 border-t border-white/15 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-slate-300">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span className="font-semibold text-white">Akreditasi B BAN-S/M</span>
+                <span className="font-semibold text-white">Akreditasi A BAN-PDM</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span className="font-semibold text-white">NPSN: 20224096</span>
+                <span className="font-semibold text-white">NPSN: 20279752</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Monitor className="w-4 h-4 text-amber-400 flex-shrink-0" />

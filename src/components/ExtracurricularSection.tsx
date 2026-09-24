@@ -141,7 +141,7 @@ export const ExtracurricularSection: React.FC<ExtracurricularSectionProps> = ({ 
             </div>
             <div>
               <h4 className="text-base sm:text-lg font-bold text-slate-900">
-                Organisasi Siswa Intra Sekolah (OSIS & MPK) SMP PGRI 5 Cimahi
+                Organisasi Siswa Intra Sekolah (OSIS & MPK) MTs Fatahillah Cimahi
               </h4>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
                 Wadah pembelajaran kepemimpinan, kedisiplinan, kekeluargaan, serta keaktifan siswa dalam berbagai kegiatan kesiswaan dan hari besar nasional/keagamaan.

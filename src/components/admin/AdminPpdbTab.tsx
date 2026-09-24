@@ -58,7 +58,7 @@ export const AdminPpdbTab: React.FC = () => {
       clean = '62' + clean;
     }
     const msg = encodeURIComponent(
-      `Halo Bapak/Ibu orang tua dari ananda *${candidateName}* (Kode Registrasi: ${regCode}), kami dari Panitia PPDB SMP PGRI 5 Cimahi ingin mengonfirmasi terkait pendaftaran PPDB TP 2027/2028.`
+      `Halo Bapak/Ibu orang tua dari ananda *${candidateName}* (Kode Registrasi: ${regCode}), kami dari Panitia PPDB MTs Fatahillah Cimahi ingin mengonfirmasi terkait pendaftaran PPDB TP 2027/2028.`
     );
     return `https://wa.me/${clean}?text=${msg}`;
   };
@@ -202,7 +202,7 @@ export const AdminPpdbTab: React.FC = () => {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
-            Daftar calon siswa pendaftar PPDB online SMP PGRI 5 Cimahi. Data diurutkan secara kronologis dengan pendaftaran terbaru di posisi paling bawah.
+            Daftar calon siswa pendaftar PPDB online MTs Fatahillah Cimahi. Data diurutkan secara kronologis dengan pendaftaran terbaru di posisi paling bawah.
           </p>
         </div>
 
@@ -502,7 +502,7 @@ export const AdminPpdbTab: React.FC = () => {
                 <GraduationCap className="w-5 h-5 text-amber-400" />
                 <div>
                   <h3 className="font-bold text-sm sm:text-base">Informasi Detail Pendaftar PPDB</h3>
-                  <p className="text-[11px] text-emerald-200">SMP PGRI 5 Cimahi — TP 2027/2028</p>
+                  <p className="text-[11px] text-emerald-200">MTs Fatahillah Cimahi — TP 2027/2028</p>
                 </div>
               </div>
               <button

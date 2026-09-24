@@ -65,7 +65,7 @@ const SLIDE_INFOS: SlideInfo[] = [
     index: 3,
     title: 'Slide 4: Halaman Depan & Lapangan',
     defaultPath: '/images/slide4_lapangan.jpg',
-    recommendedDesc: 'Foto lapangan sekolah, tiang bendera, atau halaman depan SMP PGRI 5 Cimahi.'
+    recommendedDesc: 'Foto lapangan sekolah, tiang bendera, atau halaman depan MTs Fatahillah Cimahi.'
   }
 ];
 
@@ -278,7 +278,7 @@ export const PhotoManagerModal: React.FC<PhotoManagerModalProps> = ({
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold text-white">4 Foto Slide Asli SMP PGRI 5 Cimahi:</p>
+                    <p className="font-bold text-white">4 Foto Slide Asli MTs Fatahillah Cimahi:</p>
                     <p className="mt-0.5 text-slate-300">
                       Pilih foto asli dari perangkat Anda. Setiap foto akan langsung menggantikan gambar slide dan ditampilkan murni (pixel-asli, tanpa filter AI).
                     </p>
@@ -442,7 +442,7 @@ export const PhotoManagerModal: React.FC<PhotoManagerModalProps> = ({
                       {PRINCIPAL_INFO.role}
                     </p>
                     <p className="text-xs text-slate-400 mt-1">
-                      SMP PGRI 5 Cimahi — YPLP PGRI Kota Cimahi
+                      MTs Fatahillah Cimahi — Yayasan Fatahillah Cimahi
                     </p>
                   </div>
 

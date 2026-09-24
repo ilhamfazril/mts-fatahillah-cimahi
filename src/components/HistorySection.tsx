@@ -6,13 +6,13 @@ export const HistorySection: React.FC = () => {
   const milestones = [
     {
       year: 'Pendirian Awal',
-      title: 'Kiprah Pengabdian YPLP PGRI di Kota Cimahi',
-      desc: 'Bermula dari komitmen para guru dan pengurus Persatuan Guru Republik Indonesia (PGRI) Kota Cimahi untuk menyediakan pendidikan menengah pertama yang terjangkau, inklusif, dan berkarakter bagi putra-putri di Cimahi Tengah.'
+      title: 'Kiprah Pengabdian Yayasan Fatahillah di Kota Cimahi',
+      desc: 'Bermula dari komitmen para pendidik dan tokoh masyarakat muslim di bawah naungan Yayasan Fatahillah untuk menyediakan pendidikan madrasah tsanawiyah yang bernuansa islami, terjangkau, dan berkarakter mulia bagi putra-putri di Cimahi Tengah.'
     },
     {
       year: 'Pengembangan Sarana',
       title: 'Pembangunan Kampus & Fasilitas Pembelajaran',
-      desc: 'Pengembangan bertahap gedung sekolah dua lantai di Jl. RH Abdul Halim Cigugur Tengah, dilengkapi ruang kelas yang nyaman, lapangan upacara/olahraga, ruang guru, dan perpustakaan.'
+      desc: 'Pengembangan bertahap sarana dan prasarana madrasah di Jl. Cigugur Tengah No. 45, dilengkapi ruang kelas yang nyaman, musholla, lapangan upacara/olahraga, ruang guru, dan perpustakaan.'
     },
     {
       year: 'Fasilitas Komputer',
@@ -37,7 +37,7 @@ export const HistorySection: React.FC = () => {
             <span>Kilas Sejarah</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Perjalanan Sejarah <span className="text-emerald-700">SMP PGRI 5 Cimahi</span>
+            Perjalanan Sejarah <span className="text-emerald-700">MTs Fatahillah Cimahi</span>
           </h2>
           <p className="mt-3 text-slate-600 text-base sm:text-lg">
             Dedikasi mengabdi membina tunas bangsa yang beriman, cerdas, berdisiplin, dan berakhlak mulia di Kota Cimahi, Jawa Barat.

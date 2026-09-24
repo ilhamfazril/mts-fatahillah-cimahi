@@ -35,7 +35,7 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
       {
         id: 1,
         bgImage: '/images/slide1_gedung.jpg',
-        title: 'SMP PGRI 5 Cimahi - Disiplin, Cerdas, Berkarakter',
+        title: 'MTs Fatahillah Cimahi - Disiplin, Cerdas, Berkarakter',
         subtitle: 'Terakreditasi "A" Unggul | Kurikulum Merdeka & Budipekerti Luhur',
         description: 'Mewujudkan generasi pembelajar yang berakhlak mulia, berprestasi akademik dan non-akademik, serta adaptif terhadap kemajuan teknologi.',
         badge: 'Profil Sekolah',
@@ -101,8 +101,8 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
     const newSlide: HeroSlideContent = {
       id: newSlideId,
       bgImage: '/images/slide1_gedung.jpg',
-      alt: `Slide ${newSlideNumber} SMP PGRI 5 Cimahi`,
-      title: `Slide ${newSlideNumber} - Program & Kegiatan SMP PGRI 5 Cimahi`,
+      alt: `Slide ${newSlideNumber} MTs Fatahillah Cimahi`,
+      title: `Slide ${newSlideNumber} - Program & Kegiatan MTs Fatahillah Cimahi`,
       subtitle: 'Membimbing Potensi Terbaik Generasi Penerus Bangsa',
       description: 'Kegiatan edukatif dan pembentukan kepribadian siswa berwawasan global yang didampingi oleh tenaga pendidik profesional.',
       badge: 'Kegiatan Sekolah',
@@ -170,7 +170,7 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
     { label: 'Upacara & Siswa', url: '/images/slide2_upacara.jpg' },
     { label: 'Lab Komputer ANBK', url: '/images/slide3_lab_komputer.jpg' },
     { label: 'Lapangan Olahraga', url: '/images/slide4_lapangan.jpg' },
-    { label: 'Kampus SMP PGRI 5', url: '/images/slide1_gedung.jpg' },
+    { label: 'Kampus MTs Fatahillah', url: '/images/slide1_gedung.jpg' },
     { label: 'Aktivitas Belajar Siswa', url: '/images/slide3_lab_komputer.jpg' }
   ];
 

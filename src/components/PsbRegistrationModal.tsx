@@ -45,7 +45,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
 
     try {
       setIsSubmitting(true);
-      const randomCode = `PPDB-PGRI5-${Math.floor(100000 + Math.random() * 900000)}`;
+      const randomCode = `PPDB-FATAHILLAH-${Math.floor(100000 + Math.random() * 900000)}`;
       setRegistrationCode(randomCode);
 
       // Save to Firebase Firestore in real-time
@@ -102,7 +102,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
                 Formulir Pra-Pendaftaran PPDB 2027/2028
               </h3>
               <p className="text-xs text-emerald-200">
-                SMP PGRI 5 Cimahi — YPLP PGRI Kota Cimahi
+                MTs Fatahillah Cimahi — Yayasan Fatahillah Cimahi
               </p>
             </div>
           </div>
@@ -236,7 +236,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
                       required
                       value={formData.originSchool}
                       onChange={(e) => setFormData({ ...formData, originSchool: e.target.value })}
-                      placeholder="Contoh: SDN Cigugur Tengah / SD PGRI Cimahi"
+                      placeholder="Contoh: MIS Nurul Huda / SDN Cigugur Tengah"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
@@ -334,7 +334,7 @@ export const PsbRegistrationModal: React.FC<PsbRegistrationModalProps> = ({ isOp
                   Pra-Pendaftaran Berhasil Terkirim!
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 max-w-md mx-auto">
-                  Terima kasih atas minat Anda mendaftarkan putra-putri tercinta di SMP PGRI 5 Cimahi.
+                  Terima kasih atas minat Anda mendaftarkan putra-putri tercinta di MTs Fatahillah Cimahi.
                 </p>
               </div>
 

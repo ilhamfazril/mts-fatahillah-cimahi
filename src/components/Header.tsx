@@ -141,34 +141,40 @@ export const Header: React.FC<HeaderProps> = ({
       <nav className={`w-full bg-white transition-all duration-300 border-b border-slate-100 ${
         isScrolled ? 'py-2 sm:py-2.5 shadow-md' : 'py-3 sm:py-3.5'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between">
           
           {/* Logo Brand & School Title */}
           <div 
             onClick={() => handleNavClick('beranda')}
-            className="flex items-center gap-3 sm:gap-3.5 cursor-pointer group"
+            className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group min-w-0"
           >
-            {/* Official PGRI Circular Vector Logo */}
-            <div className="relative group-hover:scale-105 transition-transform duration-300">
-              <PgriLogo size={50} />
+            {/* Official MTs Fatahillah Vector Logo */}
+            <div className="relative group-hover:scale-105 transition-transform duration-300 shrink-0">
+              <div className="block sm:hidden">
+                <PgriLogo size={40} />
+              </div>
+              <div className="hidden sm:block">
+                <PgriLogo size={50} />
+              </div>
             </div>
 
-            <div className="flex flex-col">
-              <div className="flex items-baseline gap-1.5 flex-wrap">
-                <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none group-hover:text-emerald-800 transition-colors">
-                  SMP PGRI 5
-                </span>
-                <span className="text-xl sm:text-2xl font-black text-emerald-700 tracking-tight leading-none">
-                  CIMAHI
+            <div className="flex flex-col justify-center min-w-0">
+              {/* Title: 1 jajar penuh "MTs Fatahillah Cimahi" */}
+              <div className="flex items-center leading-none">
+                <span className="text-[15px] xs:text-[16px] sm:text-2xl font-black text-slate-900 tracking-tight group-hover:text-emerald-800 transition-colors whitespace-nowrap">
+                  MTs Fatahillah Cimahi
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-1">
-                <span className="text-emerald-800 font-extrabold tracking-wider uppercase">
-                  DISIPLIN • CERDAS • BERKARAKTER
+
+              {/* Subtitle / Slogan */}
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold mt-1 leading-none">
+                <span className="text-emerald-800 font-bold sm:font-extrabold tracking-wide uppercase truncate">
+                  <span className="inline sm:hidden">Islami • Cerdas • Berakhlak</span>
+                  <span className="hidden sm:inline">ISLAMI • CERDAS • BERAKHLAKUL KARIMAH</span>
                 </span>
                 <span className="text-slate-300 hidden md:inline">|</span>
                 <span className="hidden md:inline text-slate-600 font-normal">
-                  YPLP PGRI Kota Cimahi
+                  Yayasan Fatahillah Cimahi
                 </span>
               </div>
             </div>
@@ -235,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <BookOpen className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Sejarah PGRI & Sekolah</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Sejarah & Profil Madrasah</div>
                         <div className="text-[11px] text-slate-400">Dedikasi pendidikan sejak 1983</div>
                       </div>
                     </button>
@@ -526,7 +532,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-2xl p-3.5 shadow-sm">
               <div className="flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-amber-300" />
-                <div className="text-xs font-bold">PPDB 2027/2028 SMP PGRI 5 CIMAHI</div>
+                <div className="text-xs font-bold">PPDB 2027/2028 MTS FATAHILLAH CIMAHI</div>
               </div>
               <p className="text-[11px] text-emerald-100 mt-1">
                 Penerimaan Peserta Didik Baru telah dibuka. Biaya terjangkau & fasilitas lengkap.
@@ -586,7 +592,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-xs truncate">Sejarah PGRI & Sekolah</div>
+                    <div className="font-bold text-xs truncate">Sejarah & Profil Madrasah</div>
                     <div className="text-[10px] text-slate-500 truncate">Dedikasi pendidikan Cimahi</div>
                   </div>
                 </button>

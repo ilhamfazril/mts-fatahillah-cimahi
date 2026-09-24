@@ -267,14 +267,27 @@ app.post('/api/content/sync', (req, res) => {
   }
 });
 
+let firebaseConfigData: any = null;
+try {
+  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    firebaseConfigData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  }
+} catch (e) {
+  console.warn('Could not read firebase-applet-config.json:', e);
+}
+
 /**
  * GET /api/firestore-status
  * Supplies diagnostics regarding Firestore free quota limits
  */
 app.get('/api/firestore-status', (req, res) => {
+  const projectId = firebaseConfigData?.projectId || 'decisive-emitter-hds98';
+  const databaseId = firebaseConfigData?.firestoreDatabaseId || '(default)';
   res.json({
     hasServerPersistence: true,
-    quotaExceededConsoleUrl: 'https://console.firebase.google.com/project/decisive-emitter-hds98/firestore/databases/ai-studio-schoolhubpro-e08fccfb-9a5c-4042-a2a4-57549dabb71a/data?openUpgradeDialog=true',
+    databaseId,
+    quotaExceededConsoleUrl: `https://console.firebase.google.com/project/${projectId}/firestore/databases/${databaseId}/data?openUpgradeDialog=true`,
   });
 });
 

@@ -120,7 +120,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             <span>Pilar Keunggulan Akademik</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Informasi & Program Akademik <span className="text-emerald-700">SMP PGRI 5 Cimahi</span>
+            Informasi & Program Akademik <span className="text-emerald-700">MTs Fatahillah Cimahi</span>
           </h2>
           <p className="mt-3 text-slate-600 text-sm sm:text-base">
             Pilih sub-kategori di bawah ini untuk melihat kurikulum merdeka, kesiapan asesmen digital (ANBK), serta pembiasaan karakter budi pekerti secara terstruktur.
@@ -197,7 +197,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     Pembelajaran Berdiferensiasi & Projek Penguatan Profil Pelajar Pancasila (P5)
                   </h3>
                   <p className="mt-2 text-slate-600 text-xs sm:text-sm leading-relaxed">
-                    SMP PGRI 5 Cimahi mengimplementasikan Kurikulum Merdeka dengan pendekatan mandiri yang memberi keleluasaan kepada pendidik untuk merancang pembelajaran sesuai kebutuhan murid, minat, dan potensi daerah Jawa Barat.
+                    MTs Fatahillah Cimahi mengimplementasikan Kurikulum Merdeka dengan pendekatan mandiri yang memberi keleluasaan kepada pendidik untuk merancang pembelajaran sesuai kebutuhan murid, minat, dan potensi daerah Jawa Barat.
                   </p>
                 </div>
 
@@ -265,7 +265,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     Kesiapan Laboratorium CBT Mandiri & Penguasaan Literasi Digital
                   </h3>
                   <p className="mt-2 text-slate-600 text-xs sm:text-sm leading-relaxed">
-                    SMP PGRI 5 Cimahi siap menyelenggarakan Ujian Asesmen Nasional Berbasis Komputer (ANBK) secara mandiri dengan puluhan unit komputer desktop berpendingin udara dan proktor berpengalaman.
+                    MTs Fatahillah Cimahi siap menyelenggarakan Ujian Asesmen Nasional Berbasis Komputer (ANBK) secara mandiri dengan puluhan unit komputer desktop berpendingin udara dan proktor berpengalaman.
                   </p>
                 </div>
 
@@ -333,7 +333,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     Pembiasaan Ibadah Harian, Budaya 5S Santun, dan Kepanduan Disiplin
                   </h3>
                   <p className="mt-2 text-slate-600 text-xs sm:text-sm leading-relaxed">
-                    Pendidikan di SMP PGRI 5 Cimahi menyeimbangkan kecerdasan intelektual dengan kematangan spiritual. Nilai-nilai keteladanan, rasa hormat, dan kedisiplinan ditanamkan sejak gerbang sekolah dibuka.
+                    Pendidikan di MTs Fatahillah Cimahi menyeimbangkan kecerdasan intelektual dengan kematangan spiritual. Nilai-nilai keteladanan, rasa hormat, dan kedisiplinan ditanamkan sejak gerbang sekolah dibuka.
                   </p>
                 </div>
 
@@ -401,7 +401,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     Sinergi Kurikulum Merdeka, Literasi Digital, dan Karakter Religius
                   </h3>
                   <p className="mt-2 text-slate-600 text-xs sm:text-sm leading-relaxed">
-                    Di SMP PGRI 5 Cimahi, kami mengintegrasikan 3 dimensi pembelajaran: penguasaan akademik berbasis kurikulum mandiri, kecakapan teknologi asesmen CBT, serta keteladanan budi pekerti budak Sunda yang santun dan bertakwa.
+                    Di MTs Fatahillah Cimahi, kami mengintegrasikan 3 dimensi pembelajaran: penguasaan akademik berbasis kurikulum mandiri, kecakapan teknologi asesmen CBT, serta keteladanan budi pekerti budak Sunda yang santun dan bertakwa.
                   </p>
                 </div>
 

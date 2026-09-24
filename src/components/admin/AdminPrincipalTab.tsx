@@ -171,7 +171,7 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
               type="text"
               value={draft.role}
               onChange={(e) => handleFieldChange('role', e.target.value)}
-              placeholder="Kepala SMP PGRI 5 Cimahi"
+              placeholder="Kepala MTs Fatahillah Cimahi"
               className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
             />
           </div>
@@ -216,7 +216,7 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
               {draft.role || 'Jabatan'}
             </p>
             <div className="mt-1.5 text-[11px] text-slate-500 bg-slate-100 px-3 py-0.5 rounded-full font-medium">
-              YPLP PGRI Kota Cimahi
+              Yayasan Fatahillah Cimahi
             </div>
 
             <div className="mt-4 bg-emerald-50/80 border-l-4 border-emerald-600 p-3.5 rounded-r-xl text-left w-full relative">

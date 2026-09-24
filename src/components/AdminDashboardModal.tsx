@@ -307,7 +307,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         action: meta?.action || 'update',
         targetTab: 'fasilitas',
         targetElementId: 'fasilitas',
-        details: 'Data fasilitas penunjang pembelajaran SMP PGRI 5 Cimahi berhasil diperbarui secara langsung.',
+        details: 'Data fasilitas penunjang pembelajaran MTs Fatahillah Cimahi berhasil diperbarui secara langsung.',
       }
     );
   };
@@ -371,7 +371,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       setRealtimeSuccessInfo({
         isOpen: true,
         sectionName: 'Pemulihan Konfigurasi Standar',
-        itemTitle: 'Seluruh Konten SMP PGRI 5 Cimahi',
+        itemTitle: 'Seluruh Konten MTs Fatahillah Cimahi',
         actionType: 'reset',
         timestamp: new Date().toLocaleTimeString('id-ID', {
           hour: '2-digit',
@@ -498,7 +498,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm sm:text-base font-extrabold tracking-tight text-white leading-none">
-                  Admin Panel SMP PGRI 5 Cimahi
+                  Admin Panel MTs Fatahillah Cimahi
                 </h2>
                 <span className="hidden sm:inline-flex items-center gap-1 bg-emerald-800/90 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-600/40">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -811,7 +811,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                           Kembalikan ke Sampel Data Awal
                         </h4>
                         <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                          Jika Anda ingin mereset konten sekolah kembali ke data bawaan SMP PGRI 5 Cimahi (semua penyesuaian baru akan diganti dengan data awal).
+                          Jika Anda ingin mereset konten sekolah kembali ke data bawaan MTs Fatahillah Cimahi (semua penyesuaian baru akan diganti dengan data awal).
                         </p>
                       </div>
 

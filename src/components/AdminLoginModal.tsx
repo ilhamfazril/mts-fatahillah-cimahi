@@ -74,7 +74,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
           <h3 className="text-xl font-black tracking-tight">Masuk Akun Admin</h3>
           <p className="text-xs text-emerald-100 mt-1">
-            Portal otorisasi khusus Administrator SMP PGRI 5 Cimahi untuk merubah teks & foto slide real-time.
+            Portal otorisasi khusus Administrator MTs Fatahillah Cimahi untuk merubah teks & foto slide real-time.
           </p>
         </div>
 
@@ -158,7 +158,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         {/* Footer info */}
         <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 text-center">
           <p className="text-[11px] text-slate-500 font-medium">
-            Akses dibatasi hanya untuk staf administrasi terverifikasi SMP PGRI 5 Cimahi.
+            Akses dibatasi hanya untuk staf administrasi terverifikasi MTs Fatahillah Cimahi.
           </p>
         </div>
       </div>

@@ -56,7 +56,7 @@ export const ContactSection: React.FC = () => {
             <span>Pusat Informasi & Konsultasi</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Hubungi <span className="text-emerald-700">SMP PGRI 5 Cimahi</span>
+            Hubungi <span className="text-emerald-700">MTs Fatahillah Cimahi</span>
           </h2>
           <p className="mt-3 text-slate-600 text-base sm:text-lg">
             Kami siap melayani pertanyaan seputar penerimaan peserta didik baru (PPDB), kurikulum, fasilitas, atau kunjungan sekolah.
@@ -132,10 +132,10 @@ export const ContactSection: React.FC = () => {
                   Cigugur Tengah, Cimahi Tengah
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                  Berlokasi di Jl. RH Abdul Halim, mudah diakses dari pusat Kota Cimahi dan kawasan sekitarnya.
+                  Berlokasi di Jl. Cigugur Tengah No. 45, sangat strategis dan mudah diakses dari pusat Kota Cimahi dan kawasan sekitarnya.
                 </p>
                 <a
-                  href="https://maps.google.com/?q=SMP+PGRI+5+Cimahi"
+                  href="https://maps.google.com/?q=MTs+Fatahillah+Cimahi+Jl+Cigugur+Tengah+No+45"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-white underline underline-offset-4"
@@ -164,7 +164,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <h4 className="text-base font-bold text-slate-900">Pesan Anda Berhasil Terkirim!</h4>
                   <p className="text-xs text-slate-600 mt-1 max-w-sm mx-auto">
-                    Tim Tata Usaha & Humas SMP PGRI 5 Cimahi akan menindaklanjuti pesan Anda melalui email atau telepon dalam waktu 1x24 jam kerja.
+                    Tim Tata Usaha & Humas MTs Fatahillah Cimahi akan menindaklanjuti pesan Anda melalui email atau telepon dalam waktu 1x24 jam kerja.
                   </p>
                 </div>
               ) : (

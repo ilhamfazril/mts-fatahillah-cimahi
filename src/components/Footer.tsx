@@ -28,16 +28,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) =>
               <PgriLogo size={48} />
               <div>
                 <div className="text-white font-black text-base tracking-tight">
-                  SMP PGRI 5 CIMAHI
+                  MTS FATAHILLAH CIMAHI
                 </div>
                 <div className="text-[11px] text-emerald-400 font-medium">
-                  YPLP PGRI Kota Cimahi
+                  Yayasan Fatahillah Cimahi
                 </div>
               </div>
             </div>
 
             <p className="text-slate-400 text-xs leading-relaxed">
-              Sekolah Menengah Pertama yang berdedikasi membentuk generasi berakhlak mulia, disiplin, berprestasi, dan terampil. Menyelenggarakan Kurikulum Merdeka dengan sarana laboratorium komputer ANBK dan ragam ekstrakurikuler.
+              Madrasah Tsanawiyah yang berdedikasi membentuk generasi Qur'ani yang berakhlak mulia, cerdas, berprestasi, dan terampil. Menyelenggarakan perpaduan Kurikulum Merdeka & Kemenag dengan sarana laboratorium komputer ANBK dan ragam ekstrakurikuler unggulan.
             </p>
 
             <div className="pt-2 flex flex-wrap gap-2 text-[10px]">
@@ -83,7 +83,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) =>
                   className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
                 >
                   <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Sejarah PGRI & Sekolah</span>
+                  <span>Sejarah & Profil Madrasah</span>
                 </button>
               </li>
               <li>
@@ -192,12 +192,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPsbModal }) =>
       {/* Bottom Bar */}
       <div className="border-t border-slate-800/80 py-6 px-4 bg-slate-950 text-[11px] text-slate-500 text-center sm:flex sm:justify-between sm:items-center max-w-7xl mx-auto">
         <div>
-          © 2026 SMP PGRI 5 CIMAHI ( Developer By Ilham Fazril ) Hak Cipta Dilindungi Undang-Undang
+          © 2026 MTS FATAHILLAH CIMAHI ( Developer By Ilham Fazril ) Hak Cipta Dilindungi Undang-Undang
         </div>
         <div className="mt-2 sm:mt-0 flex items-center justify-center gap-4">
-          <span>Website Resmi: smppgri5cimahi.sch.id</span>
+          <span>Website Resmi: mtsfatahillahcimahi.sch.id</span>
           <span>•</span>
-          <span className="text-emerald-400 font-bold">DISIPLIN • CERDAS • BERKARAKTER</span>
+          <span className="text-emerald-400 font-bold">ISLAMI • CERDAS • BERAKHLAKUL KARIMAH</span>
         </div>
       </div>
     </footer>

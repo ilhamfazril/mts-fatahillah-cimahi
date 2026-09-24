@@ -18,16 +18,16 @@ export function downloadPpdbGuidePdf(): void {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text('YAYASAN PEMBINA LEMBAGA PENDIDIKAN (YPLP) PGRI KOTA CIMAHI', pageWidth / 2, 11, { align: 'center' });
+  doc.text('YAYASAN PENDIDIKAN ISLAM FATAHILLAH CIMAHI', pageWidth / 2, 11, { align: 'center' });
 
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('SMP PGRI 5 CIMAHI', pageWidth / 2, 19, { align: 'center' });
+  doc.text('MTS FATAHILLAH CIMAHI', pageWidth / 2, 19, { align: 'center' });
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('NPSN: 20224096 | Akreditasi: B | Kurikulum Merdeka Mandiri', pageWidth / 2, 26, { align: 'center' });
-  doc.text('Jl. RH Abdul Halim RT 03 RW 03, Kel. Cigugur Tengah, Kec. Cimahi Tengah, Kota Cimahi', pageWidth / 2, 32, { align: 'center' });
+  doc.text('NPSN: 20279752 | Akreditasi: A | Kurikulum Merdeka & Kemenag', pageWidth / 2, 26, { align: 'center' });
+  doc.text('Jl. Cigugur Tengah No. 45, Kel. Cigugur Tengah, Kec. Cimahi Tengah, Kota Cimahi', pageWidth / 2, 32, { align: 'center' });
 
   // Document Title
   doc.setFillColor(245, 158, 11); // Amber 500
@@ -142,19 +142,19 @@ export function downloadPpdbGuidePdf(): void {
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(6, 78, 59);
-  doc.text('SEKRETARIAT PANITIA PPDB 2027/2028 SMP PGRI 5 CIMAHI', 18, currentY + 3);
+  doc.text('SEKRETARIAT PANITIA PPDB 2027/2028 MTS FATAHILLAH CIMAHI', 18, currentY + 3);
 
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(15, 23, 42);
-  doc.text('Alamat       : Kampus SMP PGRI 5 Cimahi, Jl. RH Abdul Halim RT 03 RW 03, Cigugur Tengah', 18, currentY + 8);
+  doc.text('Alamat       : Kampus MTs Fatahillah Cimahi, Jl. Cigugur Tengah No. 45, Cigugur Tengah', 18, currentY + 8);
   doc.text('Waktu Layanan: Senin s/d Jumat, Pukul 07.30 - 14.30 WIB', 18, currentY + 13);
   doc.text('Telepon / WA : (022) 665-2408 / Panitia PPDB Online', 18, currentY + 18);
 
   // Footer Note
   doc.setFontSize(8);
   doc.setTextColor(148, 163, 184);
-  doc.text('* Dokumen ini diterbitkan resmi oleh Panitia PPDB SMP PGRI 5 Cimahi Tahun Ajaran 2027/2028.', pageWidth / 2, 288, { align: 'center' });
+  doc.text('* Dokumen ini diterbitkan resmi oleh Panitia PPDB MTs Fatahillah Cimahi Tahun Ajaran 2027/2028.', pageWidth / 2, 288, { align: 'center' });
 
   // Trigger real download
-  doc.save('Pedoman_PPDB_2027-2028_SMP_PGRI_5_Cimahi.pdf');
+  doc.save('Pedoman_PPDB_2027-2028_MTs_Fatahillah_Cimahi.pdf');
 }

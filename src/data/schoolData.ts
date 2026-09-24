@@ -11,33 +11,33 @@ import {
 import { PERSISTED_USER_CONTENT } from './persistedSchoolContent';
 
 export const SCHOOL_INFO = {
-  name: 'SMP PGRI 5 Cimahi',
-  subName: 'YPLP PGRI Kota Cimahi — Jawa Barat',
-  npsn: '20224096',
-  akreditasi: 'B BAN-S/M',
+  name: 'MTs Fatahillah Cimahi',
+  subName: 'Yayasan Fatahillah Cimahi — Jawa Barat',
+  npsn: '20279752',
+  akreditasi: 'A BAN-PDM',
   iso: 'Kurikulum Merdeka Mandiri',
-  motto: 'DISIPLIN, CERDAS, BERKARAKTER',
+  motto: 'ISLAMI, CERDAS, BERAKHLAKUL KARIMAH',
   tagline: 'Membentuk Insan Beriman, Berilmu, Terampil, dan Mandiri',
-  address: 'Jl. RH Abdul Halim RT 03 RW 03, Kel. Cigugur Tengah, Kec. Cimahi Tengah, Kota Cimahi, Jawa Barat 40522',
+  address: 'Jl. Cigugur Tengah No. 45, Kel. Cigugur Tengah, Kec. Cimahi Tengah, Kota Cimahi, Jawa Barat 40522',
   phone: '(022) 665-2408',
   fax: '(022) 665-2408',
-  email: 'smppgri5cimahi@gmail.com',
-  website: 'https://smppgri5cimahi.sch.id',
+  email: 'mtsfatahillahcimahi@gmail.com',
+  website: 'https://mtsfatahillahcimahi.sch.id',
   operationalHours: 'Senin - Jumat: 07.00 - 15.00 WIB',
   socialMedia: {
-    instagram: 'https://instagram.com/smppgri5cimahi',
-    youtube: 'https://youtube.com/@smppgri5cimahi',
-    facebook: 'https://facebook.com/smppgri5cimahi',
+    instagram: 'https://instagram.com/mtsfatahillahcimahi',
+    youtube: 'https://youtube.com/@mtsfatahillahcimahi',
+    facebook: 'https://facebook.com/mtsfatahillahcimahi',
   },
   stats: {
     students: '450+',
     teachers: '26',
     extracurriculars: '14',
     achievementsPerYear: '25+',
-    accreditationScore: 'Akreditasi B',
+    accreditationScore: 'Akreditasi A',
     alumniSuccess: '100%'
   },
-  vision: 'Terwujudnya peserta didik yang beriman dan bertakwa kepada Tuhan Yang Maha Esa, berkarakter mulia, cerdas, berprestasi, terampil, serta peduli terhadap lingkungan di bawah naungan YPLP PGRI Kota Cimahi.',
+  vision: 'Terwujudnya peserta didik yang beriman dan bertakwa kepada Tuhan Yang Maha Esa, berkarakter mulia, cerdas, berprestasi, terampil, serta peduli terhadap lingkungan di bawah naungan Yayasan Fatahillah Cimahi.',
   missions: [
     'Membina keimanan dan ketakwaan melalui kegiatan keagamaan rutin serta pembiasaan sholat dhuha dan tadarus bersama.',
     'Menyelenggarakan proses pembelajaran yang aktif, kreatif, efektif, dan menyenangkan berlandaskan Kurikulum Merdeka.',
@@ -50,12 +50,12 @@ export const SCHOOL_INFO = {
 
 export const PRINCIPAL_INFO = {
   name: PERSISTED_USER_CONTENT.principal?.name || 'Niken Isniyanti',
-  role: PERSISTED_USER_CONTENT.principal?.role || 'Kepala SMP PGRI 5 Cimahi',
+  role: PERSISTED_USER_CONTENT.principal?.role || 'Kepala MTs Fatahillah Cimahi',
   photo: PERSISTED_USER_CONTENT.principal?.photo || '/images/principal_real.jpg',
-  quote: PERSISTED_USER_CONTENT.principal?.quote || '"Di SMP PGRI 5 Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
+  quote: PERSISTED_USER_CONTENT.principal?.quote || '"Di MTs Fatahillah Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
   welcomeMessage: [
     'Assalamu’alaikum Warahmatullahi Wabarakatuh, Sampurasun, Salam Sejahtera untuk kita semua.',
-    'Selamat datang di situs resmi SMP PGRI 5 Cimahi. Sebagai institusi pendidikan di bawah naungan Yayasan Pembina Lembaga Pendidikan (YPLP) PGRI Kota Cimahi, kami senantiasa berikhtiar memberikan layanan pendidikan berkualitas, terjangkau, dan humanis bagi seluruh peserta didik.',
+    'Selamat datang di situs resmi MTs Fatahillah Cimahi. Sebagai institusi pendidikan di bawah naungan Yayasan Fatahillah Cimahi dan Kementerian Agama, kami senantiasa berikhtiar memberikan layanan pendidikan berkualitas, terjangkau, dan berakhlakul karimah bagi seluruh peserta didik.',
     'Dengan bimbingan tenaga pendidik yang berpengalaman, fasilitas gedung ruang kelas yang kondusif, laboratorium komputer untuk simulasi dan pelaksanaan Asesmen Nasional Berbasis Komputer (ANBK), sarana olahraga, serta ragam kegiatan ekstrakurikuler, kami terus mengasah kompetensi akademis dan karakter budi pekerti para siswa.',
     'Mari bersama-sama kita pupuk kebersamaan dan sinergi antara sekolah, orang tua, dan masyarakat demi mengantarkan putra-putri kita menjadi insan yang berilmu, berkarakter, dan berguna bagi nusa serta bangsa.'
   ]
@@ -67,7 +67,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     title: 'Laboratorium Komputer & Kesiapan ANBK / CBT',
     badge: 'Literasi Digital',
     shortDesc: 'Penguatan kompetensi literasi dan numerasi digital melalui laboratorium komputer terpadu dan simulasi ujian berbasis komputer.',
-    fullDesc: 'SMP PGRI 5 Cimahi dilengkapi dengan sarana laboratorium komputer berpendingin ruangan dengan puluhan PC desktop siap pakai dan koneksi jaringan stabil. Fasilitas ini digunakan secara rutin untuk pembelajaran Informatika, penugasan digital, serta simulasi Asesmen Nasional Berbasis Komputer (ANBK).',
+    fullDesc: 'MTs Fatahillah Cimahi dilengkapi dengan sarana laboratorium komputer berpendingin ruangan dengan puluhan PC desktop siap pakai dan koneksi jaringan stabil. Fasilitas ini digunakan secara rutin untuk pembelajaran Informatika, penugasan digital, serta simulasi Asesmen Nasional Berbasis Komputer (ANBK).',
     icon: 'Monitor',
     image: '/images/slide3_lab_komputer.jpg',
     highlights: ['Puluhan unit PC Desktop terkoneksi LAN', 'Simulasi rutin ANBK & CBT mandiri', 'Pembelajaran dasar coding & desain', 'Internet sekolah stabil']
@@ -87,7 +87,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     title: 'Kepramukaan Gugus Depan & Pasus Paskibra',
     badge: 'Disiplin & Jiwa Korsa',
     shortDesc: 'Pendidikan karakter kepanduan dan baris-berbaris untuk memupuk jiwa patriotisme, gotong royong, dan kedisiplinan tinggi.',
-    fullDesc: 'Gerakan Pramuka Gugus Depan SMP PGRI 5 Cimahi merupakan kegiatan wajib pembentukan karakter yang aktif berkiprah di Kwartir Ranting Cimahi Tengah. Dilengkapi pasukan khusus (Pasus) Paskibra yang rutin bertugas pada upacara hari Senin dan peringatan hari kemerdekaan Republik Indonesia.',
+    fullDesc: 'Gerakan Pramuka Gugus Depan MTs Fatahillah Cimahi merupakan kegiatan wajib pembentukan karakter yang aktif berkiprah di Kwartir Ranting Cimahi Tengah. Dilengkapi pasukan khusus (Pasus) Paskibra yang rutin bertugas pada upacara hari Senin dan peringatan hari kemerdekaan Republik Indonesia.',
     icon: 'ShieldCheck',
     image: '/images/slide2_upacara.jpg',
     highlights: ['Latihan rutin PBB & tali-temali', 'Perkemahan sabtu-minggu (Persami)', 'Petugas upacara bendera terlatih', 'Lomba ketangkasan pramuka']
@@ -97,7 +97,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     title: 'Projek Penguatan Profil Pelajar Pancasila (P5)',
     badge: 'Kurikulum Merdeka',
     shortDesc: 'Pembelajaran berbasis proyek kontekstual bertema gaya hidup berkelanjutan, kearifan lokal Sunda, dan kewirausahaan.',
-    fullDesc: 'Implementasi Kurikulum Merdeka di SMP PGRI 5 Cimahi diwujudkan lewat gelar karya P5 berkala. Siswa diajak mengolah limbah organik/daur ulang, melestarikan seni dan kuliner tradisional Sunda Jawa Barat, serta membuat karya kreatif bernilai guna.',
+    fullDesc: 'Implementasi Kurikulum Merdeka di MTs Fatahillah Cimahi diwujudkan lewat gelar karya P5 berkala. Siswa diajak mengolah limbah organik/daur ulang, melestarikan seni dan kuliner tradisional Sunda Jawa Barat, serta membuat karya kreatif bernilai guna.',
     icon: 'Sparkles',
     image: '/images/slide1_gedung.jpg',
     highlights: ['Kearifan lokal budaya Jawa Barat', 'Gelar pameran karya siswa semesteran', 'Edukasi pilah sampah & lingkungan', 'Melatih kerja sama gotong royong']
@@ -117,7 +117,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     title: 'Pembinaan Olahraga Prestasi (Futsal & Voli)',
     badge: 'Sportivitas',
     shortDesc: 'Penggemblengan fisik sehat dan ketangkasan olahraga futsal, voli, dan bulutangkis di lapangan sekolah yang representatif.',
-    fullDesc: 'Dengan sarana lapangan serbaguna di halaman kampus sekolah, tim futsal dan voli SMP PGRI 5 Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi.',
+    fullDesc: 'Dengan sarana lapangan serbaguna di halaman kampus sekolah, tim futsal dan voli MTs Fatahillah Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi.',
     icon: 'Award',
     image: '/images/slide4_lapangan.jpg',
     highlights: ['Pelatih ekstrakurikuler berdedikasi', 'Turnamen antar kelas (Class Meeting)', 'Uji tanding persahabatan', 'Penguatan daya tahan fisik dan sportivitas']
@@ -131,7 +131,7 @@ export const PROGRAMS_UNGGULAN: ProgramUnggulan[] = (Array.isArray(PERSISTED_USE
 const DEFAULT_NEWS_RAW: NewsItem[] = [
   {
     id: 'news-1',
-    title: 'Simulasi Asesmen Nasional Berbasis Komputer (ANBK) di SMP PGRI 5 Cimahi Berjalan Sukses',
+    title: 'Simulasi Asesmen Nasional Berbasis Komputer (ANBK) di MTs Fatahillah Cimahi Berjalan Sukses',
     slug: 'simulasi-anbk-berjalan-sukses-smp-pgri-5-cimahi',
     category: 'Berita',
     date: '10 September 2025',
@@ -141,31 +141,31 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     image: '/images/slide3_lab_komputer.jpg',
     excerpt: 'Pelaksanaan gladi bersih dan simulasi Asesmen Nasional Berbasis Komputer (ANBK) di laboratorium komputer sekolah berlangsung tertib dan lancar tanpa kendala teknis.',
     content: [
-      'SMP PGRI 5 Cimahi sukses menggelar kegiatan simulasi dan gladi bersih Asesmen Nasional Berbasis Komputer (ANBK) untuk siswa kelas 8. Kegiatan ini bertujuan mempersiapkan kesiapan sarana teknis, kestabilan jaringan internet, serta pembiasaan siswa dalam mengoperasikan aplikasi ujian CBT Pusmendik.',
-      'Kepala SMP PGRI 5 Cimahi, Dra. Hj. Sri Wahyuni, M.M.Pd., meninjau langsung kesiapan bilik komputer dan memastikan seluruh peserta dapat mengerjakan soal literasi dan numerasi dengan tenang dan fokus.',
+      'MTs Fatahillah Cimahi sukses menggelar kegiatan simulasi dan gladi bersih Asesmen Nasional Berbasis Komputer (ANBK) untuk siswa kelas 8. Kegiatan ini bertujuan mempersiapkan kesiapan sarana teknis, kestabilan jaringan internet, serta pembiasaan siswa dalam mengoperasikan aplikasi ujian CBT Pusmendik.',
+      'Kepala MTs Fatahillah Cimahi, Dra. Hj. Sri Wahyuni, M.M.Pd., meninjau langsung kesiapan bilik komputer dan memastikan seluruh peserta dapat mengerjakan soal literasi dan numerasi dengan tenang dan fokus.',
       'Berkat dukungan teknisi dan proktor yang sigap, seluruh sesi simulasi dapat diselesaikan tepat waktu. Sekolah optimis pelaksanaan ANBK utama mendatang akan menghasilkan potret mutu pendidikan yang membanggakan bagi sekolah dan Kota Cimahi.'
     ]
   },
   {
     id: 'news-2',
-    title: 'Upacara Khidmat Memperingati Hari Guru Nasional & Hari Ulang Tahun PGRI ke-80',
+    title: 'Upacara Khidmat Memperingati Hari Guru Nasional & Milad MTs Fatahillah & Hari Guru',
     slug: 'upacara-peringatan-hut-pgri-dan-hari-guru',
     category: 'Agenda',
     date: '25 November 2025',
-    author: 'Humas SMP PGRI 5 Cimahi',
+    author: 'Humas MTs Fatahillah Cimahi',
     readTime: '4 menit',
     featured: true,
     image: '/images/slide2_upacara.jpg',
-    excerpt: 'Keluarga besar SMP PGRI 5 Cimahi menyelenggarakan upacara bendera peringatan HUT PGRI dengan khidmat di halaman sekolah, dirangkaikan penyerahan tanda apresiasi guru.',
+    excerpt: 'Keluarga besar MTs Fatahillah Cimahi menyelenggarakan upacara bendera peringatan Milad Madrasah & Hari Guru dengan khidmat di halaman sekolah, dirangkaikan penyerahan tanda apresiasi guru.',
     content: [
-      'Seluruh guru, tenaga kependidikan, serta siswa-siswi SMP PGRI 5 Cimahi berkumpul mengenakan seragam batik resmi PGRI dan seragam sekolah dalam upacara bendera memperingati Hari Guru Nasional dan HUT PGRI.',
-      'Dalam amanatnya, Pembina Upacara menegaskan pentingnya menjunjung tinggi marwah profesi guru sebagai pelita penerang bangsa serta terus mengobarkan semangat solidaritas dan etos kerja profesional para pendidik di bawah panji YPLP PGRI Kota Cimahi.',
+      'Seluruh guru, tenaga kependidikan, serta siswa-siswi MTs Fatahillah Cimahi berkumpul mengenakan seragam batik resmi madrasah dan seragam sekolah dalam upacara bendera memperingati Hari Guru Nasional dan Milad Madrasah.',
+      'Dalam amanatnya, Pembina Upacara menegaskan pentingnya menjunjung tinggi marwah profesi guru sebagai pelita penerang bangsa serta terus mengobarkan semangat solidaritas dan etos kerja profesional para pendidik di bawah panji Yayasan Fatahillah Cimahi.',
       'Acara dilanjutkan dengan pemberian cenderamata bunga oleh para pengurus OSIS kepada dewan guru sebagai wujud bakti dan terima kasih atas ilmu serta bimbingan yang telah dicurahkan setiap hari.'
     ]
   },
   {
     id: 'news-3',
-    title: 'Informasi Penerimaan Peserta Didik Baru (PPDB) SMP PGRI 5 Cimahi Tahun Pelajaran 2027/2028',
+    title: 'Informasi Penerimaan Peserta Didik Baru (PPDB) MTs Fatahillah Cimahi Tahun Pelajaran 2027/2028',
     slug: 'ppdb-smp-pgri-5-cimahi-2027-2028',
     category: 'Pengumuman',
     date: '15 Januari 2027',
@@ -173,16 +173,16 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     readTime: '5 menit',
     featured: true,
     image: '/images/slide1_gedung.jpg',
-    excerpt: 'Pendaftaran PPDB SMP PGRI 5 Cimahi telah dibuka. Tersedia jalur reguler, prestasi akademik/non-akademik, serta afirmasi bagi keluarga kurang mampu dengan biaya terjangkau.',
+    excerpt: 'Pendaftaran PPDB MTs Fatahillah Cimahi telah dibuka. Tersedia jalur reguler, prestasi akademik/non-akademik, serta afirmasi bagi keluarga kurang mampu dengan biaya terjangkau.',
     content: [
-      'Panitia Penerimaan Peserta Didik Baru (PPDB) SMP PGRI 5 Cimahi secara resmi membuka pendaftaran bagi lulusan SD/MI di wilayah Kota Cimahi, Bandung Barat, dan sekitarnya untuk Tahun Pelajaran 2027/2028.',
-      'SMP PGRI 5 Cimahi menawarkan keunggulan lingkungan belajar yang aman, bimbingan akhlak intensif, laboratorium komputer lengkap untuk ujian digital, serta beragam beasiswa kemudahan biaya pendidikan bagi siswa berprestasi dan keluarga pemegang KIP/PKH.',
-      'Pendaftaran dapat dilakukan langsung di loket Tata Usaha kampus SMP PGRI 5 Cimahi Jl. RH Abdul Halim Cigugur Tengah atau secara online melalui formulir resmi website ini.'
+      'Panitia Penerimaan Peserta Didik Baru (PPDB) MTs Fatahillah Cimahi secara resmi membuka pendaftaran bagi lulusan SD/MI di wilayah Kota Cimahi, Bandung Barat, dan sekitarnya untuk Tahun Pelajaran 2027/2028.',
+      'MTs Fatahillah Cimahi menawarkan keunggulan lingkungan belajar yang aman, bimbingan akhlak intensif, laboratorium komputer lengkap untuk ujian digital, serta beragam beasiswa kemudahan biaya pendidikan bagi siswa berprestasi dan keluarga pemegang KIP/PKH.',
+      'Pendaftaran dapat dilakukan langsung di loket Tata Usaha kampus MTs Fatahillah Cimahi Jl. Cigugur Tengah No. 45 atau secara online melalui formulir resmi website ini.'
     ]
   },
   {
     id: 'news-4',
-    title: 'Siswa SMP PGRI 5 Cimahi Raih Juara Lomba LKBB & Ketangkasan Baris Berbaris',
+    title: 'Siswa MTs Fatahillah Cimahi Raih Juara Lomba LKBB & Ketangkasan Baris Berbaris',
     slug: 'juara-lomba-lkbb-paskibra-tingkat-kota',
     category: 'Prestasi',
     date: '02 September 2025',
@@ -190,10 +190,10 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     readTime: '3 menit',
     featured: false,
     image: '/images/slide4_lapangan.jpg',
-    excerpt: 'Pasukan Pengibar Bendera (Paskibra) SMP PGRI 5 Cimahi menorehkan prestasi membanggakan dengan meraih piala kejuaraan LKBB tingkat pelajar se-Bandung Raya.',
+    excerpt: 'Pasukan Pengibar Bendera (Paskibra) MTs Fatahillah Cimahi menorehkan prestasi membanggakan dengan meraih piala kejuaraan LKBB tingkat pelajar se-Bandung Raya.',
     content: [
-      'Tim Paskibra Satuan SMP PGRI 5 Cimahi berhasil menyabet trofi penghargaan dalam ajang Lomba Ketangkasan Baris-Berbaris (LKBB) yang diselenggarakan oleh perkumpulan kepemudaan Jawa Barat.',
-      'Kerapian formasi, variasi gerakan yang memukau, serta ketegasan danton binaan pelatih mengantarkan tim PGRI 5 menduduki podium juara dan membawa pulang piala kebanggaan untuk sekolah.',
+      'Tim Paskibra Satuan MTs Fatahillah Cimahi berhasil menyabet trofi penghargaan dalam ajang Lomba Ketangkasan Baris-Berbaris (LKBB) yang diselenggarakan oleh perkumpulan kepemudaan Jawa Barat.',
+      'Kerapian formasi, variasi gerakan yang memukau, serta ketegasan danton binaan pelatih mengantarkan tim MTs Fatahillah menduduki podium juara dan membawa pulang piala kebanggaan untuk sekolah.',
       'Prestasi ini membuktikan bahwa dedikasi latihan kedisiplinan dan kekompakan siswa di luar jam pelajaran membuahkan hasil yang sangat membanggakan.'
     ]
   },
@@ -209,9 +209,9 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     image: '/images/slide2_upacara.jpg',
     excerpt: 'Pameran gelar karya Projek Penguatan Profil Pelajar Pancasila menampilkan instalasi kerajinan anyaman bambu, makanan khas Jawa Barat, dan pagelaran rampak kendang.',
     content: [
-      'Halaman dan selasar lantai 2 SMP PGRI 5 Cimahi disemarakkan oleh stan-stan pameran karya siswa dalam acara Gelar Karya P5 bertema "Kearifan Lokal dan Kewirausahaan".',
+      'Halaman dan selasar lantai 2 MTs Fatahillah Cimahi disemarakkan oleh stan-stan pameran karya siswa dalam acara Gelar Karya P5 bertema "Kearifan Lokal dan Kewirausahaan".',
       'Para siswa menampilkan kebolehan memasak kuliner tradisional Sunda seperti surabi, cilok bumbu kacang, bandros, serta kerajinan tangan dari bahan daur ulang ramah lingkungan.',
-      'Kegiatan ini diapresiasi oleh perwakilan pengurus YPLP PGRI Kota Cimahi yang hadir dan mengagumi semangat kreativitas generasi muda di sekolah ini.'
+      'Kegiatan ini diapresiasi oleh perwakilan pengurus Yayasan Fatahillah Cimahi yang hadir dan mengagumi semangat kreativitas generasi muda di sekolah ini.'
     ]
   },
   {
@@ -220,13 +220,13 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     slug: 'bakti-sosial-ramadhan-cigugur-tengah',
     category: 'Berita',
     date: '05 Agustus 2025',
-    author: 'OSIS & Rohis SMP PGRI 5',
+    author: 'OSIS & Rohis MTs Fatahillah',
     readTime: '3 menit',
     featured: false,
     image: '/images/slide1_gedung.jpg',
-    excerpt: 'OSIS dan Rohis SMP PGRI 5 Cimahi membagikan ratusan paket sembako kepada warga dhuafa di lingkungan RT 03 RW 03 Kelurahan Cigugur Tengah.',
+    excerpt: 'OSIS dan Rohis MTs Fatahillah Cimahi membagikan ratusan paket sembako kepada warga dhuafa di lingkungan RT 03 RW 03 Kelurahan Cigugur Tengah.',
     content: [
-      'Sebagai wujud pengamalan nilai empati dan kepedulian sosial, keluarga besar SMP PGRI 5 Cimahi menyerahkan bantuan paket sembako berkah kepada warga di sekitar lingkungan sekolah.',
+      'Sebagai wujud pengamalan nilai empati dan kepedulian sosial, keluarga besar MTs Fatahillah Cimahi menyerahkan bantuan paket sembako berkah kepada warga di sekitar lingkungan sekolah.',
       'Donasi dihimpun dari infak sukarela para siswa, dewan guru, dan orang tua murid. Kepala Sekolah menyatakan bahwa kegiatan ini menjadi media pembelajaran nyata bagi siswa agar memiliki hati yang dermawan dan peduli terhadap sesama tetangga.'
     ]
   }
@@ -292,7 +292,7 @@ export const PSB_INFO = {
     {
       step: 5,
       title: 'Daftar Ulang & Pengukuran Seragam',
-      desc: 'Menyelesaikan administrasi daftar ulang dan mendapatkan seragam resmi SMP PGRI 5 Cimahi.'
+      desc: 'Menyelesaikan administrasi daftar ulang dan mendapatkan seragam resmi MTs Fatahillah Cimahi.'
     },
     {
       step: 6,
@@ -376,7 +376,7 @@ export const FACILITIES_LIST: FacilityItem[] = (Array.isArray(PERSISTED_USER_CON
 const DEFAULT_EXTRACURRICULARS_RAW: ExtracurricularItem[] = [
   {
     id: 'ekskul-1',
-    name: 'Pramuka Penggalang Gudep PGRI',
+    name: 'Pramuka Penggalang Gudep MTs Fatahillah',
     category: 'Bahasa & Keorganisasian',
     description: 'Pendidikan kepanduan wajib yang melatih kemandirian, morse, tali temali, sandi, serta jiwa tolong-menolong sesama.',
     schedule: 'Jumat, 13.30 - 15.30 WIB',
@@ -385,7 +385,7 @@ const DEFAULT_EXTRACURRICULARS_RAW: ExtracurricularItem[] = [
   },
   {
     id: 'ekskul-2',
-    name: 'Pasus Paskibra Satuan PGRI 5',
+    name: 'Pasus Paskibra Satuan MTs Fatahillah',
     category: 'Bahasa & Keorganisasian',
     description: 'Pelatihan baris-berbaris formal, formasi pengibaran bendera, kedisiplinan mental, dan pemupukan jiwa patriotik.',
     schedule: 'Rabu & Sabtu, 14.30 - 16.30 WIB',
@@ -394,7 +394,7 @@ const DEFAULT_EXTRACURRICULARS_RAW: ExtracurricularItem[] = [
   },
   {
     id: 'ekskul-3',
-    name: 'Futsal SMP PGRI 5 Cimahi',
+    name: 'Futsal MTs Fatahillah Cimahi',
     category: 'Olahraga',
     description: 'Latihan fisik, kerja sama tim, teknik menggiring bola, strategi tanding, dan uji kompetisi antar sekolah.',
     schedule: 'Selasa & Kamis, 15.30 - 17.00 WIB',
@@ -444,7 +444,7 @@ const DEFAULT_EXTRACURRICULARS_RAW: ExtracurricularItem[] = [
     description: 'Olah vokal pernapasan, pembagian suara sopran-alto, lagu kebangsaan Indonesia, serta lagu daerah Jawa Barat.',
     schedule: 'Kamis, 15.00 - 16.30 WIB',
     iconName: 'Mic',
-    achievements: 'Paduan Suara Resmi Upacara Hari Guru YPLP PGRI'
+    achievements: 'Paduan Suara Resmi Upacara Hari Guru Yayasan Fatahillah'
   },
   {
     id: 'ekskul-9',
@@ -474,7 +474,7 @@ const DEFAULT_ACHIEVEMENTS_RAW: AchievementItem[] = [
   {
     id: 'ach-1',
     title: 'Juara 1 Lomba Ketangkasan Baris Berbaris (LKBB)',
-    studentName: 'Tim Paskibra Satuan PGRI 5',
+    studentName: 'Tim Paskibra Satuan MTs Fatahillah',
     event: 'Kejuaraan LKBB Pelajar Se-Bandung Raya',
     level: 'Provinsi',
     year: '2025',
@@ -484,7 +484,7 @@ const DEFAULT_ACHIEVEMENTS_RAW: AchievementItem[] = [
   {
     id: 'ach-2',
     title: 'Juara 2 Turnamen Futsal Pelajar Tingkat SMP',
-    studentName: 'Tim Futsal Putra SMP PGRI 5',
+    studentName: 'Tim Futsal Putra MTs Fatahillah',
     event: 'Piala Disdikpora Kota Cimahi 2025',
     level: 'Kota',
     year: '2025',
@@ -504,7 +504,7 @@ const DEFAULT_ACHIEVEMENTS_RAW: AchievementItem[] = [
   {
     id: 'ach-4',
     title: 'Peringkat Harapan 1 Tari Tradisional Kreasi Sunda',
-    studentName: 'Sanggar Tari SMP PGRI 5 Cimahi',
+    studentName: 'Sanggar Tari MTs Fatahillah Cimahi',
     event: 'Festival Lomba Seni Siswa Nasional (FLS2N) Cimahi',
     level: 'Kota',
     year: '2024',
@@ -555,7 +555,7 @@ export const TEACHERS_LIST: TeacherStaff[] = [
 export const TESTIMONIALS_LIST: TestimonialItem[] = [
   {
     id: 'testi-1',
-    quote: 'Sekolah di SMP PGRI 5 Cimahi sangat menyenangkan. Gurunya telaten dan sabar, fasilitas komputer untuk ANBK sangat membantu, dan kegiatan apel serta kepramukaannya mendidik kita menjadi pribadi yang disiplin.',
+    quote: 'Sekolah di MTs Fatahillah Cimahi sangat menyenangkan. Gurunya telaten dan sabar, fasilitas komputer untuk ANBK sangat membantu, dan kegiatan apel serta kepramukaannya mendidik kita menjadi pribadi yang disiplin.',
     author: 'Dicky Pratama',
     role: 'Alumnus & Siswa Berprestasi SMK Negeri 1 Cimahi',
     relation: 'Alumni Angkatan 2023',
@@ -563,7 +563,7 @@ export const TESTIMONIALS_LIST: TestimonialItem[] = [
   },
   {
     id: 'testi-2',
-    quote: 'Sebagai orang tua di Cigugur Tengah, kami sangat bersyukur menyekolahkan anak di SMP PGRI 5 Cimahi. Biaya sangat bersahabat, lokasinya dekat, serta pembiasaan sholat dhuha dan tadarus membuat akhlak anak kami semakin santun.',
+    quote: 'Sebagai orang tua di Cigugur Tengah, kami sangat bersyukur menyekolahkan anak di MTs Fatahillah Cimahi. Biaya sangat bersahabat, lokasinya dekat, serta pembiasaan sholat dhuha dan tadarus membuat akhlak anak kami semakin santun.',
     author: 'Ibu Aisyah & Bpk. Mulyadi',
     role: 'Orang Tua Siswa Kelas IX',
     relation: 'Wali Murid Angkatan 2024/2025',
@@ -571,23 +571,23 @@ export const TESTIMONIALS_LIST: TestimonialItem[] = [
   },
   {
     id: 'testi-3',
-    quote: 'Sinergi nilai kedisiplinan dan pembinaan karakter di bawah naungan YPLP PGRI Kota Cimahi membekali siswa dengan mental tangguh, menghargai guru, dan siap melanjutkan ke jenjang SMA/SMK impian.',
+    quote: 'Sinergi nilai kedisiplinan dan pembinaan karakter di bawah naungan Yayasan Fatahillah Cimahi membekali siswa dengan mental tangguh, menghargai guru, dan siap melanjutkan ke jenjang SMA/SMK impian.',
     author: 'Siti Nurhaliza, S.Pd.',
     role: 'Guru & Penggerak Literasi Pelajar',
-    relation: 'Alumni SMP PGRI 5 Cimahi Angkatan 2017',
+    relation: 'Alumni MTs Fatahillah Cimahi Angkatan 2017',
     image: ''
   }
 ];
 
 export const FAQ_LIST: FaqItem[] = [
   {
-    question: 'Kapan pendaftaran peserta didik baru (PPDB) SMP PGRI 5 Cimahi dibuka?',
-    answer: 'Pendaftaran PPDB SMP PGRI 5 Cimahi Tahun Pelajaran 2027/2028 dibuka mulai bulan Januari 2027 untuk Gelombang I (Jalur Prestasi & Awal) hingga bulan Juli 2027 untuk Gelombang II (Jalur Reguler dan Afirmasi). Pendaftaran dapat dilakukan langsung di sekolah maupun secara online.',
+    question: 'Kapan pendaftaran peserta didik baru (PPDB) MTs Fatahillah Cimahi dibuka?',
+    answer: 'Pendaftaran PPDB MTs Fatahillah Cimahi Tahun Pelajaran 2027/2028 dibuka mulai bulan Januari 2027 untuk Gelombang I (Jalur Prestasi & Awal) hingga bulan Juli 2027 untuk Gelombang II (Jalur Reguler dan Afirmasi). Pendaftaran dapat dilakukan langsung di sekolah maupun secara online.',
     category: 'PPDB'
   },
   {
-    question: 'Kurikulum apa yang diterapkan di SMP PGRI 5 Cimahi?',
-    answer: 'SMP PGRI 5 Cimahi menerapkan Kurikulum Merdeka secara menyeluruh, dilengkapi Projek Penguatan Profil Pelajar Pancasila (P5), pembiasaan literasi numerasi komputer, serta pembinaan karakter religius 5S.',
+    question: 'Kurikulum apa yang diterapkan di MTs Fatahillah Cimahi?',
+    answer: 'MTs Fatahillah Cimahi menerapkan Kurikulum Merdeka secara menyeluruh, dilengkapi Projek Penguatan Profil Pelajar Pancasila (P5), pembiasaan literasi numerasi komputer, serta pembinaan karakter religius 5S.',
     category: 'Akademik'
   },
   {
@@ -596,13 +596,13 @@ export const FAQ_LIST: FaqItem[] = [
     category: 'Fasilitas'
   },
   {
-    question: 'Di mana lokasi kampus SMP PGRI 5 Cimahi?',
-    answer: 'SMP PGRI 5 Cimahi berlokasi di Jl. RH Abdul Halim RT 03 RW 03, Kelurahan Cigugur Tengah, Kecamatan Cimahi Tengah, Kota Cimahi, Jawa Barat. Lokasinya strategis dan mudah dijangkau dari berbagai titik Kota Cimahi.',
+    question: 'Di mana lokasi kampus MTs Fatahillah Cimahi?',
+    answer: 'MTs Fatahillah Cimahi berlokasi di Jl. Cigugur Tengah No. 45, Kelurahan Cigugur Tengah, Kecamatan Cimahi Tengah, Kota Cimahi, Jawa Barat 40522. Lokasinya strategis dan mudah dijangkau dari berbagai titik Kota Cimahi.',
     category: 'Umum'
   },
   {
-    question: 'Apakah ada kemudahan biaya atau beasiswa di SMP PGRI 5 Cimahi?',
-    answer: 'Ya, sebagai sekolah di bawah naungan YPLP PGRI Kota Cimahi yang berkomitmen pada pendidikan inklusif, sekolah menyediakan skema biaya terjangkau serta fasilitas afirmasi/keringanan biaya bagi keluarga pemegang Kartu Indonesia Pintar (KIP/PKH).',
+    question: 'Apakah ada kemudahan biaya atau beasiswa di MTs Fatahillah Cimahi?',
+    answer: 'Ya, sebagai sekolah di bawah naungan Yayasan Fatahillah Cimahi yang berkomitmen pada pendidikan inklusif, sekolah menyediakan skema biaya terjangkau serta fasilitas afirmasi/keringanan biaya bagi keluarga pemegang Kartu Indonesia Pintar (KIP/PKH).',
     category: 'PPDB'
   }
 ];

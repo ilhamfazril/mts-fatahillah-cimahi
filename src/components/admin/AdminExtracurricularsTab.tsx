@@ -296,7 +296,7 @@ export const AdminExtracurricularsTab: React.FC<AdminExtracurricularsTabProps> =
                   required
                   value={editingItem.name}
                   onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                  placeholder="Contoh: Pramuka Gugus Depan SMP PGRI 5 Cimahi"
+                  placeholder="Contoh: Pramuka Gugus Depan MTs Fatahillah Cimahi"
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold text-slate-900"
                 />
               </div>
