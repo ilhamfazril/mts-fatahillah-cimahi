@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface SchoolLogoProps {
   className?: string;
@@ -23,16 +23,19 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
   size = 54,
   showBadgeBorder = false,
 }) => {
-  // Emblem bounding box is 1000 x 1000 with symmetrical padding
-  const width = size;
-  const height = size;
+  const rawId = useId();
+  const safeId = rawId.replace(/[^a-zA-Z0-9_-]/g, '');
+  const shieldGradId = `shieldBlueGrad_${safeId}`;
+  const wingsGradId = `wingsYellowGrad_${safeId}`;
+
+  const hasExplicitSizeInClass = className.includes('w-') || className.includes('h-');
 
   return (
     <div
       className={`relative inline-flex items-center justify-center flex-shrink-0 select-none overflow-visible ${
         showBadgeBorder ? 'p-1 rounded-2xl bg-white/10 ring-1 ring-white/20 shadow-sm' : ''
       } ${className}`}
-      style={{ width, height }}
+      style={hasExplicitSizeInClass ? undefined : { width: size, height: size }}
       title="Logo Resmi MTs Fatahillah Cimahi"
     >
       <svg
@@ -43,20 +46,20 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
         textRendering="geometricPrecision"
       >
         <defs>
-          <linearGradient id="compShieldBlueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id={shieldGradId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#0060CA" />
             <stop offset="50%" stopColor="#0055B8" />
             <stop offset="100%" stopColor="#004AA4" />
           </linearGradient>
 
-          <linearGradient id="compWingsYellowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id={wingsGradId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#FFF018" />
             <stop offset="60%" stopColor="#FFDE00" />
             <stop offset="100%" stopColor="#EAA600" />
           </linearGradient>
         </defs>
 
-        <g id="mts-fatahillah-official-emblem">
+        <g>
           {/* 1. Outer Royal Blue Barrel-Shield Contour (Perisai Cembung Segi Empat Bulat) */}
           <path
             d="M 500,95
@@ -72,7 +75,7 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
                C 135,420 145,320 155,230
                C 160,185 185,160 230,140
                C 290,115 390,95 500,95 Z"
-            fill="url(#compShieldBlueGrad)"
+            fill={`url(#${shieldGradId})`}
             stroke="#003D88"
             strokeWidth="5"
           />
@@ -185,11 +188,11 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
                C 219,444 225,378 233,305
                C 237,267 256,244 290,228
                C 339,205 417,189 500,189 Z"
-            fill="url(#compShieldBlueGrad)"
+            fill={`url(#${shieldGradId})`}
           />
 
           {/* 4. Left Golden Wing */}
-          <g id="compLeftWing">
+          <g>
             <path
               d="M 436,585
                  C 390,620 338,625 305,580
@@ -210,7 +213,7 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
                  C 448,565 435,560 422,568
                  C 414,575 414,585 422,585
                  Z"
-              fill="url(#compWingsYellowGrad)"
+              fill={`url(#${wingsGradId})`}
               stroke="#FFFFFF"
               strokeWidth="3"
               strokeLinejoin="round"
@@ -228,7 +231,7 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
           </g>
 
           {/* Right Golden Wing */}
-          <g id="compRightWing">
+          <g>
             <path
               d="M 564,585
                  C 610,620 662,625 695,580
@@ -249,7 +252,7 @@ export const SchoolLogo: React.FC<SchoolLogoProps> = ({
                  C 552,565 565,560 578,568
                  C 586,575 586,585 578,585
                  Z"
-              fill="url(#compWingsYellowGrad)"
+              fill={`url(#${wingsGradId})`}
               stroke="#FFFFFF"
               strokeWidth="3"
               strokeLinejoin="round"

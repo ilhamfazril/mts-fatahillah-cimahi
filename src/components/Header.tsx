@@ -150,12 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {/* Official MTs Fatahillah Vector Logo */}
             <div className="relative group-hover:scale-105 transition-transform duration-300 shrink-0">
-              <div className="block sm:hidden">
-                <PgriLogo size={40} />
-              </div>
-              <div className="hidden sm:block">
-                <PgriLogo size={50} />
-              </div>
+              <PgriLogo className="w-10 h-10 sm:w-[50px] sm:h-[50px]" size={50} />
             </div>
 
             <div className="flex flex-col justify-center min-w-0">
