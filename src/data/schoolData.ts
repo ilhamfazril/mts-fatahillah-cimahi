@@ -49,7 +49,7 @@ export const SCHOOL_INFO = {
 };
 
 export const PRINCIPAL_INFO = {
-  name: PERSISTED_USER_CONTENT.principal?.name || 'Niken Isniyanti',
+  name: PERSISTED_USER_CONTENT.principal?.name || 'Dra. Hj. Yeti Kurniati',
   role: PERSISTED_USER_CONTENT.principal?.role || 'Kepala MTs Fatahillah Cimahi',
   photo: PERSISTED_USER_CONTENT.principal?.photo || '/images/principal_real.jpg',
   quote: PERSISTED_USER_CONTENT.principal?.quote || '"Di MTs Fatahillah Cimahi, kami mendidik dengan hati, membimbing dengan keteladanan, serta membentuk generasi yang disiplin, cerdas, berakhlak mulia, dan siap meraih masa depan yang gemilang."',
@@ -132,7 +132,7 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
   {
     id: 'news-1',
     title: 'Simulasi Asesmen Nasional Berbasis Komputer (ANBK) di MTs Fatahillah Cimahi Berjalan Sukses',
-    slug: 'simulasi-anbk-berjalan-sukses-smp-pgri-5-cimahi',
+    slug: 'simulasi-anbk-berjalan-sukses-mts-fatahillah-cimahi',
     category: 'Berita',
     date: '10 September 2025',
     author: 'Tim IT & Kurikulum',
@@ -142,14 +142,14 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     excerpt: 'Pelaksanaan gladi bersih dan simulasi Asesmen Nasional Berbasis Komputer (ANBK) di laboratorium komputer sekolah berlangsung tertib dan lancar tanpa kendala teknis.',
     content: [
       'MTs Fatahillah Cimahi sukses menggelar kegiatan simulasi dan gladi bersih Asesmen Nasional Berbasis Komputer (ANBK) untuk siswa kelas 8. Kegiatan ini bertujuan mempersiapkan kesiapan sarana teknis, kestabilan jaringan internet, serta pembiasaan siswa dalam mengoperasikan aplikasi ujian CBT Pusmendik.',
-      'Kepala MTs Fatahillah Cimahi, Dra. Hj. Sri Wahyuni, M.M.Pd., meninjau langsung kesiapan bilik komputer dan memastikan seluruh peserta dapat mengerjakan soal literasi dan numerasi dengan tenang dan fokus.',
+      'Kepala MTs Fatahillah Cimahi, Niken Isniyanti, meninjau langsung kesiapan bilik komputer dan memastikan seluruh peserta dapat mengerjakan soal literasi dan numerasi dengan tenang dan fokus.',
       'Berkat dukungan teknisi dan proktor yang sigap, seluruh sesi simulasi dapat diselesaikan tepat waktu. Sekolah optimis pelaksanaan ANBK utama mendatang akan menghasilkan potret mutu pendidikan yang membanggakan bagi sekolah dan Kota Cimahi.'
     ]
   },
   {
     id: 'news-2',
     title: 'Upacara Khidmat Memperingati Hari Guru Nasional & Milad MTs Fatahillah & Hari Guru',
-    slug: 'upacara-peringatan-hut-pgri-dan-hari-guru',
+    slug: 'upacara-peringatan-milad-dan-hari-guru-mts-fatahillah',
     category: 'Agenda',
     date: '25 November 2025',
     author: 'Humas MTs Fatahillah Cimahi',
@@ -166,7 +166,7 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
   {
     id: 'news-3',
     title: 'Informasi Penerimaan Peserta Didik Baru (PPDB) MTs Fatahillah Cimahi Tahun Pelajaran 2027/2028',
-    slug: 'ppdb-smp-pgri-5-cimahi-2027-2028',
+    slug: 'ppdb-mts-fatahillah-cimahi-2027-2028',
     category: 'Pengumuman',
     date: '15 Januari 2027',
     author: 'Panitia PPDB 2027/2028',

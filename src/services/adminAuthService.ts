@@ -3,7 +3,8 @@ const ADMIN_CREDENTIALS = {
   password: 'ilhamfazril',
 };
 
-const AUTH_STORAGE_KEY = 'smp_pgri_5_admin_session';
+const AUTH_STORAGE_KEY = 'mts_fatahillah_admin_session';
+const LEGACY_AUTH_STORAGE_KEY = 'smp_pgri_5_admin_session';
 
 export interface AdminSession {
   username: string;
@@ -29,6 +30,7 @@ export function loginAdmin(usernameInput: string, passwordInput: string): { succ
     };
     try {
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+      localStorage.removeItem(LEGACY_AUTH_STORAGE_KEY);
     } catch {
       // Fallback
     }
@@ -44,6 +46,7 @@ export function loginAdmin(usernameInput: string, passwordInput: string): { succ
 export function logoutAdmin(): void {
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_AUTH_STORAGE_KEY);
   } catch {
     // Ignore
   }
@@ -51,7 +54,14 @@ export function logoutAdmin(): void {
 
 export function getAdminSession(): AdminSession | null {
   try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    let raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_AUTH_STORAGE_KEY);
+      if (raw) {
+        localStorage.setItem(AUTH_STORAGE_KEY, raw);
+        localStorage.removeItem(LEGACY_AUTH_STORAGE_KEY);
+      }
+    }
     if (!raw) return null;
     const session = JSON.parse(raw) as AdminSession;
     if (session && session.username === ADMIN_CREDENTIALS.username) {

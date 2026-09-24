@@ -241,8 +241,22 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   const handleSavePrincipal = async (updatedPrincipal: PrincipalProfileContent) => {
+    let updatedTeachers = siteContent.teachers;
+    if (Array.isArray(updatedTeachers) && updatedTeachers.length > 0) {
+      updatedTeachers = updatedTeachers.map((t) => {
+        if (t.id === 't-1' || t.role.toLowerCase().includes('kepala sekolah')) {
+          return {
+            ...t,
+            name: updatedPrincipal.name,
+            image: updatedPrincipal.photo || t.image
+          };
+        }
+        return t;
+      });
+    }
+
     await updateSiteSection(
-      { principal: updatedPrincipal },
+      { principal: updatedPrincipal, teachers: updatedTeachers },
       {
         sectionName: 'Profil & Sambutan Kepala Sekolah',
         title: updatedPrincipal.name,
@@ -350,8 +364,18 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     updatedTeachers: TeacherStaff[],
     meta?: { action?: 'create' | 'update' | 'delete'; title?: string }
   ) => {
+    const principalTeacher = updatedTeachers.find(t => t.id === 't-1' || t.role.toLowerCase().includes('kepala sekolah'));
+    const partialUpdate: Partial<SchoolSiteContent> = { teachers: updatedTeachers };
+    if (principalTeacher && principalTeacher.name && siteContent.principal) {
+      partialUpdate.principal = {
+        ...siteContent.principal,
+        name: principalTeacher.name,
+        photo: principalTeacher.image || siteContent.principal.photo,
+      };
+    }
+
     await updateSiteSection(
-      { teachers: updatedTeachers },
+      partialUpdate,
       {
         sectionName: 'Dewan Guru & Tenaga Kependidikan',
         title: meta?.title || `${updatedTeachers.length} Profil Pendidik`,
@@ -395,7 +419,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(siteContent, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `smp_pgri_5_cimahi_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute('download', `mts_fatahillah_cimahi_backup_${new Date().toISOString().slice(0, 10)}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();

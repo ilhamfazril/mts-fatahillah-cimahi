@@ -146,7 +146,7 @@ export const AdminPpdbTab: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `ppdb_2027_2028_smp_pgri_5_cimahi_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `ppdb_2027_2028_mts_fatahillah_cimahi_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();

@@ -307,7 +307,7 @@ async function start() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`SMP PGRI 5 Cimahi Server running on http://0.0.0.0:${PORT}`);
+    console.log(`MTs Fatahillah Cimahi Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

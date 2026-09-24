@@ -105,6 +105,17 @@ export interface SchoolSiteContent {
   extracurriculars: ExtracurricularItem[];
   achievements: AchievementItem[];
   teachers?: TeacherStaff[];
+  stats?: {
+    students?: string;
+    teachers?: string;
+    extracurriculars?: string;
+    accreditation?: string;
+    achievementsPerYear?: string;
+    accreditationScore?: string;
+    alumniSuccess?: string;
+    updatedAt?: number;
+    [key: string]: any;
+  };
   updatedAt?: number;
   updatedBy?: string;
 }

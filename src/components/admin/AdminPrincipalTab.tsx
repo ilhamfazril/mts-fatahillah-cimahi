@@ -157,7 +157,7 @@ export const AdminPrincipalTab: React.FC<AdminPrincipalTabProps> = ({
               type="text"
               value={draft.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              placeholder="Contoh: Dra. Hj. Sri Wahyuni, M.M.Pd."
+              placeholder="Contoh: Niken Isniyanti, S.Pd."
               className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold text-slate-900"
             />
           </div>

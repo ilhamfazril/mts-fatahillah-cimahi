@@ -10,7 +10,8 @@ import {
   deleteDoc,
   query,
   orderBy,
-  getDocFromServer
+  getDocFromServer,
+  getDocs
 } from '../lib/firebase';
 import firebaseConfigData from '../../firebase-applet-config.json';
 import {
@@ -526,15 +527,18 @@ export const DEFAULT_SITE_CONTENT: SchoolSiteContent = {
 
 const CONTENT_DOC_REF = doc(db, 'site_content', 'main_config');
 const PPDB_COLLECTION_REF = collection(db, 'ppdb_registrations');
-const CACHE_STORAGE_KEY = 'smp_pgri_5_cimahi_content_live_v7';
+const CACHE_STORAGE_KEY = 'mts_fatahillah_cimahi_content_live_v1';
 
-// Clear legacy caches that might contain old mismatched images or stale teacher cards
+// Safe migration of legacy caches so user modifications are never lost
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   try {
-    localStorage.removeItem('smp_pgri_5_cimahi_site_content_cache');
-    localStorage.removeItem('smp_pgri_5_cimahi_content_v3_real');
-    localStorage.removeItem('smp_pgri_5_cimahi_content_live_v5');
-    localStorage.removeItem('smp_pgri_5_cimahi_content_live_v6');
+    const active = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (!active) {
+      const legacy = localStorage.getItem('smp_pgri_5_cimahi_content_live_v7');
+      if (legacy) {
+        localStorage.setItem(CACHE_STORAGE_KEY, legacy);
+      }
+    }
   } catch {
     // ignore
   }
@@ -554,12 +558,16 @@ function cleanForFirestore<T>(input: T): T {
 function safeGetLocalStorage(): Partial<SchoolSiteContent> | null {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(CACHE_STORAGE_KEY);
-    if (!raw) return null;
-    if (raw.includes('unsplash.com')) {
-      localStorage.removeItem(CACHE_STORAGE_KEY);
-      return null;
+    let raw = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (!raw) {
+      raw = localStorage.getItem('smp_pgri_5_cimahi_content_live_v7');
+      if (raw) {
+        try {
+          localStorage.setItem(CACHE_STORAGE_KEY, raw);
+        } catch {}
+      }
     }
+    if (!raw) return null;
     const parsed = JSON.parse(raw);
     return parsed;
   } catch {
@@ -585,6 +593,7 @@ let currentSiteContentMemory: SchoolSiteContent = (() => {
       : DEFAULT_HERO_SLIDES,
     principal: { 
       ...DEFAULT_PRINCIPAL_CONTENT, 
+      ...(PERSISTED_USER_CONTENT.principal || {}),
       ...(base.principal || {}) 
     },
     programs: Array.isArray(base.programs) && base.programs.length > 0 
@@ -605,6 +614,7 @@ let currentSiteContentMemory: SchoolSiteContent = (() => {
     teachers: Array.isArray(base.teachers) && base.teachers.length > 0
       ? base.teachers
       : (DEFAULT_SITE_CONTENT.teachers || DEFAULT_TEACHERS_CONTENT),
+    stats: (base as any).stats || DEFAULT_STATS_CONTENT,
     updatedAt: base.updatedAt || Date.now(),
     updatedBy: base.updatedBy || 'admin_ilham',
   };
@@ -714,8 +724,8 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
       : (currentSiteContentMemory.heroSlides || DEFAULT_HERO_SLIDES),
     principal: {
       ...DEFAULT_PRINCIPAL_CONTENT,
-      ...(currentSiteContentMemory.principal || {}),
       ...(PERSISTED_USER_CONTENT.principal || {}),
+      ...(currentSiteContentMemory.principal || {}),
       ...(sanitized.principal || {}),
       photo: pickBestPhoto(
         sanitized.principal?.photo,
@@ -782,6 +792,7 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
         image: pickBestPhoto(teacher.image, cur?.image, per?.image, ''),
       };
     }),
+    stats: sanitized.stats || currentSiteContentMemory.stats || (PERSISTED_USER_CONTENT as any).stats || DEFAULT_STATS_CONTENT,
     updatedAt: sanitized.updatedAt || currentSiteContentMemory.updatedAt || Date.now(),
     updatedBy: sanitized.updatedBy || currentSiteContentMemory.updatedBy || 'admin_ilham',
   };
@@ -926,28 +937,49 @@ export function subscribeToSiteContent(
     window.addEventListener('storage', handleStorageEvent);
   }
 
-  // Active Cloud Hydration: Prioritizes Server Persistence, then falls back to Firestore
+  // Active Cloud Hydration: Prioritizes Firestore Database, then server storage
   let isHydrated = false;
-  let isFirestoreQuotaExhausted = false;
 
   const hydrateFromCloud = async () => {
-    // 1. Primary Priority: Server Persistent Storage (/api/content)
-    // Guarantees all devices (smartphones, laptops, public visitors) receive 100% of uploaded photos
-    // without ever being blocked by Google Cloud Firestore Free Tier Quota limits (HTTP 429).
+    // 1. Primary Priority: Direct fetch from Google Cloud Firestore
+    try {
+      const snap = await getDocs(collection(db, 'site_content'));
+      if (!snap.empty) {
+        const firestoreContent: Partial<SchoolSiteContent> = {};
+        snap.docs.forEach((docSnap) => {
+          const docData = docSnap.data();
+          if (docData && docData.data !== undefined) {
+            const secKey = docSnap.id.replace('section_', '') as keyof SchoolSiteContent;
+            (firestoreContent as any)[secKey] = docData.data;
+          }
+        });
+        if (Object.keys(firestoreContent).length > 0) {
+          const localCached = safeGetLocalStorage();
+          const baseMerged = mergeWithDefaults(firestoreContent);
+          const { result: preservedContent } = mergePreservingUploads(baseMerged, localCached);
+          isHydrated = true;
+          notifySubscribers(preservedContent);
+          safeSetLocalStorage(preservedContent);
+          syncLocalContentToServer(preservedContent).catch(() => {});
+        }
+      }
+    } catch (fsErr) {
+      console.warn('Firestore initial getDocs notice:', fsErr);
+    }
+
+    // 2. Server Persistent Storage (/api/content) fallback & synchronization
     try {
       const serverData = await fetchContentFromServer();
       const localCached = safeGetLocalStorage();
 
       if (serverData && Object.keys(serverData).length > 0) {
         const baseMerged = mergeWithDefaults(serverData);
-        // Guarantee that if the local browser has uploaded photos, they are NEVER overwritten by stock images
         const { result: preservedContent, hasLocalOnlyUploads } = mergePreservingUploads(baseMerged, localCached);
 
         isHydrated = true;
         notifySubscribers(preservedContent);
         safeSetLocalStorage(preservedContent);
 
-        // If local device has uploaded photos not yet on the server, sync them to server immediately!
         if (hasLocalOnlyUploads) {
           syncLocalContentToServer(preservedContent).catch((e) => console.warn('Sync local uploads notice:', e));
         }
@@ -965,22 +997,6 @@ export function subscribeToSiteContent(
       await fetchAllMediaAssetsRest();
     } catch (e) {
       // ignore
-    }
-
-    // 2. Secondary Cloud Backup: Firestore (only if not already hydrated from server/local and quota is not exhausted)
-    if (!isHydrated && !isFirestoreQuotaExhausted) {
-      try {
-        const restData = await fetchLiveContentFromFirestoreRest();
-        if (restData) {
-          const merged = mergeWithDefaults(restData);
-          isHydrated = true;
-          notifySubscribers(merged);
-        }
-      } catch (e: any) {
-        if (String(e).includes('Quota') || String(e).includes('429')) {
-          isFirestoreQuotaExhausted = true;
-        }
-      }
     }
   };
 
@@ -1063,17 +1079,15 @@ export function subscribeToSiteContent(
           if (snapshot.exists()) {
             const docData = snapshot.data();
             if (docData && docData.data !== undefined) {
-              const incomingTime = docData.updatedAt || 0;
-              // Guard: Only apply if incoming Firestore section is equal or newer than current memory
-              if (incomingTime >= (currentSiteContentMemory.updatedAt || 0)) {
-                const partialUpdate: Partial<SchoolSiteContent> = {
-                  [sec]: docData.data,
-                  updatedAt: incomingTime || Date.now(),
-                  updatedBy: docData.updatedBy || 'admin_ilham',
-                };
-                const merged = mergeWithDefaults(partialUpdate);
-                notifySubscribers(merged);
-              }
+              const partialUpdate: Partial<SchoolSiteContent> = {
+                [sec]: docData.data,
+                updatedAt: docData.updatedAt || Date.now(),
+                updatedBy: docData.updatedBy || 'admin_ilham',
+              };
+              const merged = mergeWithDefaults(partialUpdate);
+              notifySubscribers(merged);
+              safeSetLocalStorage(merged);
+              syncLocalContentToServer(merged).catch(() => {});
             }
           }
         },
@@ -1244,6 +1258,7 @@ export async function resetSiteContentToDefaultInFirestore(): Promise<void> {
     extracurriculars: EXTRACURRICULAR_LIST,
     achievements: ACHIEVEMENTS_LIST,
     teachers: TEACHERS_LIST,
+    stats: DEFAULT_STATS_CONTENT,
     updatedAt: Date.now(),
     updatedBy: 'admin_ilham (reset)',
   };
