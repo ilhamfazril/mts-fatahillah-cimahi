@@ -33,7 +33,7 @@ import {
   getInitialSiteContent
 } from './services/siteContentService';
 import { NewsItem } from './types';
-import { ArrowUp, GraduationCap, ArrowLeft } from 'lucide-react';
+import { ArrowUp, GraduationCap, ArrowLeft, LogOut } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('beranda');
@@ -119,10 +119,18 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+
+  // Trigger popup konfirmasi sebelum benar-benar keluar
+  const handleRequestLogout = () => {
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const handleConfirmLogout = () => {
     logoutAdmin();
     setIsAdmin(false);
     setIsAdminDashboardOpen(false);
+    setIsLogoutConfirmOpen(false);
   };
 
   const currentContent: SchoolSiteContent = siteContent ? {
@@ -145,7 +153,7 @@ export default function App() {
         isAdmin={isAdmin}
         onOpenAdminLogin={() => setIsAdminLoginOpen(true)}
         onOpenAdminDashboard={() => handleOpenAdminDashboard('overview')}
-        onLogoutAdmin={handleLogout}
+        onLogoutAdmin={handleRequestLogout}
         onSelectAcademicFilter={setAcademicFilter}
       />
 
@@ -486,10 +494,49 @@ export default function App() {
         isOpen={isAdminDashboardOpen}
         onClose={() => setIsAdminDashboardOpen(false)}
         siteContent={currentContent}
-        onLogout={handleLogout}
+        onLogout={handleRequestLogout}
         onNavigateTab={handleNavigate}
         initialTab={adminDashboardInitialTab}
       />
+
+      {/* Pop-up Konfirmasi Keluar Admin */}
+      {isLogoutConfirmOpen && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3 text-rose-600 mb-3">
+              <div className="w-11 h-11 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
+                <LogOut className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-base leading-tight">Konfirmasi Keluar</h3>
+                <p className="text-[11px] text-slate-500">Panel Admin SMP PGRI 5 Cimahi</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 mb-5 leading-relaxed">
+              Apakah Anda yakin ingin keluar dari akun admin? Anda harus login kembali menggunakan username dan kata sandi untuk mengelola data website dan pendaftaran PPDB.
+            </p>
+
+            <div className="flex justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsLogoutConfirmOpen(false)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmLogout}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm hover:shadow cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Ya, Keluar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

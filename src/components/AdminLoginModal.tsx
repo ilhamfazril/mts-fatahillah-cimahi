@@ -5,8 +5,6 @@ import {
   KeyRound, 
   X, 
   AlertCircle, 
-  CheckCircle2, 
-  ShieldCheck, 
   ArrowRight,
   Eye,
   EyeOff
@@ -52,12 +50,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     }, 400);
   };
 
-  const handleUsePreset = () => {
-    setUsername('admin_ilham');
-    setPassword('ilhamfazril');
-    setErrorMessage(null);
-  };
-
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
@@ -87,7 +79,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5" autoComplete="off">
           {errorMessage && (
             <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 animate-in fade-in duration-150">
               <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
@@ -108,7 +100,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Masukkan username"
-                autoComplete="username"
+                autoComplete="off"
                 required
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
@@ -128,7 +120,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan kata sandi"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
                 className="w-full pl-10 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
@@ -141,21 +133,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-          </div>
-
-          {/* Quick Preset Helper */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-1.5 text-slate-600">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>Akun: <strong className="text-slate-900">admin_ilham</strong></span>
-            </div>
-            <button
-              type="button"
-              onClick={handleUsePreset}
-              className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-100/70 hover:bg-emerald-200/70 px-2.5 py-1 rounded-xl transition-colors"
-            >
-              Isi Otomatis
-            </button>
           </div>
 
           {/* Submit Button */}
