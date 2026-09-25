@@ -170,7 +170,7 @@ export const AdminHeroSlidesTab: React.FC<AdminHeroSlidesTabProps> = ({
     { label: 'Upacara & Siswa', url: '/images/slide2_upacara.jpg' },
     { label: 'Lab Komputer ANBK', url: '/images/slide3_lab_komputer.jpg' },
     { label: 'Lapangan Olahraga', url: '/images/slide4_lapangan.jpg' },
-    { label: 'Kampus MTs Fatahillah', url: '/images/slide1_gedung.jpg' },
+    { label: 'Gedung Sekolah MTs Fatahillah', url: '/images/slide1_gedung.jpg' },
     { label: 'Aktivitas Belajar Siswa', url: '/images/slide3_lab_komputer.jpg' }
   ];
 

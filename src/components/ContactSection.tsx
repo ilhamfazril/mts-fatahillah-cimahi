@@ -126,7 +126,7 @@ export const ContactSection: React.FC = () => {
             <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-lg relative overflow-hidden">
               <div className="relative z-10">
                 <div className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
-                  Lokasi Kampus
+                  Lokasi Sekolah
                 </div>
                 <h4 className="text-base font-bold text-white mb-2">
                   Cigugur Tengah, Cimahi Tengah

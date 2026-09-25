@@ -316,7 +316,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     await updateSiteSection(
       { facilities: updatedFacilities },
       {
-        sectionName: 'Sarana & Prasarana Kampus',
+        sectionName: 'Sarana & Prasarana Sekolah',
         title: meta?.title || `${updatedFacilities.length} Fasilitas`,
         action: meta?.action || 'update',
         targetTab: 'fasilitas',

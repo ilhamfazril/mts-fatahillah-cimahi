@@ -11,7 +11,7 @@ export const HistorySection: React.FC = () => {
     },
     {
       year: 'Pengembangan Sarana',
-      title: 'Pembangunan Kampus & Fasilitas Pembelajaran',
+      title: 'Pembangunan Gedung & Fasilitas Sekolah',
       desc: 'Pengembangan bertahap sarana dan prasarana madrasah di Jl. Cigugur Tengah No. 45, dilengkapi ruang kelas yang nyaman, musholla, lapangan upacara/olahraga, ruang guru, dan perpustakaan.'
     },
     {

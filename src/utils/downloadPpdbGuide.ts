@@ -146,7 +146,7 @@ export function downloadPpdbGuidePdf(): void {
 
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(15, 23, 42);
-  doc.text('Alamat       : Kampus MTs Fatahillah Cimahi, Jl. Cigugur Tengah No. 45, Cigugur Tengah', 18, currentY + 8);
+  doc.text('Alamat       : MTs Fatahillah Cimahi, Jl. Cigugur Tengah No. 45, Cigugur Tengah', 18, currentY + 8);
   doc.text('Waktu Layanan: Senin s/d Jumat, Pukul 07.30 - 14.30 WIB', 18, currentY + 13);
   doc.text('Telepon / WA : (022) 665-2408 / Panitia PPDB Online', 18, currentY + 18);
 

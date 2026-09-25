@@ -35,7 +35,7 @@ export const FacilitiesSection: React.FC<FacilitiesSectionProps> = ({ facilities
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Fasilitas Kampus <span className="text-emerald-700">Modern & Ramah Anak</span>
+              Fasilitas Sekolah <span className="text-emerald-700">Modern & Ramah Anak</span>
             </h2>
             <p className="mt-2 text-slate-600 text-sm sm:text-base max-w-xl">
               Didukung infrastruktur berstandar nasional dan internasional guna mendukung kenyamanan belajar, eksplorasi riset, dan pengembangan bakat minat siswa.
@@ -129,7 +129,7 @@ export const FacilitiesSection: React.FC<FacilitiesSectionProps> = ({ facilities
                 Standar Sanitasi Sekolah Sehat Strata Paripurna
               </div>
               <div className="text-xs text-slate-600 mt-0.5">
-                Pengawasan CCTV 24 Jam di seluruh area kampus, air minum steril teruji berkala, dan penanganan medis cepat tanggap.
+                Pengawasan CCTV 24 Jam di seluruh area sekolah, air minum steril teruji berkala, dan penanganan medis cepat tanggap.
               </div>
             </div>
           </div>

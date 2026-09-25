@@ -645,6 +645,36 @@ function notifySubscribers(content: SchoolSiteContent) {
 }
 
 /**
+ * Replaces any outdated "kampus" terminology with "sekolah" (e.g. fasilitas kampus -> fasilitas sekolah, lokasi kampus -> lokasi sekolah).
+ */
+export function cleanCampusTermsInObject<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'string') {
+    return obj
+      .replace(/fasilitas kampus/gi, (match) => (match === 'Fasilitas Kampus' ? 'Fasilitas Sekolah' : match === 'FASILITAS KAMPUS' ? 'FASILITAS SEKOLAH' : 'fasilitas sekolah'))
+      .replace(/lokasi kampus/gi, (match) => (match === 'Lokasi Kampus' ? 'Lokasi Sekolah' : match === 'LOKASI KAMPUS' ? 'LOKASI SEKOLAH' : 'lokasi sekolah'))
+      .replace(/area kampus/gi, (match) => (match === 'Area Kampus' ? 'Area Sekolah' : match === 'AREA KAMPUS' ? 'AREA SEKOLAH' : 'area sekolah'))
+      .replace(/bangunan kampus/gi, (match) => (match === 'Bangunan Kampus' ? 'Bangunan Sekolah' : match === 'BANGUNAN KAMPUS' ? 'BANGUNAN SEKOLAH' : 'bangunan sekolah'))
+      .replace(/halaman kampus sekolah/gi, 'halaman sekolah')
+      .replace(/halaman kampus/gi, 'halaman sekolah')
+      .replace(/kampus sekolah/gi, 'sekolah')
+      .replace(/kampus MTs Fatahillah/gi, 'MTs Fatahillah')
+      .replace(/Kampus MTs Fatahillah/gi, 'MTs Fatahillah') as unknown as T;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => cleanCampusTermsInObject(item)) as unknown as T;
+  }
+  if (typeof obj === 'object') {
+    const res: any = {};
+    for (const key of Object.keys(obj)) {
+      res[key] = cleanCampusTermsInObject((obj as any)[key]);
+    }
+    return res as T;
+  }
+  return obj;
+}
+
+/**
  * Helper to ensure slide images or profile photos are valid web URLs or Base64
  * and never broken "media:" reference tokens.
  */
@@ -797,8 +827,9 @@ export function mergeWithDefaults(data?: Partial<SchoolSiteContent> | null): Sch
     updatedBy: sanitized.updatedBy || currentSiteContentMemory.updatedBy || 'admin_ilham',
   };
 
-  currentSiteContentMemory = merged;
-  return merged;
+  const cleaned = cleanCampusTermsInObject(merged);
+  currentSiteContentMemory = cleaned;
+  return cleaned;
 }
 
 export function mergePreservingUploads(
@@ -903,7 +934,7 @@ export function mergePreservingUploads(
     hasLocalOnlyUploads = true;
   }
 
-  return { result: res, hasLocalOnlyUploads };
+  return { result: cleanCampusTermsInObject(res), hasLocalOnlyUploads };
 }
 
 /**

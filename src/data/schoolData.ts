@@ -117,7 +117,7 @@ const DEFAULT_PROGRAMS_RAW: ProgramUnggulan[] = [
     title: 'Pembinaan Olahraga Prestasi (Futsal & Voli)',
     badge: 'Sportivitas',
     shortDesc: 'Penggemblengan fisik sehat dan ketangkasan olahraga futsal, voli, dan bulutangkis di lapangan sekolah yang representatif.',
-    fullDesc: 'Dengan sarana lapangan serbaguna di halaman kampus sekolah, tim futsal dan voli MTs Fatahillah Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi.',
+    fullDesc: 'Dengan sarana lapangan serbaguna di halaman sekolah, tim futsal dan voli MTs Fatahillah Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi.',
     icon: 'Award',
     image: '/images/slide4_lapangan.jpg',
     highlights: ['Pelatih ekstrakurikuler berdedikasi', 'Turnamen antar kelas (Class Meeting)', 'Uji tanding persahabatan', 'Penguatan daya tahan fisik dan sportivitas']
@@ -177,7 +177,7 @@ const DEFAULT_NEWS_RAW: NewsItem[] = [
     content: [
       'Panitia Penerimaan Peserta Didik Baru (PPDB) MTs Fatahillah Cimahi secara resmi membuka pendaftaran bagi lulusan SD/MI di wilayah Kota Cimahi, Bandung Barat, dan sekitarnya untuk Tahun Pelajaran 2027/2028.',
       'MTs Fatahillah Cimahi menawarkan keunggulan lingkungan belajar yang aman, bimbingan akhlak intensif, laboratorium komputer lengkap untuk ujian digital, serta beragam beasiswa kemudahan biaya pendidikan bagi siswa berprestasi dan keluarga pemegang KIP/PKH.',
-      'Pendaftaran dapat dilakukan langsung di loket Tata Usaha kampus MTs Fatahillah Cimahi Jl. Cigugur Tengah No. 45 atau secara online melalui formulir resmi website ini.'
+      'Pendaftaran dapat dilakukan langsung di loket Tata Usaha MTs Fatahillah Cimahi Jl. Cigugur Tengah No. 45 atau secara online melalui formulir resmi website ini.'
     ]
   },
   {
@@ -307,7 +307,7 @@ const DEFAULT_FACILITIES_RAW: FacilityItem[] = [
     id: 'fac-1',
     name: 'Gedung Sekolah Representatif 2 Lantai',
     category: 'Akademik',
-    description: 'Bangunan kampus yang kokoh, rapi, bertingkat dua dengan selasar teduh dan sirkulasi udara alami yang segar untuk kenyamanan belajar setiap kelas.',
+    description: 'Bangunan sekolah yang kokoh, rapi, bertingkat dua dengan selasar teduh dan sirkulasi udara alami yang segar untuk kenyamanan belajar setiap kelas.',
     image: '/images/slide1_gedung.jpg',
     features: ['Ruang Kelas Berpapan Tulis & Audio', 'Ventilasi & Pencahayaan Alami', 'Selasar Lantai Dua Teduh', 'Akses Tangga Aman & Nyaman']
   },
@@ -596,7 +596,7 @@ export const FAQ_LIST: FaqItem[] = [
     category: 'Fasilitas'
   },
   {
-    question: 'Di mana lokasi kampus MTs Fatahillah Cimahi?',
+    question: 'Di mana lokasi sekolah MTs Fatahillah Cimahi?',
     answer: 'MTs Fatahillah Cimahi berlokasi di Jl. Cigugur Tengah No. 45, Kelurahan Cigugur Tengah, Kecamatan Cimahi Tengah, Kota Cimahi, Jawa Barat 40522. Lokasinya strategis dan mudah dijangkau dari berbagai titik Kota Cimahi.',
     category: 'Umum'
   },

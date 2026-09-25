@@ -14,7 +14,7 @@ export const PERSISTED_USER_CONTENT: Partial<SchoolSiteContent> = {
       ],
       "id": "fac-1",
       "category": "Akademik",
-      "description": "Bangunan kampus yang kokoh, rapi, bertingkat dua dengan selasar teduh dan sirkulasi udara alami yang segar untuk kenyamanan belajar setiap kelas."
+      "description": "Bangunan sekolah yang kokoh, rapi, bertingkat dua dengan selasar teduh dan sirkulasi udara alami yang segar untuk kenyamanan belajar setiap kelas."
     },
     {
       "features": [
@@ -158,7 +158,7 @@ export const PERSISTED_USER_CONTENT: Partial<SchoolSiteContent> = {
       "content": [
         "Panitia Penerimaan Peserta Didik Baru (PPDB) MTs Fatahillah Cimahi secara resmi membuka pendaftaran bagi lulusan SD/MI di wilayah Kota Cimahi, Bandung Barat, dan sekitarnya untuk Tahun Pelajaran 2025/2026.",
         "MTs Fatahillah Cimahi menawarkan keunggulan lingkungan belajar yang aman, bimbingan akhlak intensif, laboratorium komputer lengkap untuk ujian digital, serta beragam beasiswa kemudahan biaya pendidikan bagi siswa berprestasi dan keluarga pemegang KIP/PKH.",
-        "Pendaftaran dapat dilakukan langsung di loket Tata Usaha kampus MTs Fatahillah Cimahi Jl. Cigugur Tengah No. 45 atau secara online melalui formulir resmi website ini."
+        "Pendaftaran dapat dilakukan langsung di loket Tata Usaha MTs Fatahillah Cimahi Jl. Cigugur Tengah No. 45 atau secara online melalui formulir resmi website ini."
       ],
       "category": "Pengumuman",
       "featured": true,
@@ -284,7 +284,7 @@ export const PERSISTED_USER_CONTENT: Partial<SchoolSiteContent> = {
       "id": "olahraga",
       "icon": "Award",
       "image": "/images/slide4_lapangan.jpg",
-      "fullDesc": "Dengan sarana lapangan serbaguna di halaman kampus sekolah, tim futsal dan voli MTs Fatahillah Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi.",
+      "fullDesc": "Dengan sarana lapangan serbaguna di halaman sekolah, tim futsal dan voli MTs Fatahillah Cimahi rutin mengadakan sesi latihan terstruktur serta pertandingan persahabatan antar sekolah menengah pertama di Kota Cimahi.",
       "badge": "Sportivitas",
       "title": "Pembinaan Olahraga Prestasi (Futsal & Voli)",
       "highlights": [

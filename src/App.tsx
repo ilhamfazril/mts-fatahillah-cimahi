@@ -336,7 +336,7 @@ export default function App() {
                   Sarana & Prasarana
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
-                  Sarana & Fasilitas Kampus MTs Fatahillah Cimahi
+                  Sarana & Fasilitas Sekolah MTs Fatahillah Cimahi
                 </h1>
                 <p className="text-xs sm:text-sm text-emerald-200 mt-1">
                   Dukungan sarana laboratorium komputer CBT/ANBK, ruang kelas nyaman, perpustakaan, dan lapangan olahraga.

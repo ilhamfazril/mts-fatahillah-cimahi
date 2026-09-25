@@ -113,7 +113,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
     },
     {
       id: 'facilities',
-      label: 'Fasilitas Kampus',
+      label: 'Fasilitas Sekolah',
       count: content.facilities.length,
       unit: 'Sarana & prasarana',
       icon: <Building2 className="w-5 h-5 text-teal-600" />,

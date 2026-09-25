@@ -16,7 +16,7 @@ function readLiveContent(): any {
   try {
     if (fs.existsSync(CONTENT_FILE_PATH)) {
       const raw = fs.readFileSync(CONTENT_FILE_PATH, 'utf8');
-      return JSON.parse(raw);
+      return cleanCampusTerms(JSON.parse(raw));
     }
   } catch (err) {
     console.warn('Error reading live_site_content.json:', err);
@@ -24,13 +24,41 @@ function readLiveContent(): any {
   return null;
 }
 
+function cleanCampusTerms(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'string') {
+    return obj
+      .replace(/fasilitas kampus/gi, (match) => (match === 'Fasilitas Kampus' ? 'Fasilitas Sekolah' : match === 'FASILITAS KAMPUS' ? 'FASILITAS SEKOLAH' : 'fasilitas sekolah'))
+      .replace(/lokasi kampus/gi, (match) => (match === 'Lokasi Kampus' ? 'Lokasi Sekolah' : match === 'LOKASI KAMPUS' ? 'LOKASI SEKOLAH' : 'lokasi sekolah'))
+      .replace(/area kampus/gi, (match) => (match === 'Area Kampus' ? 'Area Sekolah' : match === 'AREA KAMPUS' ? 'AREA SEKOLAH' : 'area sekolah'))
+      .replace(/bangunan kampus/gi, (match) => (match === 'Bangunan Kampus' ? 'Bangunan Sekolah' : match === 'BANGUNAN KAMPUS' ? 'BANGUNAN SEKOLAH' : 'bangunan sekolah'))
+      .replace(/halaman kampus sekolah/gi, 'halaman sekolah')
+      .replace(/halaman kampus/gi, 'halaman sekolah')
+      .replace(/kampus sekolah/gi, 'sekolah')
+      .replace(/kampus MTs Fatahillah/gi, 'MTs Fatahillah')
+      .replace(/Kampus MTs Fatahillah/gi, 'MTs Fatahillah');
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(cleanCampusTerms);
+  }
+  if (typeof obj === 'object') {
+    const res: any = {};
+    for (const key of Object.keys(obj)) {
+      res[key] = cleanCampusTerms(obj[key]);
+    }
+    return res;
+  }
+  return obj;
+}
+
 function writeLiveContent(data: any): boolean {
   try {
+    const cleaned = cleanCampusTerms(data);
     const dir = path.dirname(CONTENT_FILE_PATH);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(CONTENT_FILE_PATH, JSON.stringify(data, null, 2), 'utf8');
+    fs.writeFileSync(CONTENT_FILE_PATH, JSON.stringify(cleaned, null, 2), 'utf8');
     return true;
   } catch (err) {
     console.error('Error writing live_site_content.json:', err);

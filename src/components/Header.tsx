@@ -440,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <Phone className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Kontak & Lokasi Kampus</div>
+                        <div className="font-bold text-slate-900 group-hover:text-emerald-900">Kontak & Lokasi Sekolah</div>
                         <div className="text-[11px] text-slate-400">Peta, WhatsApp resmi & layanan info</div>
                       </div>
                     </button>
@@ -752,7 +752,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-xs truncate">Kontak & Lokasi Kampus</div>
+                    <div className="font-bold text-xs truncate">Kontak & Lokasi Sekolah</div>
                     <div className="text-[10px] text-slate-500 truncate">Peta, kontak WhatsApp & pengaduan</div>
                   </div>
                 </button>
